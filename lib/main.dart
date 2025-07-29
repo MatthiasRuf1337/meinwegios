@@ -1,0 +1,66 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import 'models/etappe.dart';
+import 'models/bild.dart';
+import 'models/medien_datei.dart';
+import 'models/app_settings.dart';
+import 'providers/etappen_provider.dart';
+import 'providers/bilder_provider.dart';
+import 'providers/medien_provider.dart';
+import 'providers/settings_provider.dart';
+import 'screens/onboarding_screen.dart';
+import 'screens/main_navigation.dart';
+import 'services/database_service.dart';
+import 'services/permission_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Datenbank initialisieren
+  await DatabaseService.instance.initDatabase();
+  
+  // Berechtigungen prüfen
+  await PermissionService.requestInitialPermissions();
+  
+  runApp(MeinWegApp());
+}
+
+class MeinWegApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => EtappenProvider()),
+        ChangeNotifierProvider(create: (_) => BilderProvider()),
+        ChangeNotifierProvider(create: (_) => MedienProvider()),
+      ],
+      child: Consumer<SettingsProvider>(
+        builder: (context, settingsProvider, child) {
+          return MaterialApp(
+            title: 'MeinWeg - Etappen-Tracker',
+            theme: ThemeData(
+              colorScheme: ColorScheme.light(
+                primary: Color(0xFF00847E),
+              ),
+              brightness: Brightness.light,
+            ),
+            darkTheme: ThemeData(
+              colorScheme: ColorScheme.dark(
+                primary: Color(0xFF00847E),
+              ),
+              brightness: Brightness.dark,
+            ),
+            home: settingsProvider.isFirstAppUsage 
+                ? OnboardingScreen() 
+                : MainNavigation(),
+            debugShowCheckedModeBanner: false,
+          );
+        },
+      ),
+    );
+  }
+} 
