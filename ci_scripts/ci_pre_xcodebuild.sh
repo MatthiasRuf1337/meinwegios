@@ -73,6 +73,20 @@ if [ -f "ios/Flutter/Generated.xcconfig" ]; then
     echo "✅ Generated.xcconfig created successfully!"
     echo "📄 Generated.xcconfig content:"
     head -5 ios/Flutter/Generated.xcconfig
+    
+    # CRITICAL: Copy Flutter config files to ROOT where Xcode Cloud expects them
+    echo "📋 Copying Flutter config files to Xcode Cloud expected location..."
+    mkdir -p Flutter
+    cp -r ios/Flutter/* Flutter/
+    echo "✅ Flutter files copied to root Flutter/ directory"
+    
+    # Verify the copy worked
+    if [ -f "Flutter/Generated.xcconfig" ]; then
+        echo "✅ Generated.xcconfig now available at root Flutter/ location"
+    else
+        echo "❌ Failed to copy Generated.xcconfig to root location"
+        exit 1
+    fi
 else
     echo "❌ Generated.xcconfig was not created!"
     exit 1
