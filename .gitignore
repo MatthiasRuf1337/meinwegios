@@ -72,6 +72,30 @@ app.*.map.json
 *.tmp
 *.temp
 
+# Additional iOS specific (from GitHub repository)
+**/dgph
+*.mode1v3
+*.mode2v3
+*.moved-aside
+*.pbxuser
+*.perspectivev3
+**/*sync/
+.sconsign.dblite
+.tags*
+**/.vagrant/
+**/DerivedData/
+Icon?
+**/.symlinks/
+profile
+xcuserdata
+**/.generated/
+
+# Exceptions to above rules.
+!default.mode1v3
+!default.mode2v3
+!default.pbxuser
+!default.perspectivev3
+
 # Embedded repositories (Flutter SDK and iOS project)
 /flutter/
-/ios/ 
+/ios/
