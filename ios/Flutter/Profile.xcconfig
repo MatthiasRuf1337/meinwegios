@@ -1,22 +1,2 @@
-// Flutter configuration for Profile mode - self-contained for Xcode Cloud
-FLUTTER_TARGET=lib/main.dart
-FLUTTER_BUILD_MODE=profile
-FLUTTER_FRAMEWORK_DIR=${FLUTTER_ROOT}/bin/cache/artifacts/engine/ios-profile
-SYMROOT=${SRCROOT}/../build/ios
-FLUTTER_BUILD_NAME=1.0.0
-FLUTTER_BUILD_NUMBER=1
-DART_DEFINES=
-DART_OBFUSCATION=false
-TRACK_WIDGET_CREATION=false
-TREE_SHAKE_ICONS=false
-EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386
-
-// Flutter Root (fallback for Xcode Cloud)
-FLUTTER_ROOT=/tmp/flutter
-
-// Dart defines
-GCC_PREPROCESSOR_DEFINITIONS=$(inherited) FLUTTER_BUILD_MODE=profile DART_VM_PRODUCT=1
-
-// Optional includes - will be ignored if files don't exist
-#include? "../Pods/Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"
-#include? "Generated.xcconfig"
+#include "../Pods/Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"
+#include "Generated.xcconfig"
