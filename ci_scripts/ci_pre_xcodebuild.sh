@@ -45,6 +45,13 @@ flutter doctor --no-version-check
 echo "📦 Installing Flutter dependencies..."
 flutter pub get
 
+# Ensure asset directories exist (even if empty)
+echo "📁 Ensuring asset directories exist..."
+mkdir -p assets/images
+mkdir -p assets/audio
+mkdir -p assets/pdf
+echo "✅ Asset directories created/verified"
+
 # Precache iOS engine artifacts (IMPORTANT!)
 echo "⚙️ Downloading Flutter iOS engine artifacts..."
 flutter precache --ios
@@ -101,6 +108,16 @@ if [ -f "ios/Runner/GeneratedPluginRegistrant.h" ]; then
     echo "✅ GeneratedPluginRegistrant.h copied to Runner/ directory"
 else
     echo "❌ GeneratedPluginRegistrant.h not found in ios/Runner/!"
+    exit 1
+fi
+
+# CRITICAL: Copy GeneratedPluginRegistrant.m to Runner/ where Xcode expects it
+echo "📋 Copying GeneratedPluginRegistrant.m to Runner/ directory..."
+if [ -f "ios/Runner/GeneratedPluginRegistrant.m" ]; then
+    cp ios/Runner/GeneratedPluginRegistrant.m Runner/
+    echo "✅ GeneratedPluginRegistrant.m copied to Runner/ directory"
+else
+    echo "❌ GeneratedPluginRegistrant.m not found in ios/Runner/!"
     exit 1
 fi
 
