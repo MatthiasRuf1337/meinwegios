@@ -83,27 +83,37 @@ if [ -f "ios/Flutter/Generated.xcconfig" ]; then
     echo "✅ Generated.xcconfig created successfully!"
     echo "📄 Generated.xcconfig content:"
     head -5 ios/Flutter/Generated.xcconfig
-    
-    # CRITICAL: Copy Flutter config files to ROOT where Xcode Cloud expects them
-    echo "📋 Copying Flutter config files to Xcode Cloud expected location..."
-    mkdir -p Flutter
-    cp -r ios/Flutter/* Flutter/
-    echo "✅ Flutter files copied to root Flutter/ directory"
-    
-    # Paths are already correct: ../Pods/ from Flutter/ points to ROOT Pods/
-    echo "✅ Relative paths ../Pods/ are correct from Flutter/ to ROOT Pods/"
-    
-    # Verify the copy worked
-    if [ -f "Flutter/Generated.xcconfig" ]; then
-        echo "✅ Generated.xcconfig now available at root Flutter/ location"
-    else
-        echo "❌ Failed to copy Generated.xcconfig to root location"
-        exit 1
-    fi
 else
     echo "❌ Generated.xcconfig was not created!"
     exit 1
 fi
+
+# CRITICAL: Copy Flutter config files to ROOT where Xcode Cloud expects them
+echo "📋 Copying Flutter config files to Xcode Cloud expected location..."
+mkdir -p Flutter
+cp -r ios/Flutter/* Flutter/
+echo "✅ Flutter files copied to root Flutter/ directory"
+
+# CRITICAL: Copy GeneratedPluginRegistrant.h to Runner/ where bridging header expects it
+echo "📋 Copying GeneratedPluginRegistrant.h to Runner/ directory..."
+if [ -f "ios/Runner/GeneratedPluginRegistrant.h" ]; then
+    cp ios/Runner/GeneratedPluginRegistrant.h Runner/
+    echo "✅ GeneratedPluginRegistrant.h copied to Runner/ directory"
+else
+    echo "❌ GeneratedPluginRegistrant.h not found in ios/Runner/!"
+    exit 1
+fi
+
+# Verify the copy worked
+if [ -f "Flutter/Generated.xcconfig" ]; then
+    echo "✅ Generated.xcconfig now available at root Flutter/ location"
+else
+    echo "❌ Failed to copy Generated.xcconfig to root location"
+    exit 1
+fi
+
+# Paths are already correct: ../Pods/ from Flutter/ points to ROOT Pods/
+echo "✅ Relative paths ../Pods/ are correct from Flutter/ to ROOT Pods/"
 
 echo "🎉 Flutter setup completed successfully for Xcode Cloud!"
 exit 0
