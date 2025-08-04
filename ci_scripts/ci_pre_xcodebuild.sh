@@ -45,6 +45,10 @@ flutter doctor --no-version-check
 echo "📦 Installing Flutter dependencies..."
 flutter pub get
 
+# Precache iOS engine artifacts (IMPORTANT!)
+echo "⚙️ Downloading Flutter iOS engine artifacts..."
+flutter precache --ios
+
 # Navigate to iOS directory and install CocoaPods
 echo "📱 Setting up iOS..."
 cd ios
