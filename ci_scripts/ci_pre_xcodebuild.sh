@@ -64,6 +64,16 @@ fi
 
 cd ..
 
+# CRITICAL: Copy Pods directory to ROOT where Xcode Cloud expects it
+echo "📁 Copying Pods directory to Xcode Cloud expected location..."
+if [ -d "ios/Pods" ]; then
+    cp -r ios/Pods .
+    echo "✅ Pods directory copied to root location"
+else
+    echo "❌ ios/Pods directory not found!"
+    exit 1
+fi
+
 # Generate Flutter iOS configuration
 echo "🔧 Generating Flutter iOS configuration..."
 flutter build ios --config-only
@@ -80,20 +90,8 @@ if [ -f "ios/Flutter/Generated.xcconfig" ]; then
     cp -r ios/Flutter/* Flutter/
     echo "✅ Flutter files copied to root Flutter/ directory"
     
-    # FIX: Update relative paths in xcconfig files for ROOT location
-    echo "🔧 Fixing relative paths in xcconfig files for ROOT location..."
-    if [ -f "Flutter/Debug.xcconfig" ]; then
-        sed -i '' 's|../Pods/|ios/Pods/|g' Flutter/Debug.xcconfig
-        echo "✅ Fixed paths in Debug.xcconfig"
-    fi
-    if [ -f "Flutter/Release.xcconfig" ]; then
-        sed -i '' 's|../Pods/|ios/Pods/|g' Flutter/Release.xcconfig
-        echo "✅ Fixed paths in Release.xcconfig"
-    fi
-    if [ -f "Flutter/Profile.xcconfig" ]; then
-        sed -i '' 's|../Pods/|ios/Pods/|g' Flutter/Profile.xcconfig
-        echo "✅ Fixed paths in Profile.xcconfig"
-    fi
+    # Paths are already correct: ../Pods/ from Flutter/ points to ROOT Pods/
+    echo "✅ Relative paths ../Pods/ are correct from Flutter/ to ROOT Pods/"
     
     # Verify the copy worked
     if [ -f "Flutter/Generated.xcconfig" ]; then
