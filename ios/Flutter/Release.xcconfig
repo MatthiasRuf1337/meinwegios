@@ -1,2 +1,14 @@
 #include? "../Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include? "Generated.xcconfig"
+
+// Fallback Flutter configuration for Release mode
+FLUTTER_TARGET=lib/main.dart
+FLUTTER_BUILD_MODE=release
+FLUTTER_FRAMEWORK_DIR=$(FLUTTER_ROOT)/bin/cache/artifacts/engine/ios-release
+SYMROOT=${SRCROOT}/../build/ios
+FLUTTER_BUILD_NAME=1.0.0
+FLUTTER_BUILD_NUMBER=1
+DART_DEFINES=
+DART_OBFUSCATION=false
+TRACK_WIDGET_CREATION=false
+TREE_SHAKE_ICONS=false
