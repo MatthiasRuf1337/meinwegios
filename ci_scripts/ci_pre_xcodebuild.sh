@@ -10,9 +10,15 @@ echo "📍 Current directory: $(pwd)"
 echo "📍 Available files:"
 ls -la
 
+# Navigate to project root (parent directory)
+cd ..
+echo "📍 Moved to project root: $(pwd)"
+
 # Check if we're in the right directory  
 if [ ! -f "pubspec.yaml" ]; then
-    echo "❌ Error: pubspec.yaml not found"
+    echo "❌ Error: pubspec.yaml not found even in project root"
+    echo "📁 Files in current directory:"
+    ls -la
     exit 1
 fi
 
