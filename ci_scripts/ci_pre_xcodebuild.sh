@@ -80,6 +80,21 @@ if [ -f "ios/Flutter/Generated.xcconfig" ]; then
     cp -r ios/Flutter/* Flutter/
     echo "✅ Flutter files copied to root Flutter/ directory"
     
+    # FIX: Update relative paths in xcconfig files for ROOT location
+    echo "🔧 Fixing relative paths in xcconfig files for ROOT location..."
+    if [ -f "Flutter/Debug.xcconfig" ]; then
+        sed -i '' 's|../Pods/|ios/Pods/|g' Flutter/Debug.xcconfig
+        echo "✅ Fixed paths in Debug.xcconfig"
+    fi
+    if [ -f "Flutter/Release.xcconfig" ]; then
+        sed -i '' 's|../Pods/|ios/Pods/|g' Flutter/Release.xcconfig
+        echo "✅ Fixed paths in Release.xcconfig"
+    fi
+    if [ -f "Flutter/Profile.xcconfig" ]; then
+        sed -i '' 's|../Pods/|ios/Pods/|g' Flutter/Profile.xcconfig
+        echo "✅ Fixed paths in Profile.xcconfig"
+    fi
+    
     # Verify the copy worked
     if [ -f "Flutter/Generated.xcconfig" ]; then
         echo "✅ Generated.xcconfig now available at root Flutter/ location"
