@@ -7,6 +7,19 @@ set -e
 
 echo "🔧 Configuring Xcode Cloud for Runner-Release schema..."
 
+# Zum Projekt-Root wechseln
+cd /Volumes/workspace/repository
+echo "📍 Working directory: $(pwd)"
+
+# Überprüfen ob wir im richtigen Verzeichnis sind
+if [ ! -f "pubspec.yaml" ]; then
+    echo "❌ Error: pubspec.yaml not found. Current directory: $(pwd)"
+    ls -la
+    exit 1
+fi
+
+echo "✅ Found pubspec.yaml - we're in the Flutter project"
+
 # Flutter Setup
 echo "📦 Installing Flutter dependencies..."
 flutter pub get
@@ -14,6 +27,11 @@ flutter pub get
 # iOS Setup
 echo "🍎 Installing iOS dependencies..."
 cd ios
+if [ ! -f "Podfile" ]; then
+    echo "❌ Error: Podfile not found in ios directory"
+    exit 1
+fi
+
 pod install
 cd ..
 
@@ -23,6 +41,8 @@ if [ -f "ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner-Release.xcscheme" ];
     echo "✅ Runner-Release schema found"
 else
     echo "❌ Runner-Release schema not found!"
+    echo "Available schemas:"
+    ls -la ios/Runner.xcodeproj/xcshareddata/xcschemes/
     exit 1
 fi
 
