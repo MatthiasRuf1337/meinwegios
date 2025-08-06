@@ -5,7 +5,12 @@ set -e
 
 echo "🔧 Setting up Xcode Cloud build with Runner-Release schema..."
 
+# Zum Projekt-Root wechseln
+cd /Volumes/workspace/repository
+echo "📍 Working directory: $(pwd)"
+
 # Pods installieren
+echo "🍎 Installing CocoaPods dependencies..."
 cd ios
 pod install
 cd ..
