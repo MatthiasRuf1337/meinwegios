@@ -44,6 +44,10 @@ echo "✅ Found pubspec.yaml - we're in the Flutter project"
 echo "📦 Installing Flutter dependencies..."
 flutter pub get
 
+# Flutter iOS Engine precache (WICHTIG für pod install)
+echo "⚙️ Pre-caching Flutter iOS engine..."
+flutter precache --ios
+
 # Verifizieren dass Generated.xcconfig erstellt wurde
 echo "🔍 Verifying Flutter generated files..."
 if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
@@ -54,7 +58,17 @@ if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
 fi
 echo "✅ Generated.xcconfig found"
 
-# Pods installieren (NACH flutter pub get)
+# Verifizieren dass Flutter.xcframework existiert
+echo "🔍 Verifying Flutter iOS engine..."
+if [ ! -d "/tmp/flutter/bin/cache/artifacts/engine/ios/Flutter.xcframework" ]; then
+    echo "❌ Error: Flutter.xcframework not found after flutter precache --ios"
+    echo "Flutter cache directory:"
+    ls -la /tmp/flutter/bin/cache/artifacts/engine/ios/ || echo "iOS engine directory not found"
+    exit 1
+fi
+echo "✅ Flutter.xcframework found"
+
+# Pods installieren (NACH flutter precache --ios)
 echo "🍎 Installing CocoaPods dependencies..."
 cd ios
 if [ ! -f "Podfile" ]; then
