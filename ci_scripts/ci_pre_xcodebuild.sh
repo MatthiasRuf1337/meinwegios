@@ -92,8 +92,8 @@ flutter build ios --release --no-codesign
 echo "🏗️ Building with Runner-Release schema..."
 # Wir sind jetzt im Projekt-Root, also cd ios
 cd ios
-if [ ! -f "Runner.xcworkspace" ]; then
-    echo "❌ Error: Runner.xcworkspace not found in ios directory"
+if [ ! -d "Runner.xcworkspace" ]; then
+    echo "❌ Error: Runner.xcworkspace directory not found in ios directory"
     echo "Current directory: $(pwd)"
     echo "Available files:"
     ls -la
