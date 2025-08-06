@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 enum MedienTyp {
   pdf,
   mp3,
@@ -30,11 +32,25 @@ class MedienDatei {
       'dateipfad': dateipfad,
       'groesse': groesse,
       'importDatum': importDatum.millisecondsSinceEpoch,
-      'metadaten': metadaten,
+      'metadaten': json.encode(metadaten),
     };
   }
 
   factory MedienDatei.fromMap(Map<String, dynamic> map) {
+    Map<String, dynamic> metadaten = {};
+    if (map['metadaten'] != null) {
+      try {
+        if (map['metadaten'] is String) {
+          metadaten = Map<String, dynamic>.from(json.decode(map['metadaten']));
+        } else {
+          metadaten = Map<String, dynamic>.from(map['metadaten']);
+        }
+      } catch (e) {
+        print('Fehler beim Parsen der Metadaten: $e');
+        metadaten = {};
+      }
+    }
+
     return MedienDatei(
       id: map['id'],
       typ: MedienTyp.values[map['typ']],
@@ -42,7 +58,7 @@ class MedienDatei {
       dateipfad: map['dateipfad'],
       groesse: map['groesse'],
       importDatum: DateTime.fromMillisecondsSinceEpoch(map['importDatum']),
-      metadaten: Map<String, dynamic>.from(map['metadaten'] ?? {}),
+      metadaten: metadaten,
     );
   }
 
@@ -82,4 +98,4 @@ class MedienDatei {
 
   bool get istPDF => typ == MedienTyp.pdf;
   bool get istMP3 => typ == MedienTyp.mp3;
-} 
+}

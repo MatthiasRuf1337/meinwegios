@@ -6,7 +6,8 @@ import 'dart:io';
 class AudioPlayerScreen extends StatefulWidget {
   final MedienDatei medienDatei;
 
-  const AudioPlayerScreen({Key? key, required this.medienDatei}) : super(key: key);
+  const AudioPlayerScreen({Key? key, required this.medienDatei})
+      : super(key: key);
 
   @override
   _AudioPlayerScreenState createState() => _AudioPlayerScreenState();
@@ -28,7 +29,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   Future<void> _initAudioPlayer() async {
     _audioPlayer = AudioPlayer();
-    
+
     try {
       // Prüfen ob die Datei existiert
       final file = File(widget.medienDatei.dateipfad);
@@ -42,10 +43,10 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
       // Audio laden
       await _audioPlayer.setFilePath(widget.medienDatei.dateipfad);
-      
+
       // Duration abrufen
       _duration = _audioPlayer.duration ?? Duration.zero;
-      
+
       // Listener für Position und Status
       _audioPlayer.positionStream.listen((position) {
         setState(() {
@@ -81,21 +82,30 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.medienDatei.dateiname),
+        title: Text(
+          widget.medienDatei.dateiname,
+          style: TextStyle(fontSize: 16),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         backgroundColor: Color(0xFF00847E),
         foregroundColor: Colors.white,
+        toolbarHeight: 56,
         actions: [
           IconButton(
-            icon: Icon(Icons.playlist_play),
+            icon: Icon(Icons.playlist_play, size: 20),
             onPressed: () => _showPlaylist(context),
+            padding: EdgeInsets.all(8),
           ),
           IconButton(
-            icon: Icon(Icons.shuffle),
+            icon: Icon(Icons.shuffle, size: 20),
             onPressed: () => _toggleShuffle(),
+            padding: EdgeInsets.all(8),
           ),
           IconButton(
-            icon: Icon(Icons.repeat),
+            icon: Icon(Icons.repeat, size: 20),
             onPressed: () => _toggleRepeat(),
+            padding: EdgeInsets.all(8),
           ),
         ],
       ),
@@ -187,13 +197,14 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   Widget _buildPlayerContent() {
     return Container(
       color: Colors.grey.shade100,
-      child: Column(
-        children: [
-          // Album Art Placeholder
-          Expanded(
-            flex: 3,
-            child: Container(
-              margin: EdgeInsets.all(32.0),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Album Art Placeholder
+            Container(
+              height: 200,
+              width: 200,
+              margin: EdgeInsets.all(24.0),
               decoration: BoxDecoration(
                 color: Color(0xFF00847E),
                 borderRadius: BorderRadius.circular(20),
@@ -207,53 +218,55 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               ),
               child: Icon(
                 Icons.music_note,
-                size: 80,
+                size: 60,
                 color: Colors.white,
               ),
             ),
-          ),
 
-          // Audio Info
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  Text(
-                    widget.medienDatei.dateiname,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade800,
+            // Audio Info
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.medienDatei.dateiname,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade800,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Audio-Datei',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
+                    SizedBox(height: 8),
+                    Text(
+                      'Audio-Datei',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 32),
+                    SizedBox(height: 32),
 
-                  // Progress Bar
-                  _buildProgressBar(),
-                  SizedBox(height: 16),
+                    // Progress Bar
+                    _buildProgressBar(),
+                    SizedBox(height: 12),
 
-                  // Time Display
-                  _buildTimeDisplay(),
-                  SizedBox(height: 32),
+                    // Time Display
+                    _buildTimeDisplay(),
+                    SizedBox(height: 24),
 
-                  // Controls
-                  _buildControls(),
-                ],
+                    // Controls
+                    _buildControls(),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -302,9 +315,10 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
-          icon: Icon(Icons.skip_previous, size: 32),
+          icon: Icon(Icons.skip_previous, size: 28),
           onPressed: _previousTrack,
           color: Color(0xFF00847E),
+          padding: EdgeInsets.all(8),
         ),
         Container(
           decoration: BoxDecoration(
@@ -314,16 +328,18 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
           child: IconButton(
             icon: Icon(
               _isPlaying ? Icons.pause : Icons.play_arrow,
-              size: 32,
+              size: 28,
             ),
             onPressed: _togglePlayPause,
             color: Colors.white,
+            padding: EdgeInsets.all(8),
           ),
         ),
         IconButton(
-          icon: Icon(Icons.skip_next, size: 32),
+          icon: Icon(Icons.skip_next, size: 28),
           onPressed: _nextTrack,
           color: Color(0xFF00847E),
+          padding: EdgeInsets.all(8),
         ),
       ],
     );
@@ -388,4 +404,4 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       ),
     );
   }
-} 
+}

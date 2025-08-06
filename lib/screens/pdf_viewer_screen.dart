@@ -6,7 +6,8 @@ import 'dart:io';
 class PDFViewerScreen extends StatefulWidget {
   final MedienDatei medienDatei;
 
-  const PDFViewerScreen({Key? key, required this.medienDatei}) : super(key: key);
+  const PDFViewerScreen({Key? key, required this.medienDatei})
+      : super(key: key);
 
   @override
   _PDFViewerScreenState createState() => _PDFViewerScreenState();
@@ -128,6 +129,30 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   }
 
   Widget _buildPDFContent() {
+    // Prüfen ob Datei existiert
+    final file = File(widget.medienDatei.dateipfad);
+    if (!file.existsSync()) {
+      setState(() {
+        _error = 'PDF-Datei nicht gefunden: ${widget.medienDatei.dateipfad}';
+        _isLoading = false;
+      });
+      return _buildErrorState();
+    }
+
+    print('Lade PDF von: ${widget.medienDatei.dateipfad}');
+    print('Datei existiert: ${file.existsSync()}');
+    print('Dateigröße: ${file.lengthSync()} bytes');
+
+    // Timeout für PDF-Laden hinzufügen
+    Future.delayed(Duration(seconds: 10), () {
+      if (_isLoading) {
+        setState(() {
+          _error = 'PDF-Laden hat zu lange gedauert. Versuchen Sie es erneut.';
+          _isLoading = false;
+        });
+      }
+    });
+
     return PDFView(
       filePath: widget.medienDatei.dateipfad,
       enableSwipe: true,
@@ -139,18 +164,21 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       fitPolicy: FitPolicy.BOTH,
       preventLinkNavigation: false,
       onRender: (pages) {
+        print('PDF erfolgreich geladen, Seiten: $pages');
         setState(() {
           _totalPages = pages!;
           _isLoading = false;
         });
       },
       onError: (error) {
+        print('PDF Fehler: $error');
         setState(() {
           _error = error.toString();
           _isLoading = false;
         });
       },
       onPageError: (page, error) {
+        print('PDF Seitenfehler: Seite $page - $error');
         setState(() {
           _error = 'Fehler auf Seite $page: $error';
         });
@@ -279,4 +307,4 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
       ),
     );
   }
-} 
+}

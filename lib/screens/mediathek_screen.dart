@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:open_file/open_file.dart';
+import 'dart:io';
 import '../providers/medien_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/medien_datei.dart';
 import 'mediathek_login_screen.dart';
 import 'pdf_viewer_screen.dart';
+import 'pdf_viewer_screen_alternative.dart';
+import 'pdf_viewer_simple.dart';
 import 'audio_player_screen.dart';
 
 class MediathekScreen extends StatefulWidget {
@@ -53,13 +57,14 @@ class _MediathekScreenState extends State<MediathekScreen> {
               Expanded(
                 child: Consumer<MedienProvider>(
                   builder: (context, medienProvider, child) {
-                    final medien = medienProvider.medienDateien
-                        .where((medien) {
-                          final matchesSearch = medien.dateiname.toLowerCase().contains(_searchQuery.toLowerCase());
-                          final matchesType = _selectedType == null || medien.typ == _selectedType;
-                          return matchesSearch && matchesType;
-                        })
-                        .toList();
+                    final medien = medienProvider.medienDateien.where((medien) {
+                      final matchesSearch = medien.dateiname
+                          .toLowerCase()
+                          .contains(_searchQuery.toLowerCase());
+                      final matchesType =
+                          _selectedType == null || medien.typ == _selectedType;
+                      return matchesSearch && matchesType;
+                    }).toList();
 
                     if (medien.isEmpty) {
                       return _buildEmptyState();
@@ -155,8 +160,12 @@ class _MediathekScreenState extends State<MediathekScreen> {
     return Consumer<MedienProvider>(
       builder: (context, medienProvider, child) {
         final totalMedien = medienProvider.medienDateien.length;
-                 final pdfCount = medienProvider.medienDateien.where((m) => m.typ == MedienTyp.pdf).length;
-         final mp3Count = medienProvider.medienDateien.where((m) => m.typ == MedienTyp.mp3).length;
+        final pdfCount = medienProvider.medienDateien
+            .where((m) => m.typ == MedienTyp.pdf)
+            .length;
+        final mp3Count = medienProvider.medienDateien
+            .where((m) => m.typ == MedienTyp.mp3)
+            .length;
 
         return Container(
           padding: EdgeInsets.all(16.0),
@@ -169,7 +178,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem('Gesamt', totalMedien.toString(), Icons.library_books),
+              _buildStatItem(
+                  'Gesamt', totalMedien.toString(), Icons.library_books),
               _buildStatItem('PDF', pdfCount.toString(), Icons.picture_as_pdf),
               _buildStatItem('MP3', mp3Count.toString(), Icons.audiotrack),
             ],
@@ -252,17 +262,17 @@ class _MediathekScreenState extends State<MediathekScreen> {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: medienDatei.typ == MedienTyp.pdf 
-                ? Colors.red.shade100 
+            color: medienDatei.typ == MedienTyp.pdf
+                ? Colors.red.shade100
                 : Colors.blue.shade100,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
-            medienDatei.typ == MedienTyp.pdf 
-                ? Icons.picture_as_pdf 
+            medienDatei.typ == MedienTyp.pdf
+                ? Icons.picture_as_pdf
                 : Icons.audiotrack,
-            color: medienDatei.typ == MedienTyp.pdf 
-                ? Colors.red.shade600 
+            color: medienDatei.typ == MedienTyp.pdf
+                ? Colors.red.shade600
                 : Colors.blue.shade600,
           ),
         ),
@@ -323,14 +333,36 @@ class _MediathekScreenState extends State<MediathekScreen> {
     );
   }
 
-  void _openMedien(MedienDatei medienDatei) {
+  void _openMedien(MedienDatei medienDatei) async {
     if (medienDatei.typ == MedienTyp.pdf) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PDFViewerScreen(medienDatei: medienDatei),
-        ),
-      );
+      try {
+        final file = File(medienDatei.dateipfad);
+        if (file.existsSync()) {
+          final result = await OpenFile.open(medienDatei.dateipfad);
+          if (result.type != ResultType.done) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Fehler beim Öffnen der PDF: ${result.message}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('PDF-Datei nicht gefunden'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Öffnen der PDF: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else if (medienDatei.typ == MedienTyp.mp3) {
       Navigator.push(
         context,
@@ -369,7 +401,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Medien löschen'),
-        content: Text('Möchten Sie "${medienDatei.dateiname}" wirklich löschen?'),
+        content:
+            Text('Möchten Sie "${medienDatei.dateiname}" wirklich löschen?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -487,7 +520,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+              final settingsProvider =
+                  Provider.of<SettingsProvider>(context, listen: false);
               final oldPin = oldPinController.text;
               final newPin = newPinController.text;
               final confirmPin = confirmPinController.text;
@@ -543,7 +577,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
   }
 
   void _logout(BuildContext context) {
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
     settingsProvider.logoutMediathek();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -552,4 +587,4 @@ class _MediathekScreenState extends State<MediathekScreen> {
       ),
     );
   }
-} 
+}

@@ -1,39 +1,64 @@
-# Xcode Cloud Setup für Flutter
+# Xcode Cloud Setup für TestFlight
 
-## Option 1: Mit Pre-Build Script (Aktuell)
-- ✅ `ci_scripts/ci_pre_xcodebuild.sh` installiert CocoaPods
-- ✅ Fallback-Konfigurationen in xcconfig-Dateien
+## Release Schema Konfiguration
 
-## Option 2: Komplett ohne Script (Falls Script weiter fehlschlägt)
+Für TestFlight-Builds muss das **Release-Schema** verwendet werden. Wir haben ein separates Release-Schema erstellt:
 
-### Schritte für Option 2:
+### Verfügbare Schemas:
 
-1. **Script deaktivieren:**
-   ```bash
-   # Script umbenennen um es zu deaktivieren
-   mv ci_scripts/ci_pre_xcodebuild.sh ci_scripts/ci_pre_xcodebuild.sh.disabled
-   ```
+1. **Runner** (Debug) - Für Entwicklung
+2. **Runner-Release** (Release) - Für TestFlight ✅
 
-2. **Xcode Cloud Workflow Einstellungen:**
-   - In Xcode Cloud: **Workflow bearbeiten**
-   - **Build Actions** → **Pre-Actions** hinzufügen:
-   ```bash
-   # Nur CocoaPods installieren
-   cd ios && pod install
-   ```
+## Xcode Cloud Konfiguration
 
-3. **Oder komplett ohne Pre-Actions:**
-   - xcconfig-Dateien haben bereits Fallback-Konfigurationen
-   - Sollte auch ohne CocoaPods-Installation funktionieren
+### 1. Schema in Xcode Cloud auswählen:
 
-## Debugging Xcode Cloud
+- Gehen Sie zu Xcode → Product → Xcode Cloud → View Cloud Builds
+- Wählen Sie Ihr Projekt aus
+- Unter "Build Configuration" wählen Sie **Runner-Release** aus
 
-Wenn der Build fehlschlägt:
-1. **Build Logs** in Xcode Cloud prüfen
-2. **Environment Variables** prüfen  
-3. **Simplest possible solution** verwenden
+### 2. Build Settings für Release:
 
-## Aktuelle Konfiguration
-- ✅ xcconfig-Dateien haben Fallback-Flutter-Konfiguration
-- ✅ Alle Includes sind optional (`#include?`)
-- ✅ Build sollte auch ohne Script funktionieren
+```
+Build Configuration: Release
+Scheme: Runner-Release
+Archive Action: Release
+```
+
+### 3. Automatische Builds:
+
+Das Release-Schema wird automatisch für alle TestFlight-Builds verwendet.
+
+## Manueller Build für TestFlight
+
+```bash
+# Flutter Build mit Release-Konfiguration
+flutter build ios --release
+
+# Oder mit Xcode direkt
+xcodebuild -scheme Runner-Release -configuration Release archive
+```
+
+## Troubleshooting
+
+### Problem: Build kommt nicht in TestFlight
+
+**Lösung**: Stellen Sie sicher, dass das **Runner-Release** Schema verwendet wird.
+
+### Problem: Debug-Build wird hochgeladen
+
+**Lösung**: Überprüfen Sie die Xcode Cloud Einstellungen und wählen Sie das Release-Schema.
+
+## Schema Unterschiede
+
+| Schema         | Konfiguration | Verwendung            |
+| -------------- | ------------- | --------------------- |
+| Runner         | Debug         | Entwicklung, Testing  |
+| Runner-Release | Release       | TestFlight, App Store |
+
+## Nächste Schritte
+
+1. Öffnen Sie Xcode
+2. Wählen Sie das **Runner-Release** Schema aus
+3. Führen Sie einen neuen Cloud Build aus
+4. Das Build sollte jetzt in TestFlight erscheinen

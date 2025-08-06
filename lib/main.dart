@@ -18,13 +18,16 @@ import 'services/permission_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Datenbank initialisieren
   await DatabaseService.instance.initDatabase();
-  
+
+  // Vorab geladene Medien (PDFs und MP3s) importieren
+  await DatabaseService.instance.importPreloadedMedia();
+
   // Berechtigungen prüfen
   await PermissionService.requestInitialPermissions();
-  
+
   runApp(MeinWegApp());
 }
 
@@ -54,8 +57,8 @@ class MeinWegApp extends StatelessWidget {
               ),
               brightness: Brightness.dark,
             ),
-            home: settingsProvider.isFirstAppUsage 
-                ? OnboardingScreen() 
+            home: settingsProvider.isFirstAppUsage
+                ? OnboardingScreen()
                 : MainNavigation(),
             debugShowCheckedModeBanner: false,
           );
@@ -63,4 +66,4 @@ class MeinWegApp extends StatelessWidget {
       ),
     );
   }
-} 
+}
