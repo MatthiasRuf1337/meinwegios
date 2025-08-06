@@ -28,22 +28,6 @@ fi
 
 echo "✅ Found pubspec.yaml - we're in the Flutter project"
 
-# iOS Setup (Flutter wird später im Pre-Build Script behandelt)
-echo "🍎 Installing iOS dependencies..."
-cd ios
-if [ ! -f "Podfile" ]; then
-    echo "❌ Error: Podfile not found in ios directory"
-    exit 1
-fi
-
-if command -v pod >/dev/null 2>&1; then
-    pod install
-else
-    echo "❌ Error: pod command not available"
-    exit 1
-fi
-cd ..
-
 # Verify Runner-Release schema exists
 echo "🔍 Verifying Runner-Release schema..."
 if [ -f "ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner-Release.xcscheme" ]; then
@@ -59,4 +43,5 @@ fi
 export XCODE_CLOUD_SCHEME="Runner-Release"
 export XCODE_CLOUD_CONFIGURATION="Release"
 
-echo "✅ Xcode Cloud configured for Runner-Release schema!" 
+echo "✅ Xcode Cloud configured for Runner-Release schema!"
+echo "📝 Note: Pod install will be done in pre-build script after flutter pub get" 

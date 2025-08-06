@@ -40,11 +40,21 @@ fi
 
 echo "✅ Found pubspec.yaml - we're in the Flutter project"
 
-# Flutter Setup
+# Flutter Setup (MUSS vor pod install laufen)
 echo "📦 Installing Flutter dependencies..."
 flutter pub get
 
-# Pods installieren
+# Verifizieren dass Generated.xcconfig erstellt wurde
+echo "🔍 Verifying Flutter generated files..."
+if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
+    echo "❌ Error: Generated.xcconfig not found after flutter pub get"
+    echo "Flutter files in ios/Flutter/:"
+    ls -la ios/Flutter/ || echo "ios/Flutter/ directory not found"
+    exit 1
+fi
+echo "✅ Generated.xcconfig found"
+
+# Pods installieren (NACH flutter pub get)
 echo "🍎 Installing CocoaPods dependencies..."
 cd ios
 if [ ! -f "Podfile" ]; then
