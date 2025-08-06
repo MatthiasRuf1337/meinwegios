@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../providers/etappen_provider.dart';
 import '../models/etappe.dart';
 import '../services/permission_service.dart';
@@ -29,7 +30,8 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         builder: (context, etappenProvider, child) {
           // Wenn bereits eine Etappe aktiv ist, zeige Tracking-Screen
           if (etappenProvider.hatAktuelleEtappe) {
-            return EtappeTrackingScreen(etappe: etappenProvider.aktuelleEtappe!);
+            return EtappeTrackingScreen(
+                etappe: etappenProvider.aktuelleEtappe!);
           }
 
           return SingleChildScrollView(
@@ -40,15 +42,15 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
                 // Header
                 _buildHeader(),
                 SizedBox(height: 24),
-                
+
                 // Formular
                 _buildForm(),
                 SizedBox(height: 24),
-                
+
                 // Buttons
                 _buildButtons(etappenProvider),
                 SizedBox(height: 24),
-                
+
                 // Letzte Etappen
                 _buildRecentEtappen(etappenProvider),
               ],
@@ -64,7 +66,10 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF00847E).withOpacity(0.1), Color(0xFF00847E).withOpacity(0.2)],
+          colors: [
+            Color(0xFF00847E).withOpacity(0.1),
+            Color(0xFF00847E).withOpacity(0.2)
+          ],
         ),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -109,7 +114,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
           ),
         ),
         SizedBox(height: 16),
-        
+
         // Name
         TextField(
           controller: _nameController,
@@ -121,7 +126,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
           ),
         ),
         SizedBox(height: 16),
-        
+
         // Notizen
         TextField(
           controller: _notizenController,
@@ -161,7 +166,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
           ),
         ),
         SizedBox(height: 12),
-        
+
         // Manuelle Etappe erstellen
         SizedBox(
           width: double.infinity,
@@ -186,7 +191,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
 
   Widget _buildRecentEtappen(EtappenProvider provider) {
     final recentEtappen = provider.etappen.take(3).toList();
-    
+
     if (recentEtappen.isEmpty) {
       return SizedBox.shrink();
     }
@@ -238,8 +243,10 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
 
     try {
       // Berechtigungen prüfen
-      bool locationPermission = await PermissionService.checkLocationPermission();
-      bool activityPermission = await PermissionService.checkActivityRecognitionPermission();
+      bool locationPermission =
+          await PermissionService.checkLocationPermission();
+      bool activityPermission =
+          await PermissionService.checkActivityRecognitionPermission();
 
       if (!locationPermission || !activityPermission) {
         await _requestMissingPermissions();
@@ -252,8 +259,8 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         name: _nameController.text.trim(),
         startzeit: DateTime.now(),
         status: EtappenStatus.aktiv,
-        notizen: _notizenController.text.trim().isEmpty 
-            ? null 
+        notizen: _notizenController.text.trim().isEmpty
+            ? null
             : _notizenController.text.trim(),
         erstellungsDatum: DateTime.now(),
       );
@@ -264,7 +271,6 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
       // Formular zurücksetzen
       _nameController.clear();
       _notizenController.clear();
-
     } catch (e) {
       _showErrorDialog('Fehler beim Starten der Etappe: $e');
     } finally {
@@ -291,8 +297,8 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         startzeit: DateTime.now(),
         endzeit: DateTime.now(),
         status: EtappenStatus.abgeschlossen,
-        notizen: _notizenController.text.trim().isEmpty 
-            ? null 
+        notizen: _notizenController.text.trim().isEmpty
+            ? null
             : _notizenController.text.trim(),
         erstellungsDatum: DateTime.now(),
       );
@@ -304,7 +310,6 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
       _notizenController.clear();
 
       _showSuccessDialog('Etappe erfolgreich erstellt!');
-
     } catch (e) {
       _showErrorDialog('Fehler beim Erstellen der Etappe: $e');
     } finally {
@@ -331,7 +336,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              PermissionService.openAppSettings();
+              openAppSettings();
             },
             child: Text('Einstellungen öffnen'),
           ),
@@ -376,4 +381,4 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
       ),
     );
   }
-} 
+}

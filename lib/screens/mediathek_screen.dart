@@ -53,7 +53,6 @@ class _MediathekScreenState extends State<MediathekScreen> {
             children: [
               _buildSearchBar(),
               _buildFilterChips(),
-              _buildStatistics(),
               Expanded(
                 child: Consumer<MedienProvider>(
                   builder: (context, medienProvider, child) {
@@ -153,63 +152,6 @@ class _MediathekScreenState extends State<MediathekScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatistics() {
-    return Consumer<MedienProvider>(
-      builder: (context, medienProvider, child) {
-        final totalMedien = medienProvider.medienDateien.length;
-        final pdfCount = medienProvider.medienDateien
-            .where((m) => m.typ == MedienTyp.pdf)
-            .length;
-        final mp3Count = medienProvider.medienDateien
-            .where((m) => m.typ == MedienTyp.mp3)
-            .length;
-
-        return Container(
-          padding: EdgeInsets.all(16.0),
-          margin: EdgeInsets.symmetric(horizontal: 16.0),
-          decoration: BoxDecoration(
-            color: Color(0xFF00847E).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Color(0xFF00847E).withOpacity(0.3)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildStatItem(
-                  'Gesamt', totalMedien.toString(), Icons.library_books),
-              _buildStatItem('PDF', pdfCount.toString(), Icons.picture_as_pdf),
-              _buildStatItem('MP3', mp3Count.toString(), Icons.audiotrack),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, color: Color(0xFF00847E), size: 20),
-        SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF00847E),
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-          ),
-        ),
-      ],
     );
   }
 

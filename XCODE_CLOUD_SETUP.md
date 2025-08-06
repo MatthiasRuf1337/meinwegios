@@ -1,33 +1,58 @@
 # Xcode Cloud Setup für TestFlight
 
+## ✅ Release Schema erstellen (ERFORDERLICH)
+
+### Schritt 1: Release Schema in Xcode erstellen
+
+1. **Xcode öffnen:**
+
+   ```bash
+   open ios/Runner.xcworkspace
+   ```
+
+2. **Neues Schema erstellen:**
+
+   - **Product** → **Scheme** → **Manage Schemes**
+   - **+** Button klicken
+   - **Runner** auswählen
+   - **Name**: `Runner-Release`
+   - **Shared** aktivieren ✅
+
+3. **Release-Konfiguration setzen:**
+   - **Edit Scheme** → **Run** → **Info**
+   - **Build Configuration**: `Release` auswählen
+   - **Archive** → **Build Configuration**: `Release` auswählen
+
+### Schritt 2: Xcode Cloud konfigurieren
+
+1. **Xcode Cloud Build konfigurieren:**
+
+   - **Product** → **Xcode Cloud** → **View Cloud Builds**
+   - **Build Configuration** → **Runner-Release** auswählen
+
+2. **Automatische Builds:**
+   - Bei jedem Git Push wird jetzt das Release-Schema verwendet
+   - Builds werden automatisch zu TestFlight hochgeladen
+
 ## Release Schema Konfiguration
 
-Für TestFlight-Builds muss das **Release-Schema** verwendet werden. Wir haben ein separates Release-Schema erstellt:
+Für TestFlight-Builds muss das **Release-Schema** verwendet werden:
 
 ### Verfügbare Schemas:
 
-1. **Runner** (Debug) - Für Entwicklung
-2. **Runner-Release** (Release) - Für TestFlight ✅
+| Schema             | Konfiguration | Verwendung            | Status        |
+| ------------------ | ------------- | --------------------- | ------------- |
+| **Runner**         | Debug         | Entwicklung, Testing  | ❌ TestFlight |
+| **Runner-Release** | Release       | TestFlight, App Store | ✅ TestFlight |
 
-## Xcode Cloud Konfiguration
+## Automatische Builds nach Git Push
 
-### 1. Schema in Xcode Cloud auswählen:
+Nach der Konfiguration:
 
-- Gehen Sie zu Xcode → Product → Xcode Cloud → View Cloud Builds
-- Wählen Sie Ihr Projekt aus
-- Unter "Build Configuration" wählen Sie **Runner-Release** aus
-
-### 2. Build Settings für Release:
-
-```
-Build Configuration: Release
-Scheme: Runner-Release
-Archive Action: Release
-```
-
-### 3. Automatische Builds:
-
-Das Release-Schema wird automatisch für alle TestFlight-Builds verwendet.
+1. **Git Push** → Xcode Cloud baut automatisch
+2. **Release-Schema** wird verwendet
+3. **Build** wird zu TestFlight hochgeladen
+4. **Keine manuelle Intervention** nötig
 
 ## Manueller Build für TestFlight
 
@@ -43,22 +68,19 @@ xcodebuild -scheme Runner-Release -configuration Release archive
 
 ### Problem: Build kommt nicht in TestFlight
 
-**Lösung**: Stellen Sie sicher, dass das **Runner-Release** Schema verwendet wird.
+**Lösung**: Stellen Sie sicher, dass das **Runner-Release** Schema erstellt und konfiguriert wurde.
 
 ### Problem: Debug-Build wird hochgeladen
 
 **Lösung**: Überprüfen Sie die Xcode Cloud Einstellungen und wählen Sie das Release-Schema.
 
-## Schema Unterschiede
-
-| Schema         | Konfiguration | Verwendung            |
-| -------------- | ------------- | --------------------- |
-| Runner         | Debug         | Entwicklung, Testing  |
-| Runner-Release | Release       | TestFlight, App Store |
-
 ## Nächste Schritte
 
-1. Öffnen Sie Xcode
-2. Wählen Sie das **Runner-Release** Schema aus
-3. Führen Sie einen neuen Cloud Build aus
-4. Das Build sollte jetzt in TestFlight erscheinen
+1. **Release Schema erstellen** (siehe Schritt 1)
+2. **Xcode Cloud konfigurieren** (siehe Schritt 2)
+3. **Git Push** → Automatischer Release-Build
+4. **TestFlight** → Build sollte erscheinen
+
+## ✅ Erfolg!
+
+Nach der Konfiguration wird bei jedem Git Push automatisch ein Release-Build erstellt und zu TestFlight hochgeladen! 🚀

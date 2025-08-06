@@ -107,4 +107,4 @@ class PermissionService {
         return 'Diese Berechtigung ist für die volle Funktionalität der App erforderlich.';
     }
   }
-} 
+}

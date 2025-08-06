@@ -1,0 +1,3 @@
+  static Future<void> openAppSettings() async {
+    await openAppSettings();
+  }
