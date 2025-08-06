@@ -13,7 +13,6 @@ echo "📍 Working directory: $(pwd)"
 
 # Überprüfen verfügbare Befehle
 echo "🔍 Checking available commands..."
-which flutter || echo "⚠️ flutter not found in PATH"
 which pod || echo "⚠️ pod not found in PATH"
 
 # PATH erweitern falls nötig
@@ -29,16 +28,7 @@ fi
 
 echo "✅ Found pubspec.yaml - we're in the Flutter project"
 
-# Flutter Setup
-echo "📦 Installing Flutter dependencies..."
-if command -v flutter >/dev/null 2>&1; then
-    flutter pub get
-else
-    echo "❌ Error: flutter command not available"
-    exit 1
-fi
-
-# iOS Setup
+# iOS Setup (Flutter wird später im Pre-Build Script behandelt)
 echo "🍎 Installing iOS dependencies..."
 cd ios
 if [ ! -f "Podfile" ]; then

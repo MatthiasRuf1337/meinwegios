@@ -9,6 +9,18 @@ echo "🔧 Setting up Xcode Cloud build with Runner-Release schema..."
 cd /Volumes/workspace/repository
 echo "📍 Working directory: $(pwd)"
 
+# Flutter installieren falls nicht verfügbar
+echo "📦 Installing Flutter..."
+if ! command -v flutter >/dev/null 2>&1; then
+    echo "🔄 Flutter not found, installing..."
+    # Flutter von GitHub herunterladen
+    git clone https://github.com/flutter/flutter.git -b stable --depth 1 /tmp/flutter
+    export PATH="/tmp/flutter/bin:$PATH"
+    echo "✅ Flutter installed at /tmp/flutter/bin"
+else
+    echo "✅ Flutter already available"
+fi
+
 # Überprüfen verfügbare Befehle
 echo "🔍 Checking available commands..."
 which flutter || echo "⚠️ flutter not found in PATH"
@@ -30,12 +42,7 @@ echo "✅ Found pubspec.yaml - we're in the Flutter project"
 
 # Flutter Setup
 echo "📦 Installing Flutter dependencies..."
-if command -v flutter >/dev/null 2>&1; then
-    flutter pub get
-else
-    echo "❌ Error: flutter command not available"
-    exit 1
-fi
+flutter pub get
 
 # Pods installieren
 echo "🍎 Installing CocoaPods dependencies..."
