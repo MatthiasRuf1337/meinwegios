@@ -9,6 +9,16 @@ echo "🔧 Setting up Xcode Cloud build with Runner-Release schema..."
 cd /Volumes/workspace/repository
 echo "📍 Working directory: $(pwd)"
 
+# Überprüfen verfügbare Befehle
+echo "🔍 Checking available commands..."
+which flutter || echo "⚠️ flutter not found in PATH"
+which pod || echo "⚠️ pod not found in PATH"
+which xcodebuild || echo "⚠️ xcodebuild not found in PATH"
+
+# PATH erweitern falls nötig
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+echo "📍 Updated PATH: $PATH"
+
 # Überprüfen ob wir im richtigen Verzeichnis sind
 if [ ! -f "pubspec.yaml" ]; then
     echo "❌ Error: pubspec.yaml not found. Current directory: $(pwd)"
@@ -20,7 +30,12 @@ echo "✅ Found pubspec.yaml - we're in the Flutter project"
 
 # Flutter Setup
 echo "📦 Installing Flutter dependencies..."
-flutter pub get
+if command -v flutter >/dev/null 2>&1; then
+    flutter pub get
+else
+    echo "❌ Error: flutter command not available"
+    exit 1
+fi
 
 # Pods installieren
 echo "🍎 Installing CocoaPods dependencies..."
@@ -30,7 +45,12 @@ if [ ! -f "Podfile" ]; then
     exit 1
 fi
 
-pod install
+if command -v pod >/dev/null 2>&1; then
+    pod install
+else
+    echo "❌ Error: pod command not available"
+    exit 1
+fi
 cd ..
 
 # Flutter Build mit Release-Konfiguration
@@ -45,6 +65,11 @@ if [ ! -f "Runner.xcworkspace" ]; then
     exit 1
 fi
 
-xcodebuild -workspace Runner.xcworkspace -scheme Runner-Release -configuration Release archive -archivePath build/Runner.xcarchive
+if command -v xcodebuild >/dev/null 2>&1; then
+    xcodebuild -workspace Runner.xcworkspace -scheme Runner-Release -configuration Release archive -archivePath build/Runner.xcarchive
+else
+    echo "❌ Error: xcodebuild command not available"
+    exit 1
+fi
 
 echo "✅ Build completed successfully with Runner-Release schema!"

@@ -11,6 +11,15 @@ echo "🔧 Configuring Xcode Cloud for Runner-Release schema..."
 cd /Volumes/workspace/repository
 echo "📍 Working directory: $(pwd)"
 
+# Überprüfen verfügbare Befehle
+echo "🔍 Checking available commands..."
+which flutter || echo "⚠️ flutter not found in PATH"
+which pod || echo "⚠️ pod not found in PATH"
+
+# PATH erweitern falls nötig
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+echo "📍 Updated PATH: $PATH"
+
 # Überprüfen ob wir im richtigen Verzeichnis sind
 if [ ! -f "pubspec.yaml" ]; then
     echo "❌ Error: pubspec.yaml not found. Current directory: $(pwd)"
@@ -22,7 +31,12 @@ echo "✅ Found pubspec.yaml - we're in the Flutter project"
 
 # Flutter Setup
 echo "📦 Installing Flutter dependencies..."
-flutter pub get
+if command -v flutter >/dev/null 2>&1; then
+    flutter pub get
+else
+    echo "❌ Error: flutter command not available"
+    exit 1
+fi
 
 # iOS Setup
 echo "🍎 Installing iOS dependencies..."
@@ -32,7 +46,12 @@ if [ ! -f "Podfile" ]; then
     exit 1
 fi
 
-pod install
+if command -v pod >/dev/null 2>&1; then
+    pod install
+else
+    echo "❌ Error: pod command not available"
+    exit 1
+fi
 cd ..
 
 # Verify Runner-Release schema exists
