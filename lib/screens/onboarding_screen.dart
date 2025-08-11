@@ -190,10 +190,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          _buildEmojiBullet('🗺', 'Strecke aufzeichnen oder Schritte zählen'),
-                          _buildEmojiBullet('📷', 'Bilder zu jeder Etappe festhalten'),
-                          _buildEmojiBullet('🎙', 'Gedanken als Audio aufnehmen'),
-                          _buildEmojiBullet('📖', 'E-Paper und Meditationen direkt in der App nutzen'),
+                          _buildEmojiBullet(
+                              '🗺', 'Strecke aufzeichnen oder Schritte zählen'),
+                          _buildEmojiBullet(
+                              '📷', 'Bilder zu jeder Etappe festhalten'),
+                          _buildEmojiBullet(
+                              '🎙', 'Gedanken als Audio aufnehmen'),
+                          _buildEmojiBullet('📖',
+                              'E-Paper und Meditationen direkt in der App nutzen'),
                           const SizedBox(height: 32),
 
                           // Berechtigungen
@@ -225,7 +229,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 16),
-                          ..._permissions.map((permission) => _buildPermissionItem(permission)),
+                          ..._permissions.map(
+                              (permission) => _buildPermissionItem(permission)),
                         ],
                       ),
                     ),
@@ -259,15 +264,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                       SizedBox(height: 12),
-                      TextButton(
-                        onPressed: () => _skipOnboarding(),
-                        child: Text(
-                          'Überspringen (nur für Tests)',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -346,12 +342,5 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Navigator.of(context).pushReplacementNamed('/main');
   }
 
-  void _skipOnboarding() async {
-    final settingsProvider =
-        Provider.of<SettingsProvider>(context, listen: false);
-    await settingsProvider.setFirstAppUsage(false);
-    await settingsProvider.setOnboardingCompleted(true);
-
-    Navigator.of(context).pushReplacementNamed('/main');
-  }
+  // _skipOnboarding entfernt: Button wurde aus der UI entfernt
 }
