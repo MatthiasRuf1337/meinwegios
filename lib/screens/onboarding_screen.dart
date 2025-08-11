@@ -91,7 +91,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       SizedBox(width: 16),
                       // App Name
                       Text(
-                        'Mein Weg',
+                        'Mein Weg – Meine Reise',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -111,7 +111,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: [
                         // Titel
                         Text(
-                          'Willkommen bei Mein Weg!',
+                          'Die App zu deinem Buch',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -121,34 +121,64 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         SizedBox(height: 16),
 
-                        // Beschreibung
+                        // Einleitungstexte
                         Text(
-                          'Dein persönlicher Etappen-Tracker für Wanderungen und Touren',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
-                          ),
+                          'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise“.\nSie ist deine Begleitung unterwegs – digital, praktisch und persönlich.',
+                          style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
                           textAlign: TextAlign.center,
                         ),
-                        SizedBox(height: 32),
+                        SizedBox(height: 16),
+                        Text(
+                          'Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.\nDort findest du alle Texte, Reflexionsseiten, thematischen Impulse und Zitate.',
+                          style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 24),
 
-                        // Features
-                        _buildFeatureItem(
-                            Icons.gps_fixed, 'GPS-Tracking für präzise Routen'),
-                        _buildFeatureItem(Icons.directions_walk,
-                            'Automatische Schrittzählung'),
-                        _buildFeatureItem(
-                            Icons.camera_alt, 'Bilder zu deinen Touren'),
-                        _buildFeatureItem(
-                            Icons.library_books, 'Multimedia-Verwaltung'),
+                        // Funktionen
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Die App ergänzt dein Buch um wertvolle digitale Funktionen:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade800,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        _buildEmojiBullet('🗺', 'Strecke aufzeichnen oder Schritte zählen'),
+                        _buildEmojiBullet('📷', 'Bilder zu jeder Etappe festhalten'),
+                        _buildEmojiBullet('🎙', 'Gedanken als Audio aufnehmen'),
+                        _buildEmojiBullet('📖', 'E-Paper und Meditationen direkt in der App nutzen'),
                         SizedBox(height: 32),
 
                         // Berechtigungen
                         Text(
-                          'Für die volle Funktionalität benötigt die App folgende Berechtigungen:',
+                          'Wichtiger Hinweis zur Nutzung',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Damit alle Funktionen reibungslos arbeiten, fragt die App beim Start den Zugriff auf Standort, Kamera, Fotos, Aktivitätserkennung und Schrittzähler ab.\n\nDeine Privatsphäre hat oberste Priorität: Alle Daten bleiben ausschließlich auf deinem Handy – keine Weitergabe, kein Upload.',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade700,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Benötigte Berechtigungen:',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade700,
+                            fontWeight: FontWeight.w600,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -207,24 +237,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildFeatureItem(IconData icon, String text) {
+  // Vorherige Feature-Liste wird jetzt durch Emoji-Bullets ersetzt
+
+  Widget _buildEmojiBullet(String emoji, String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            color: Color(0xFF00847E),
-            size: 20,
-          ),
-          SizedBox(width: 12),
+          Text(emoji, style: TextStyle(fontSize: 18)),
+          SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade700,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
             ),
           ),
         ],
