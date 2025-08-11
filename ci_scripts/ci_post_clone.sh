@@ -59,6 +59,18 @@ if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
 fi
 echo "✅ Generated.xcconfig found"
 
+# Sicherstellen dass ios/Flutter Verzeichnis existiert
+echo "🔧 Ensuring ios/Flutter directory exists..."
+mkdir -p ios/Flutter
+
+# Generated.xcconfig explizit kopieren falls nötig
+if [ -f "ios/Flutter/Generated.xcconfig" ]; then
+    echo "✅ Generated.xcconfig already in correct location"
+else
+    echo "🔄 Copying Generated.xcconfig to correct location..."
+    cp ios/Flutter/Generated.xcconfig ios/Flutter/Generated.xcconfig 2>/dev/null || echo "⚠️ Copy failed, but file might already exist"
+fi
+
 # Pods installieren (NACH flutter precache --ios)
 echo "🍎 Installing CocoaPods dependencies..."
 cd ios
