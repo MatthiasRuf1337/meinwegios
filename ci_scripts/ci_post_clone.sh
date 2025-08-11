@@ -1,7 +1,7 @@
 #!/bin/bash
-
 # Xcode Cloud Post-Clone Script
 # Konfiguriert das Runner-Release Schema für TestFlight Builds
+# UND bereitet Flutter/CocoaPods vor dem Xcode Build vor
 
 set -e
 
@@ -13,6 +13,7 @@ echo "📍 Working directory: $(pwd)"
 
 # Überprüfen verfügbare Befehle
 echo "🔍 Checking available commands..."
+which flutter || echo "⚠️ flutter not found in PATH"
 which pod || echo "⚠️ pod not found in PATH"
 
 # PATH erweitern falls nötig
@@ -27,6 +28,52 @@ if [ ! -f "pubspec.yaml" ]; then
 fi
 
 echo "✅ Found pubspec.yaml - we're in the Flutter project"
+
+# Flutter installieren falls nicht verfügbar
+echo "📦 Installing Flutter..."
+if ! command -v flutter >/dev/null 2>&1; then
+    echo "🔄 Flutter not found, installing..."
+    # Flutter von GitHub herunterladen
+    git clone https://github.com/flutter/flutter.git -b stable --depth 1 /tmp/flutter
+    export PATH="/tmp/flutter/bin:$PATH"
+    echo "✅ Flutter installed at /tmp/flutter/bin"
+else
+    echo "✅ Flutter already available"
+fi
+
+# Flutter Setup (MUSS vor pod install laufen)
+echo "📦 Installing Flutter dependencies..."
+flutter pub get
+
+# Flutter iOS Engine precache (WICHTIG für pod install)
+echo "⚙️ Pre-caching Flutter iOS engine..."
+flutter precache --ios
+
+# Verifizieren dass Generated.xcconfig erstellt wurde
+echo "🔍 Verifying Flutter generated files..."
+if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
+    echo "❌ Error: Generated.xcconfig not found after flutter pub get"
+    echo "Flutter files in ios/Flutter/:"
+    ls -la ios/Flutter/ || echo "ios/Flutter/ directory not found"
+    exit 1
+fi
+echo "✅ Generated.xcconfig found"
+
+# Pods installieren (NACH flutter precache --ios)
+echo "🍎 Installing CocoaPods dependencies..."
+cd ios
+if [ ! -f "Podfile" ]; then
+    echo "❌ Error: Podfile not found in ios directory"
+    exit 1
+fi
+
+if command -v pod >/dev/null 2>&1; then
+    pod install
+else
+    echo "❌ Error: pod command not available"
+    exit 1
+fi
+cd ..
 
 # Verify Runner-Release schema exists
 echo "🔍 Verifying Runner-Release schema..."
@@ -44,4 +91,4 @@ export XCODE_CLOUD_SCHEME="Runner-Release"
 export XCODE_CLOUD_CONFIGURATION="Release"
 
 echo "✅ Xcode Cloud configured for Runner-Release schema!"
-echo "📝 Note: Pod install will be done in pre-build script after flutter pub get" 
+echo "✅ Flutter and CocoaPods prepared for Xcode build!" 
