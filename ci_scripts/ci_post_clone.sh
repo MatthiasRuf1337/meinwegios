@@ -118,7 +118,26 @@ if [ ! -f "Podfile" ]; then
 fi
 
 if command -v pod >/dev/null 2>&1; then
+    echo "🔄 Running pod install..."
     pod install
+    
+    # Zusätzlich: Pod install mit repo update für FileLists
+    echo "🔄 Running pod install --repo-update to ensure FileLists..."
+    pod install --repo-update
+    
+    # Verifizieren dass FileLists existieren
+    echo "🔍 Verifying CocoaPods FileLists..."
+    if [ -f "Pods/Target Support Files/Pods-Runner/Pods-Runner-frameworks-Release-input-files.xcfilelist" ]; then
+        echo "✅ Release input files xcfilelist found"
+    else
+        echo "⚠️ Release input files xcfilelist not found"
+    fi
+    
+    if [ -f "Pods/Target Support Files/Pods-Runner/Pods-Runner-frameworks-Release-output-files.xcfilelist" ]; then
+        echo "✅ Release output files xcfilelist found"
+    else
+        echo "⚠️ Release output files xcfilelist not found"
+    fi
 else
     echo "❌ Error: pod command not available"
     exit 1
