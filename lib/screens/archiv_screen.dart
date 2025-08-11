@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import '../providers/etappen_provider.dart';
+import '../providers/bilder_provider.dart';
 import '../models/etappe.dart';
+import '../models/bild.dart';
 import 'etappe_detail_screen.dart';
 
 class ArchivScreen extends StatefulWidget {
@@ -33,13 +38,14 @@ class _ArchivScreenState extends State<ArchivScreen> {
           ),
         ],
       ),
-      body: Consumer<EtappenProvider>(
-        builder: (context, etappenProvider, child) {
+      body: Consumer2<EtappenProvider, BilderProvider>(
+        builder: (context, etappenProvider, bilderProvider, child) {
           if (etappenProvider.isLoading) {
             return Center(child: CircularProgressIndicator());
           }
 
-          List<Etappe> filteredEtappen = _getFilteredEtappen(etappenProvider.etappen);
+          List<Etappe> filteredEtappen =
+              _getFilteredEtappen(etappenProvider.etappen);
 
           if (filteredEtappen.isEmpty) {
             return _buildEmptyState();
@@ -49,7 +55,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
             children: [
               // Statistiken
               _buildStatistics(etappenProvider),
-              
+
               // Etappen Liste
               Expanded(
                 child: ListView.builder(
@@ -57,7 +63,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
                   itemCount: filteredEtappen.length,
                   itemBuilder: (context, index) {
                     final etappe = filteredEtappen[index];
-                    return _buildEtappeCard(etappe);
+                    return _buildEtappeCard(etappe, bilderProvider);
                   },
                 ),
               ),
@@ -73,9 +79,9 @@ class _ArchivScreenState extends State<ArchivScreen> {
       margin: EdgeInsets.all(16),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
+        color: Color(0xFF00847E).withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green.shade200),
+        border: Border.all(color: Color(0xFF00847E).withOpacity(0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -103,14 +109,14 @@ class _ArchivScreenState extends State<ArchivScreen> {
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Colors.green, size: 24),
+        Icon(icon, color: Color(0xFF00847E), size: 24),
         SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.green.shade800,
+            color: Color(0xFF00847E),
           ),
         ),
         Text(
@@ -124,66 +130,138 @@ class _ArchivScreenState extends State<ArchivScreen> {
     );
   }
 
-  Widget _buildEtappeCard(Etappe etappe) {
+  Widget _buildEtappeCard(Etappe etappe, BilderProvider bilderProvider) {
+    // Letztes Bild der Etappe finden
+    List<Bild> etappenBilder = bilderProvider.getBilderByEtappe(etappe.id);
+    Bild? letztesBild = etappenBilder.isNotEmpty
+        ? etappenBilder
+            .reduce((a, b) => a.aufnahmeZeit.isAfter(b.aufnahmeZeit) ? a : b)
+        : null;
+
     return Card(
       margin: EdgeInsets.only(bottom: 12),
       elevation: 2,
       child: InkWell(
         onTap: () => _openEtappeDetail(etappe),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      etappe.name,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Bild-Anzeige über die ganze Breite
+            if (letztesBild != null) ...[
+              Container(
+                width: double.infinity,
+                height: 200,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                  child: Image.file(
+                    File(letztesBild.dateipfad),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade200,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.broken_image,
+                                size: 48,
+                                color: Colors.grey.shade400,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Bild konnte nicht geladen werden',
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  _buildStatusChip(etappe.status),
-                ],
-              ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                  SizedBox(width: 4),
-                  Text(
-                    DateFormat('dd.MM.yyyy HH:mm').format(etappe.startzeit),
-                    style: TextStyle(color: Colors.grey.shade600),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  _buildInfoItem(Icons.straighten, etappe.formatierteDistanz),
-                  SizedBox(width: 16),
-                  _buildInfoItem(Icons.directions_walk, '${etappe.schrittAnzahl} Schritte'),
-                  SizedBox(width: 16),
-                  _buildInfoItem(Icons.timer, etappe.formatierteDauer),
-                ],
-              ),
-              if (etappe.notizen != null && etappe.notizen!.isNotEmpty) ...[
-                SizedBox(height: 8),
-                Text(
-                  etappe.notizen!,
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontStyle: FontStyle.italic,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
+              ),
             ],
-          ),
+
+            // Etappen-Informationen
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          etappe.name,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      _buildStatusChip(etappe.status),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                      SizedBox(width: 4),
+                      Text(
+                        DateFormat('dd.MM.yyyy HH:mm').format(etappe.startzeit),
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      _buildInfoItem(
+                          Icons.straighten, etappe.formatierteDistanz),
+                      SizedBox(width: 16),
+                      _buildInfoItem(Icons.directions_walk,
+                          '${etappe.schrittAnzahl} Schritte'),
+                      SizedBox(width: 16),
+                      _buildInfoItem(Icons.timer, etappe.formatierteDauer),
+                    ],
+                  ),
+                  if (etappe.notizen != null && etappe.notizen!.isNotEmpty) ...[
+                    SizedBox(height: 8),
+                    Text(
+                      etappe.notizen!,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  // Bild-Anzahl anzeigen
+                  if (etappenBilder.isNotEmpty) ...[
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.photo_library, size: 16, color: Colors.grey),
+                        SizedBox(width: 4),
+                        Text(
+                          '${etappenBilder.length} Bild${etappenBilder.length == 1 ? '' : 'er'}',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -192,7 +270,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
   Widget _buildStatusChip(EtappenStatus status) {
     Color color;
     String text;
-    
+
     switch (status) {
       case EtappenStatus.aktiv:
         color = Colors.orange;
@@ -203,7 +281,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
         text = 'Pausiert';
         break;
       case EtappenStatus.abgeschlossen:
-        color = Colors.green;
+        color = Color(0xFF00847E);
         text = 'Abgeschlossen';
         break;
     }
@@ -278,15 +356,20 @@ class _ArchivScreenState extends State<ArchivScreen> {
 
     // Suche
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((etappe) =>
-          etappe.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          (etappe.notizen?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false)
-      ).toList();
+      filtered = filtered
+          .where((etappe) =>
+              etappe.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              (etappe.notizen
+                      ?.toLowerCase()
+                      .contains(_searchQuery.toLowerCase()) ??
+                  false))
+          .toList();
     }
 
     // Status Filter
     if (_selectedStatus != null) {
-      filtered = filtered.where((etappe) => etappe.status == _selectedStatus).toList();
+      filtered =
+          filtered.where((etappe) => etappe.status == _selectedStatus).toList();
     }
 
     return filtered;
@@ -403,4 +486,4 @@ class _ArchivScreenState extends State<ArchivScreen> {
       ),
     );
   }
-} 
+}

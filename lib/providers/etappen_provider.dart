@@ -48,7 +48,8 @@ class EtappenProvider with ChangeNotifier {
       final index = _etappen.indexWhere((e) => e.id == etappe.id);
       if (index != -1) {
         _etappen[index] = etappe;
-        _etappen.sort((a, b) => b.erstellungsDatum.compareTo(a.erstellungsDatum));
+        _etappen
+            .sort((a, b) => b.erstellungsDatum.compareTo(a.erstellungsDatum));
         notifyListeners();
       }
     } catch (e) {
@@ -83,11 +84,13 @@ class EtappenProvider with ChangeNotifier {
 
   List<Etappe> searchEtappen(String query) {
     if (query.isEmpty) return _etappen;
-    
-    return _etappen.where((etappe) =>
-        etappe.name.toLowerCase().contains(query.toLowerCase()) ||
-        (etappe.notizen?.toLowerCase().contains(query.toLowerCase()) ?? false)
-    ).toList();
+
+    return _etappen
+        .where((etappe) =>
+            etappe.name.toLowerCase().contains(query.toLowerCase()) ||
+            (etappe.notizen?.toLowerCase().contains(query.toLowerCase()) ??
+                false))
+        .toList();
   }
 
   List<Etappe> getEtappenByStatus(EtappenStatus status) {
@@ -95,10 +98,11 @@ class EtappenProvider with ChangeNotifier {
   }
 
   List<Etappe> getEtappenByDateRange(DateTime start, DateTime end) {
-    return _etappen.where((etappe) =>
-        etappe.erstellungsDatum.isAfter(start) &&
-        etappe.erstellungsDatum.isBefore(end)
-    ).toList();
+    return _etappen
+        .where((etappe) =>
+            etappe.erstellungsDatum.isAfter(start) &&
+            etappe.erstellungsDatum.isBefore(end))
+        .toList();
   }
 
   double getGesamtDistanz() {
@@ -112,4 +116,4 @@ class EtappenProvider with ChangeNotifier {
   Duration getGesamtDauer() {
     return _etappen.fold(Duration.zero, (sum, etappe) => sum + etappe.dauer);
   }
-} 
+}

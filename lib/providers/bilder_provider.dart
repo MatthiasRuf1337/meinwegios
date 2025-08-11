@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../models/bild.dart';
 import '../services/database_service.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class BilderProvider with ChangeNotifier {
   List<Bild> _bilder = [];
@@ -19,6 +21,8 @@ class BilderProvider with ChangeNotifier {
 
     try {
       _bilder = await DatabaseService.instance.getBilder();
+      // Repariere ggf. ungültige Dateipfade (z.B. temporäre Pfade)
+      await _repairBildPathsIfNeeded();
       _bilder.sort((a, b) => b.aufnahmeZeit.compareTo(a.aufnahmeZeit));
     } catch (e) {
       print('Fehler beim Laden der Bilder: $e');
@@ -26,6 +30,33 @@ class BilderProvider with ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> _repairBildPathsIfNeeded() async {
+    final repaired = <Bild>[];
+    for (final bild in _bilder) {
+      final file = File(bild.dateipfad);
+      if (!file.existsSync()) {
+        // Versuch: Datei liegt unter App-Dokumente/bilder mit dateiname
+        try {
+          // lazy import to avoid top-level dependency issues
+          final docsDir = await getApplicationDocumentsDirectory();
+          final candidate = File('${docsDir.path}/bilder/${bild.dateiname}');
+          if (candidate.existsSync()) {
+            final repairedBild = bild.copyWith(dateipfad: candidate.path);
+            await DatabaseService.instance.updateBild(repairedBild);
+            repaired.add(repairedBild);
+          }
+        } catch (_) {}
+      }
+    }
+    if (repaired.isNotEmpty) {
+      // Ersetze reparierte Einträge im Speicher
+      for (final rb in repaired) {
+        final idx = _bilder.indexWhere((b) => b.id == rb.id);
+        if (idx != -1) _bilder[idx] = rb;
+      }
+    }
   }
 
   Future<void> loadBilder() async {
@@ -45,6 +76,23 @@ class BilderProvider with ChangeNotifier {
 
   Future<void> deleteBild(String bildId) async {
     try {
+      // Datei vom Speicher entfernen, falls vorhanden
+      Bild? toDelete;
+      for (final b in _bilder) {
+        if (b.id == bildId) {
+          toDelete = b;
+          break;
+        }
+      }
+      if (toDelete != null) {
+        try {
+          final file = File(toDelete.dateipfad);
+          if (file.existsSync()) {
+            await file.delete();
+          }
+        } catch (_) {}
+      }
+
       await DatabaseService.instance.deleteBild(bildId);
       _bilder.removeWhere((b) => b.id == bildId);
       notifyListeners();
@@ -63,17 +111,18 @@ class BilderProvider with ChangeNotifier {
 
   List<Bild> searchBilder(String query) {
     if (query.isEmpty) return _bilder;
-    
-    return _bilder.where((bild) =>
-        bild.dateiname.toLowerCase().contains(query.toLowerCase())
-    ).toList();
+
+    return _bilder
+        .where((bild) =>
+            bild.dateiname.toLowerCase().contains(query.toLowerCase()))
+        .toList();
   }
 
   List<Bild> getBilderByDateRange(DateTime start, DateTime end) {
-    return _bilder.where((bild) =>
-        bild.aufnahmeZeit.isAfter(start) &&
-        bild.aufnahmeZeit.isBefore(end)
-    ).toList();
+    return _bilder
+        .where((bild) =>
+            bild.aufnahmeZeit.isAfter(start) && bild.aufnahmeZeit.isBefore(end))
+        .toList();
   }
 
   int getBilderCount() {
@@ -83,4 +132,4 @@ class BilderProvider with ChangeNotifier {
   int getBilderCountByEtappe(String etappenId) {
     return _bilder.where((bild) => bild.etappenId == etappenId).length;
   }
-} 
+}

@@ -147,6 +147,16 @@ class DatabaseService {
     );
   }
 
+  Future<void> updateBild(Bild bild) async {
+    final db = await database;
+    await db.update(
+      'bilder',
+      bild.toMap(),
+      where: 'id = ?',
+      whereArgs: [bild.id],
+    );
+  }
+
   // Medien-Dateien Operationen
   Future<void> insertMedienDatei(MedienDatei medienDatei) async {
     final db = await database;

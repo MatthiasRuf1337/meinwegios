@@ -27,7 +27,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.green.shade50,
+              Color(0xFF00847E).withOpacity(0.1),
               Colors.white,
             ],
           ),
@@ -46,7 +46,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          color: Colors.green,
+                          color: Color(0xFF00847E),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Icon(
@@ -56,19 +56,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                       SizedBox(height: 32),
-                      
+
                       // Titel
                       Text(
                         'Willkommen bei MeinWeg!',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green.shade800,
+                          color: Color(0xFF00847E),
                         ),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 16),
-                      
+
                       // Beschreibung
                       Text(
                         'Dein persönlicher Etappen-Tracker für Wanderungen und Touren',
@@ -79,14 +79,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 32),
-                      
+
                       // Features
-                      _buildFeatureItem(Icons.gps_fixed, 'GPS-Tracking für präzise Routen'),
-                      _buildFeatureItem(Icons.directions_walk, 'Automatische Schrittzählung'),
-                      _buildFeatureItem(Icons.camera_alt, 'Bilder zu deinen Touren'),
-                      _buildFeatureItem(Icons.library_books, 'Multimedia-Verwaltung'),
+                      _buildFeatureItem(
+                          Icons.gps_fixed, 'GPS-Tracking für präzise Routen'),
+                      _buildFeatureItem(
+                          Icons.directions_walk, 'Automatische Schrittzählung'),
+                      _buildFeatureItem(
+                          Icons.camera_alt, 'Bilder zu deinen Touren'),
+                      _buildFeatureItem(
+                          Icons.library_books, 'Multimedia-Verwaltung'),
                       SizedBox(height: 32),
-                      
+
                       // Berechtigungen
                       if (_currentStep == 0) ...[
                         Text(
@@ -98,14 +102,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 16),
-                        ..._permissions.map((permission) => 
-                          _buildPermissionItem(permission)
-                        ),
+                        ..._permissions.map(
+                            (permission) => _buildPermissionItem(permission)),
                       ],
                     ],
                   ),
                 ),
-                
+
                 // Buttons
                 Column(
                   children: [
@@ -114,7 +117,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: ElevatedButton(
                         onPressed: () => _handleNextStep(),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: Color(0xFF00847E),
                           foregroundColor: Colors.white,
                           padding: EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
@@ -158,7 +161,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Icon(
             icon,
-            color: Colors.green,
+            color: Color(0xFF00847E),
             size: 20,
           ),
           SizedBox(width: 12),
@@ -183,7 +186,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Icon(
             Icons.check_circle,
-            color: Colors.green,
+            color: Color(0xFF00847E),
             size: 16,
           ),
           SizedBox(width: 8),
@@ -221,18 +224,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _completeOnboarding() async {
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
     await settingsProvider.setFirstAppUsage(false);
     await settingsProvider.setOnboardingCompleted(true);
-    
+
     Navigator.of(context).pushReplacementNamed('/main');
   }
 
   void _skipOnboarding() async {
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
     await settingsProvider.setFirstAppUsage(false);
     await settingsProvider.setOnboardingCompleted(true);
-    
+
     Navigator.of(context).pushReplacementNamed('/main');
   }
-} 
+}

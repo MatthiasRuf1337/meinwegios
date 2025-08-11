@@ -293,19 +293,52 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
-                                    child: Image.file(
-                                      File(bild.dateipfad),
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Container(
-                                          color: Colors.grey[300],
-                                          child: Icon(
-                                            Icons.broken_image,
-                                            color: Colors.grey[600],
+                                    child: Stack(
+                                      children: [
+                                        Positioned.fill(
+                                          child: Image.file(
+                                            File(bild.dateipfad),
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container(
+                                                color: Colors.grey[300],
+                                                child: Icon(
+                                                  Icons.broken_image,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              );
+                                            },
                                           ),
-                                        );
-                                      },
+                                        ),
+                                        Positioned(
+                                          top: 4,
+                                          right: 4,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.4),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                IconButton(
+                                                  icon: Icon(Icons.delete,
+                                                      color: Colors.white,
+                                                      size: 18),
+                                                  padding: EdgeInsets.zero,
+                                                  constraints: BoxConstraints(),
+                                                  tooltip: 'Bild löschen',
+                                                  onPressed: () =>
+                                                      _confirmDeleteBild(bild),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -436,8 +469,6 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       ],
     );
   }
-
-
 
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
@@ -960,6 +991,38 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => BildDetailScreen(bild: bild),
+      ),
+    );
+  }
+
+  void _confirmDeleteBild(Bild bild) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Bild löschen'),
+        content: Text('Möchtest du dieses Bild wirklich löschen?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(context);
+              final bilderProvider =
+                  Provider.of<BilderProvider>(context, listen: false);
+              await bilderProvider.deleteBild(bild.id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Bild gelöscht'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            },
+            child: Text('Löschen'),
+          ),
+        ],
       ),
     );
   }

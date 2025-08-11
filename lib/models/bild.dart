@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Bild {
   final String id;
   final String dateiname;
@@ -28,11 +30,26 @@ class Bild {
       'longitude': longitude,
       'aufnahmeZeit': aufnahmeZeit.millisecondsSinceEpoch,
       'etappenId': etappenId,
-      'metadaten': metadaten,
+      'metadaten': json.encode(metadaten),
     };
   }
 
   factory Bild.fromMap(Map<String, dynamic> map) {
+    // Metadaten korrekt verarbeiten - könnte String oder Map sein
+    Map<String, dynamic> metadaten = {};
+    if (map['metadaten'] != null) {
+      if (map['metadaten'] is String) {
+        try {
+          metadaten = Map<String, dynamic>.from(json.decode(map['metadaten']));
+        } catch (e) {
+          print('Fehler beim Parsen der Metadaten: $e');
+          metadaten = {};
+        }
+      } else if (map['metadaten'] is Map) {
+        metadaten = Map<String, dynamic>.from(map['metadaten']);
+      }
+    }
+
     return Bild(
       id: map['id'],
       dateiname: map['dateiname'],
@@ -41,7 +58,7 @@ class Bild {
       longitude: map['longitude'],
       aufnahmeZeit: DateTime.fromMillisecondsSinceEpoch(map['aufnahmeZeit']),
       etappenId: map['etappenId'],
-      metadaten: Map<String, dynamic>.from(map['metadaten'] ?? {}),
+      metadaten: metadaten,
     );
   }
 
@@ -71,7 +88,7 @@ class Bild {
 
   String get formatierteAufnahmeZeit {
     return '${aufnahmeZeit.day}.${aufnahmeZeit.month}.${aufnahmeZeit.year} '
-           '${aufnahmeZeit.hour.toString().padLeft(2, '0')}:'
-           '${aufnahmeZeit.minute.toString().padLeft(2, '0')}';
+        '${aufnahmeZeit.hour.toString().padLeft(2, '0')}:'
+        '${aufnahmeZeit.minute.toString().padLeft(2, '0')}';
   }
-} 
+}

@@ -61,5 +61,13 @@
 	<string>Die App benötigt Zugriff auf Fotos, um Bilder aus Ihrer Galerie zu importieren.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Die App benötigt Zugriff auf das Mikrofon für Audio-Aufnahmen.</string>
+	
+	<!-- Hintergrund-Modi -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>background-processing</string>
+		<string>background-fetch</string>
+	</array>
 </dict>
 </plist> 

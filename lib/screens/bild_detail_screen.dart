@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import '../models/bild.dart';
+import 'package:provider/provider.dart';
+import '../providers/bilder_provider.dart';
 
 class BildDetailScreen extends StatelessWidget {
   final Bild bild;
@@ -11,9 +16,14 @@ class BildDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Bild Details'),
-        backgroundColor: Colors.green,
+        backgroundColor: Color(0xFF00847E),
         foregroundColor: Colors.white,
         actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () => _confirmDelete(context),
+            tooltip: 'Bild löschen',
+          ),
           IconButton(
             icon: Icon(Icons.share),
             onPressed: () => _shareBild(context),
@@ -28,7 +38,7 @@ class BildDetailScreen extends StatelessWidget {
             // Bild
             _buildImage(),
             SizedBox(height: 24),
-            
+
             // Details
             _buildDetails(),
           ],
@@ -47,20 +57,37 @@ class BildDetailScreen extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.asset(
-          'assets/images/placeholder.jpg', // Placeholder
+        child: _buildImageWidget(),
+      ),
+    );
+  }
+
+  Widget _buildImageWidget() {
+    try {
+      final file = File(bild.dateipfad);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: Colors.grey.shade200,
-              child: Icon(
-                Icons.image,
-                color: Colors.grey.shade400,
-                size: 64,
-              ),
-            );
+            return _buildPlaceholderImage();
           },
-        ),
+        );
+      } else {
+        return _buildPlaceholderImage();
+      }
+    } catch (e) {
+      return _buildPlaceholderImage();
+    }
+  }
+
+  Widget _buildPlaceholderImage() {
+    return Container(
+      color: Colors.grey.shade200,
+      child: Icon(
+        Icons.image,
+        color: Colors.grey.shade400,
+        size: 64,
       ),
     );
   }
@@ -99,6 +126,19 @@ class BildDetailScreen extends StatelessWidget {
           ],
           if (bild.etappenId != null)
             _buildDetailRow('Etappen-ID', bild.etappenId!),
+          if (bild.metadaten.isNotEmpty) ...[
+            SizedBox(height: 16),
+            Text(
+              'Metadaten',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            ...bild.metadaten.entries.map(
+                (entry) => _buildDetailRow(entry.key, entry.value.toString())),
+          ],
         ],
       ),
     );
@@ -135,9 +175,48 @@ class BildDetailScreen extends StatelessWidget {
   }
 
   void _shareBild(BuildContext context) {
-    // Implementierung für das Teilen von Bildern
+    // Implementierung für das Teilen des Bildes
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Teilen-Funktion wird implementiert...')),
     );
   }
-} 
+
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Bild löschen'),
+        content: Text('Möchtest du dieses Bild wirklich löschen?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(context);
+              // delete via provider
+              // We cannot access provider in a StatelessWidget without context:
+              // use Provider.of here
+              // ignore: use_build_context_synchronously
+              final bilderProvider =
+                  Provider.of<BilderProvider>(context, listen: false);
+              await bilderProvider.deleteBild(bild.id);
+              // pop back after deletion
+              // ignore: use_build_context_synchronously
+              Navigator.pop(context);
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text('Bild gelöscht'),
+                    backgroundColor: Colors.red),
+              );
+            },
+            child: Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+  }
+}

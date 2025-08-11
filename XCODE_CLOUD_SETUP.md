@@ -19,6 +19,7 @@
    - **Shared** aktivieren ✅
 
 3. **Release-Konfiguration setzen:**
+
    - **Edit Scheme** → **Run** → **Info**
    - **Build Configuration**: `Release` auswählen
    - **Archive** → **Build Configuration**: `Release` auswählen
@@ -28,11 +29,67 @@
 1. **Xcode Cloud Build konfigurieren:**
 
    - **Product** → **Xcode Cloud** → **View Cloud Builds**
-   - **Build Configuration** → **Runner-Release** auswählen
+   - **Ihr Projekt** auswählen
+   - **Build Configuration** → **Runner-Release** auswählen (WICHTIG!)
 
 2. **Automatische Builds:**
+
    - Bei jedem Git Push wird jetzt das Release-Schema verwendet
    - Builds werden automatisch zu TestFlight hochgeladen
+
+## 🔧 Xcode Cloud Schema ändern (AKTUELL ERFORDERLICH)
+
+**Problem**: Xcode Cloud verwendet noch das Debug-Schema "Runner"
+
+**Lösung**:
+
+1. **Xcode öffnen:**
+
+   ```bash
+   open ios/Runner.xcworkspace
+   ```
+
+2. **Xcode Cloud konfigurieren:**
+
+   - **Product** → **Xcode Cloud** → **View Cloud Builds**
+   - **Ihr Projekt** auswählen
+   - **Build Configuration** → **Runner-Release** auswählen ✅
+   - **Speichern**
+
+3. **Neuen Build starten:**
+   - **Start Build** klicken
+   - Oder neuen Git Push machen
+
+## 🔐 Code-Signing Problem lösen (AKTUELL ERFORDERLICH)
+
+**Problem**: `No signing certificate "iOS Development" found`
+
+**Lösung**:
+
+1. **Apple Developer Account prüfen:**
+
+   - Gehen Sie zu [developer.apple.com](https://developer.apple.com)
+   - **Certificates, Identifiers & Profiles**
+   - Stellen Sie sicher, dass Sie ein **iOS Development Certificate** haben
+
+2. **Xcode Cloud Code-Signing konfigurieren:**
+
+   - **Xcode** → **Product** → **Xcode Cloud** → **View Cloud Builds**
+   - **Ihr Projekt** auswählen
+   - **Settings** → **Code Signing**
+   - **Automatic** auswählen (empfohlen)
+   - Oder **Manual** und Zertifikat hochladen
+
+3. **Team ID prüfen:**
+
+   - **Xcode** → **Runner.xcodeproj** → **Signing & Capabilities**
+   - **Team**: `V3VVPQ9SZ3` sollte korrekt sein
+   - **Bundle Identifier**: Sollte eindeutig sein
+
+4. **Provisioning Profile:**
+
+   - Xcode Cloud erstellt automatisch Provisioning Profiles
+   - Falls nicht: **Manual** auswählen und Profile hochladen
 
 ## Release Schema Konfiguration
 
@@ -72,12 +129,32 @@ xcodebuild -scheme Runner-Release -configuration Release archive
 
 ### Problem: Debug-Build wird hochgeladen
 
-**Lösung**: Überprüfen Sie die Xcode Cloud Einstellungen und wählen Sie das Release-Schema.
+**Lösung**: Xcode Cloud Schema auf **Runner-Release** ändern.
+
+### Problem: Code-Signing Fehler
+
+```
+No signing certificate "iOS Development" found
+```
+
+**Lösung**:
+
+1. **Apple Developer Account** prüfen
+2. **Xcode Cloud Code-Signing** auf **Automatic** setzen
+3. **Team ID** in Xcode prüfen
+4. **Provisioning Profile** konfigurieren
+
+### Problem: `The sandbox is not in sync with the Podfile.lock`
+
+**Lösung**:
+
+1. `cd ios && pod install` lokal ausführen
+2. `git add ios/Podfile.lock && git commit && git push`
 
 ## Nächste Schritte
 
-1. **Release Schema erstellen** (siehe Schritt 1)
-2. **Xcode Cloud konfigurieren** (siehe Schritt 2)
+1. **Xcode Cloud Schema ändern** (siehe Schritt 2)
+2. **Neuen Build starten**
 3. **Git Push** → Automatischer Release-Build
 4. **TestFlight** → Build sollte erscheinen
 

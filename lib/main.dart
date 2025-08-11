@@ -25,8 +25,8 @@ void main() async {
   // Vorab geladene Medien (PDFs und MP3s) importieren
   await DatabaseService.instance.importPreloadedMedia();
 
-  // Berechtigungen prüfen
-  await PermissionService.requestInitialPermissions();
+  // Berechtigungen werden später manuell angefordert
+  print('App gestartet - Berechtigungen werden manuell angefordert');
 
   runApp(MeinWegApp());
 }
