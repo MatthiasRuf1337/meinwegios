@@ -329,4 +329,16 @@ class DatabaseService {
       print('Fehler beim Hinzufügen der PDF: $e');
     }
   }
+
+  // App-Verzeichnis für Dateien abrufen
+  Future<Directory> getAppDirectory() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final medienDir = Directory('${appDir.path}/medien');
+    
+    if (!await medienDir.exists()) {
+      await medienDir.create(recursive: true);
+    }
+    
+    return medienDir;
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'dart:io';
 import '../models/medien_datei.dart';
 import '../services/database_service.dart';
 
@@ -95,6 +96,87 @@ class MedienProvider with ChangeNotifier {
       return '${(groesse / 1024).toStringAsFixed(1)} KB';
     } else {
       return '${(groesse / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+  }
+
+  Future<bool> importFile(File file) async {
+    try {
+      if (!file.existsSync()) {
+        print('Datei existiert nicht: ${file.path}');
+        return false;
+      }
+
+      final fileName = file.path.split('/').last;
+      final fileExtension = fileName.split('.').last.toLowerCase();
+      
+      // Bestimme den Medientyp basierend auf der Dateiendung
+      MedienTyp? medienTyp;
+      switch (fileExtension) {
+        case 'pdf':
+          medienTyp = MedienTyp.pdf;
+          break;
+        case 'mp3':
+        case 'wav':
+        case 'm4a':
+        case 'aac':
+          medienTyp = MedienTyp.mp3;
+          break;
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+        case 'gif':
+        case 'bmp':
+          medienTyp = MedienTyp.bild;
+          break;
+        default:
+          medienTyp = MedienTyp.andere;
+          break;
+      }
+
+      // Kopiere die Datei in das App-Verzeichnis
+      final appDir = await DatabaseService.instance.getAppDirectory();
+      final targetPath = '${appDir.path}/$fileName';
+      final targetFile = File(targetPath);
+      
+      // Wenn die Datei bereits existiert, füge einen Zeitstempel hinzu
+      if (targetFile.existsSync()) {
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+        final newFileName = '${nameWithoutExtension}_$timestamp.$fileExtension';
+        final newTargetPath = '${appDir.path}/$newFileName';
+        await file.copy(newTargetPath);
+        
+        // Erstelle MedienDatei mit dem neuen Namen
+        final medienDatei = MedienDatei(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          dateiname: newFileName,
+          dateipfad: newTargetPath,
+          typ: medienTyp,
+          groesse: await file.length(),
+          importDatum: DateTime.now(),
+        );
+        
+        await addMedienDatei(medienDatei);
+      } else {
+        await file.copy(targetPath);
+        
+        // Erstelle MedienDatei
+        final medienDatei = MedienDatei(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          dateiname: fileName,
+          dateipfad: targetPath,
+          typ: medienTyp,
+          groesse: await file.length(),
+          importDatum: DateTime.now(),
+        );
+        
+        await addMedienDatei(medienDatei);
+      }
+      
+      return true;
+    } catch (e) {
+      print('Fehler beim Importieren der Datei: $e');
+      return false;
     }
   }
 } 

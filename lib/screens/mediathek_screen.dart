@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:open_file/open_file.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../providers/medien_provider.dart';
 import '../providers/settings_provider.dart';
@@ -219,7 +221,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           ),
         ),
         title: Text(
-          medienDatei.dateiname,
+          medienDatei.anzeigeName,
           style: TextStyle(fontWeight: FontWeight.w500),
         ),
         subtitle: Column(
@@ -344,7 +346,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
       builder: (context) => AlertDialog(
         title: Text('Medien löschen'),
         content:
-            Text('Möchten Sie "${medienDatei.dateiname}" wirklich löschen?'),
+            Text('Möchten Sie "${medienDatei.anzeigeName}" wirklich löschen?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -368,10 +370,137 @@ class _MediathekScreenState extends State<MediathekScreen> {
   }
 
   void _importMedia(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Medien hinzufügen',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 20),
+            ListTile(
+              leading: Icon(Icons.photo_camera, color: Color(0xFF00847E)),
+              title: Text('Kamera'),
+              subtitle: Text('Foto aufnehmen'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImageFromCamera();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library, color: Color(0xFF00847E)),
+              title: Text('Galerie'),
+              subtitle: Text('Foto aus Galerie wählen'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImageFromGallery();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.folder_open, color: Color(0xFF00847E)),
+              title: Text('Datei auswählen'),
+              subtitle: Text('PDF, MP3, Bilder oder andere Dateien'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickFile();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _pickImageFromCamera() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 80,
+      );
+      
+      if (image != null) {
+        await _importFile(File(image.path));
+      }
+    } catch (e) {
+      _showErrorSnackBar('Fehler beim Aufnehmen des Fotos: $e');
+    }
+  }
+
+  void _pickImageFromGallery() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+      
+      if (image != null) {
+        await _importFile(File(image.path));
+      }
+    } catch (e) {
+      _showErrorSnackBar('Fehler beim Auswählen des Fotos: $e');
+    }
+  }
+
+  void _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: [
+          'pdf', 'mp3', 'wav', 'm4a', 'aac',
+          'jpg', 'jpeg', 'png', 'gif', 'bmp',
+          'txt', 'doc', 'docx', 'xls', 'xlsx',
+          'ppt', 'pptx', 'zip', 'rar'
+        ],
+        allowMultiple: false,
+      );
+
+      if (result != null && result.files.single.path != null) {
+        await _importFile(File(result.files.single.path!));
+      }
+    } catch (e) {
+      _showErrorSnackBar('Fehler beim Auswählen der Datei: $e');
+    }
+  }
+
+  void _importFile(File file) async {
+    try {
+      if (!file.existsSync()) {
+        _showErrorSnackBar('Datei existiert nicht');
+        return;
+      }
+
+      final medienProvider = Provider.of<MedienProvider>(context, listen: false);
+      final success = await medienProvider.importFile(file);
+      
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Datei erfolgreich importiert: ${file.path.split('/').last}'),
+            backgroundColor: Color(0xFF00847E),
+          ),
+        );
+      } else {
+        _showErrorSnackBar('Fehler beim Importieren der Datei');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Fehler beim Importieren: $e');
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Import-Funktion wird implementiert...'),
-        backgroundColor: Color(0xFF00847E),
+        content: Text(message),
+        backgroundColor: Colors.red,
       ),
     );
   }

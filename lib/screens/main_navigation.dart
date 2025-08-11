@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'archiv_screen.dart';
 import 'etappe_start_screen.dart';
 import 'galerie_screen.dart';
@@ -11,7 +12,7 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
-  
+
   final List<Widget> _screens = [
     ArchivScreen(),
     EtappeStartScreen(),
@@ -40,23 +41,29 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        selectedItemColor: Color(0xFF00847E),
-        unselectedItemColor: Colors.grey,
-        items: _navigationItems,
+    return GestureDetector(
+      onTap: () {
+        // Tastatur schließen wenn außerhalb eines Textfeldes getippt wird
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          selectedItemColor: Color(0xFF00847E),
+          unselectedItemColor: Colors.grey,
+          items: _navigationItems,
+        ),
       ),
     );
   }
-} 
+}

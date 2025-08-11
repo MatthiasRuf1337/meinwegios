@@ -111,33 +111,39 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<EtappenProvider>(
-      builder: (context, etappenProvider, child) {
-        final currentEtappe = etappenProvider.aktuelleEtappe;
-
-        if (currentEtappe == null) {
-          return _buildNoActiveEtappe();
-        }
-
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(currentEtappe.name),
-            backgroundColor: Color(0xFF00847E),
-            foregroundColor: Colors.white,
-            actions: [
-              IconButton(
-                icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause),
-                onPressed: () => _togglePause(),
-              ),
-              IconButton(
-                icon: Icon(Icons.stop),
-                onPressed: () => _stopTracking(etappenProvider),
-              ),
-            ],
-          ),
-          body: _buildTrackingInterface(currentEtappe),
-        );
+    return GestureDetector(
+      onTap: () {
+        // Tastatur schließen wenn außerhalb eines Textfeldes getippt wird
+        FocusScope.of(context).unfocus();
       },
+      child: Consumer<EtappenProvider>(
+        builder: (context, etappenProvider, child) {
+          final currentEtappe = etappenProvider.aktuelleEtappe;
+
+          if (currentEtappe == null) {
+            return _buildNoActiveEtappe();
+          }
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(currentEtappe.name),
+              backgroundColor: Color(0xFF00847E),
+              foregroundColor: Colors.white,
+              actions: [
+                IconButton(
+                  icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause),
+                  onPressed: () => _togglePause(),
+                ),
+                IconButton(
+                  icon: Icon(Icons.stop),
+                  onPressed: () => _stopTracking(etappenProvider),
+                ),
+              ],
+            ),
+            body: _buildTrackingInterface(currentEtappe),
+          );
+        },
+      ),
     );
   }
 
@@ -521,14 +527,13 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
 
   void _startBackgroundTimer() {
     // Timer der auch im Hintergrund läuft
-    Timer.periodic(Duration(seconds: 30), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 30), (timer) {
       if (!_isPaused) {
         // Zeit basierend auf Startzeit berechnen (funktioniert auch im Hintergrund)
         final now = DateTime.now();
-        final startTime = Provider.of<EtappenProvider>(context, listen: false)
-                .aktuelleEtappe
-                ?.startzeit ??
-            now;
+        final etappenProvider =
+            Provider.of<EtappenProvider>(context, listen: false);
+        final startTime = etappenProvider.aktuelleEtappe?.startzeit ?? now;
 
         final elapsed = now.difference(startTime);
 
@@ -616,9 +621,13 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     try {
       Pedometer.stepCountStream.listen(
         (StepCount event) {
-          print('Schritt Update: ${event.steps} Schritte');
+          print(
+              'Schritt Update: ${event.steps} Schritte (Basis: $_initialStepCount)');
           if (!_isPaused && mounted) {
             final newSteps = event.steps - _initialStepCount;
+            print(
+                'Berechnete Schritte: $newSteps (${event.steps} - $_initialStepCount)');
+
             setState(() {
               _stepCount = newSteps;
             });
@@ -647,6 +656,13 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
 
       // Sofort in Etappe speichern
       _saveStepData('START', _initialStepCount);
+
+      // Initiale Schritte auch in der UI anzeigen
+      if (mounted) {
+        setState(() {
+          _stepCount = 0; // Startet bei 0
+        });
+      }
     } catch (e) {
       print('Fehler beim Abrufen der initialen Schritte: $e');
       _initialStepCount = 0;
@@ -773,6 +789,9 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     try {
       final currentStepCount = await Pedometer.stepCountStream.first;
       final newSteps = currentStepCount.steps - _initialStepCount;
+      print(
+          'Speichere Schritte ($action): $newSteps (${currentStepCount.steps} - $_initialStepCount)');
+
       setState(() {
         _stepCount = newSteps;
       });
@@ -787,7 +806,8 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       final currentStepCount = await Pedometer.stepCountStream.first;
       _initialStepCount =
           currentStepCount.steps - _stepCount; // Neue Basis setzen
-      print('Neue Basis-Schritte nach Resume: $_initialStepCount');
+      print(
+          'Neue Basis-Schritte nach Resume: $_initialStepCount (${currentStepCount.steps} - $_stepCount)');
     } catch (e) {
       print('Fehler beim Setzen der neuen Basis-Schritte: $e');
     }
