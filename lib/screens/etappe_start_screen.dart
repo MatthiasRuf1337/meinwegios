@@ -9,6 +9,7 @@ import '../providers/etappen_provider.dart';
 import '../models/etappe.dart';
 import '../services/permission_service.dart';
 import 'etappe_tracking_screen.dart';
+import 'etappe_detail_screen.dart';
 
 class EtappeStartScreen extends StatefulWidget {
   @override
@@ -982,8 +983,12 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
   }
 
   void _openEtappeDetail(Etappe etappe) {
-    // Navigation zum Etappen-Detail-Screen
-    // (wird später implementiert)
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EtappeDetailScreen(etappe: etappe),
+      ),
+    );
   }
 
   void _showErrorDialog(String message) {
