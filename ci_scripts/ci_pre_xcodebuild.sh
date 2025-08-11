@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # CI Script für Xcode Cloud mit Runner-Release Schema
+# Version: 2025-08-06 - Fixed Runner.xcworkspace directory check
 set -e
 
 echo "🔧 Setting up Xcode Cloud build with Runner-Release schema..."
