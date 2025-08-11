@@ -10,8 +10,10 @@ class MedienProvider with ChangeNotifier {
   List<MedienDatei> get medienDateien => _medienDateien;
   bool get isLoading => _isLoading;
 
-  List<MedienDatei> get pdfDateien => _medienDateien.where((m) => m.istPDF).toList();
-  List<MedienDatei> get mp3Dateien => _medienDateien.where((m) => m.istMP3).toList();
+  List<MedienDatei> get pdfDateien =>
+      _medienDateien.where((m) => m.istPDF).toList();
+  List<MedienDatei> get mp3Dateien =>
+      _medienDateien.where((m) => m.istMP3).toList();
 
   MedienProvider() {
     _loadMedienDateien();
@@ -63,17 +65,19 @@ class MedienProvider with ChangeNotifier {
 
   List<MedienDatei> searchMedienDateien(String query) {
     if (query.isEmpty) return _medienDateien;
-    
-    return _medienDateien.where((medienDatei) =>
-        medienDatei.dateiname.toLowerCase().contains(query.toLowerCase())
-    ).toList();
+
+    return _medienDateien
+        .where((medienDatei) =>
+            medienDatei.dateiname.toLowerCase().contains(query.toLowerCase()))
+        .toList();
   }
 
   List<MedienDatei> getMedienDateienByDateRange(DateTime start, DateTime end) {
-    return _medienDateien.where((medienDatei) =>
-        medienDatei.importDatum.isAfter(start) &&
-        medienDatei.importDatum.isBefore(end)
-    ).toList();
+    return _medienDateien
+        .where((medienDatei) =>
+            medienDatei.importDatum.isAfter(start) &&
+            medienDatei.importDatum.isBefore(end))
+        .toList();
   }
 
   int getMedienDateienCount() {
@@ -85,7 +89,8 @@ class MedienProvider with ChangeNotifier {
   }
 
   double getGesamtGroesse() {
-    return _medienDateien.fold(0.0, (sum, medienDatei) => sum + medienDatei.groesse);
+    return _medienDateien.fold(
+        0.0, (sum, medienDatei) => sum + medienDatei.groesse);
   }
 
   String getFormatierteGesamtGroesse() {
@@ -108,7 +113,7 @@ class MedienProvider with ChangeNotifier {
 
       final fileName = file.path.split('/').last;
       final fileExtension = fileName.split('.').last.toLowerCase();
-      
+
       // Bestimme den Medientyp basierend auf der Dateiendung
       MedienTyp? medienTyp;
       switch (fileExtension) {
@@ -119,6 +124,8 @@ class MedienProvider with ChangeNotifier {
         case 'wav':
         case 'm4a':
         case 'aac':
+        case 'flac':
+        case 'ogg':
           medienTyp = MedienTyp.mp3;
           break;
         case 'jpg':
@@ -126,7 +133,23 @@ class MedienProvider with ChangeNotifier {
         case 'png':
         case 'gif':
         case 'bmp':
+        case 'webp':
+        case 'tiff':
           medienTyp = MedienTyp.bild;
+          break;
+        case 'txt':
+        case 'doc':
+        case 'docx':
+        case 'xls':
+        case 'xlsx':
+        case 'ppt':
+        case 'pptx':
+        case 'zip':
+        case 'rar':
+        case '7z':
+        case 'tar':
+        case 'gz':
+          medienTyp = MedienTyp.andere;
           break;
         default:
           medienTyp = MedienTyp.andere;
@@ -137,15 +160,16 @@ class MedienProvider with ChangeNotifier {
       final appDir = await DatabaseService.instance.getAppDirectory();
       final targetPath = '${appDir.path}/$fileName';
       final targetFile = File(targetPath);
-      
+
       // Wenn die Datei bereits existiert, füge einen Zeitstempel hinzu
       if (targetFile.existsSync()) {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+        final nameWithoutExtension =
+            fileName.substring(0, fileName.lastIndexOf('.'));
         final newFileName = '${nameWithoutExtension}_$timestamp.$fileExtension';
         final newTargetPath = '${appDir.path}/$newFileName';
         await file.copy(newTargetPath);
-        
+
         // Erstelle MedienDatei mit dem neuen Namen
         final medienDatei = MedienDatei(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -155,11 +179,11 @@ class MedienProvider with ChangeNotifier {
           groesse: await file.length(),
           importDatum: DateTime.now(),
         );
-        
+
         await addMedienDatei(medienDatei);
       } else {
         await file.copy(targetPath);
-        
+
         // Erstelle MedienDatei
         final medienDatei = MedienDatei(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -169,14 +193,14 @@ class MedienProvider with ChangeNotifier {
           groesse: await file.length(),
           importDatum: DateTime.now(),
         );
-        
+
         await addMedienDatei(medienDatei);
       }
-      
+
       return true;
     } catch (e) {
       print('Fehler beim Importieren der Datei: $e');
       return false;
     }
   }
-} 
+}

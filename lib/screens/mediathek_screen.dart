@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../providers/medien_provider.dart';
 import '../providers/settings_provider.dart';
@@ -20,6 +21,7 @@ class MediathekScreen extends StatefulWidget {
 class _MediathekScreenState extends State<MediathekScreen> {
   String _searchQuery = '';
   MedienTyp? _selectedType;
+  bool _showOnlyVerlagsdateien = false;
 
   @override
   void initState() {
@@ -63,7 +65,11 @@ class _MediathekScreenState extends State<MediathekScreen> {
                           .contains(_searchQuery.toLowerCase());
                       final matchesType =
                           _selectedType == null || medien.typ == _selectedType;
-                      return matchesSearch && matchesType;
+                      final matchesVerlagsdateien =
+                          !_showOnlyVerlagsdateien || medien.istVerlagsdatei;
+                      return matchesSearch &&
+                          matchesType &&
+                          matchesVerlagsdateien;
                     }).toList();
 
                     if (medien.isEmpty) {
@@ -146,6 +152,22 @@ class _MediathekScreenState extends State<MediathekScreen> {
             onSelected: (selected) {
               setState(() {
                 _selectedType = selected ? MedienTyp.mp3 : null;
+              });
+            },
+            selectedColor: Color(0xFF00847E).withOpacity(0.2),
+            checkmarkColor: Color(0xFF00847E),
+          ),
+          SizedBox(width: 8),
+          FilterChip(
+            label: Text('Verlagsdateien'),
+            selected: _showOnlyVerlagsdateien,
+            onSelected: (selected) {
+              setState(() {
+                _showOnlyVerlagsdateien = selected;
+                if (selected) {
+                  _selectedType =
+                      null; // Reset type filter when showing only verlagsdateien
+                }
               });
             },
             selectedColor: Color(0xFF00847E).withOpacity(0.2),
@@ -405,10 +427,10 @@ class _MediathekScreenState extends State<MediathekScreen> {
             ListTile(
               leading: Icon(Icons.folder_open, color: Color(0xFF00847E)),
               title: Text('Datei auswählen'),
-              subtitle: Text('Nur Bilder verfügbar'),
+              subtitle: Text('PDF, MP3, Bilder oder andere Dateien'),
               onTap: () {
                 Navigator.pop(context);
-                _pickImageFromGallery();
+                _pickFile();
               },
             ),
           ],
@@ -446,6 +468,42 @@ class _MediathekScreenState extends State<MediathekScreen> {
       }
     } catch (e) {
       _showErrorSnackBar('Fehler beim Auswählen des Fotos: $e');
+    }
+  }
+
+  void _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: [
+          'pdf',
+          'mp3',
+          'wav',
+          'm4a',
+          'aac',
+          'jpg',
+          'jpeg',
+          'png',
+          'gif',
+          'bmp',
+          'txt',
+          'doc',
+          'docx',
+          'xls',
+          'xlsx',
+          'ppt',
+          'pptx',
+          'zip',
+          'rar'
+        ],
+        allowMultiple: false,
+      );
+
+      if (result != null && result.files.single.path != null) {
+        await _importFile(File(result.files.single.path!));
+      }
+    } catch (e) {
+      _showErrorSnackBar('Fehler beim Auswählen der Datei: $e');
     }
   }
 

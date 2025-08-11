@@ -48,14 +48,18 @@ class _GalerieScreenState extends State<GalerieScreen> {
             child: Consumer<BilderProvider>(
               builder: (context, bilderProvider, child) {
                 final bilder = bilderProvider.bilder
-                    .where((bild) => bild.dateiname.toLowerCase().contains(_searchQuery.toLowerCase()))
+                    .where((bild) => bild.dateiname
+                        .toLowerCase()
+                        .contains(_searchQuery.toLowerCase()))
                     .toList();
 
                 if (bilder.isEmpty) {
                   return _buildEmptyState();
                 }
 
-                return _isGridView ? _buildGridView(bilder) : _buildListView(bilder);
+                return _isGridView
+                    ? _buildGridView(bilder)
+                    : _buildListView(bilder);
               },
             ),
           ),
@@ -90,9 +94,9 @@ class _GalerieScreenState extends State<GalerieScreen> {
     return Consumer<BilderProvider>(
       builder: (context, bilderProvider, child) {
         final totalBilder = bilderProvider.bilder.length;
-                 final bilderMitGPS = bilderProvider.bilder.where((b) => b.hatGPS).length;
         final bilderHeute = bilderProvider.bilder
-            .where((b) => b.aufnahmeZeit.isAfter(DateTime.now().subtract(Duration(days: 1))))
+            .where((b) => b.aufnahmeZeit
+                .isAfter(DateTime.now().subtract(Duration(days: 1))))
             .length;
 
         return Container(
@@ -106,8 +110,8 @@ class _GalerieScreenState extends State<GalerieScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem('Gesamt', totalBilder.toString(), Icons.photo_library),
-              _buildStatItem('Mit GPS', bilderMitGPS.toString(), Icons.location_on),
+              _buildStatItem(
+                  'Gesamt', totalBilder.toString(), Icons.photo_library),
               _buildStatItem('Heute', bilderHeute.toString(), Icons.today),
             ],
           ),
@@ -229,13 +233,13 @@ class _GalerieScreenState extends State<GalerieScreen> {
           bild.dateiname,
           style: TextStyle(fontWeight: FontWeight.w500),
         ),
-                 subtitle: Text(
-           bild.formatierteAufnahmeZeit,
-           style: TextStyle(color: Colors.grey.shade600),
-         ),
-                 trailing: bild.hatGPS
-             ? Icon(Icons.location_on, color: Color(0xFF00847E))
-             : null,
+        subtitle: Text(
+          bild.formatierteAufnahmeZeit,
+          style: TextStyle(color: Colors.grey.shade600),
+        ),
+        trailing: bild.hatGPS
+            ? Icon(Icons.location_on, color: Color(0xFF00847E))
+            : null,
         onTap: () => _openImageDetail(bild),
       ),
     );
@@ -279,4 +283,4 @@ class _GalerieScreenState extends State<GalerieScreen> {
       ),
     );
   }
-} 
+}

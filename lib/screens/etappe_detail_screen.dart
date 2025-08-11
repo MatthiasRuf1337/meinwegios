@@ -27,55 +27,11 @@ class EtappeDetailScreen extends StatefulWidget {
 }
 
 class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
-  int _currentIndex = 0;
   final ImagePicker _picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _screens = [
-      _buildEtappeDetailsContent(),
-      EtappeStartScreen(),
-      GalerieScreen(),
-      MediathekScreen(),
-    ];
-
-    final List<BottomNavigationBarItem> _navigationItems = [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.info),
-        label: 'Details',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.play_arrow),
-        label: 'Etappe',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.photo_library),
-        label: 'Galerie',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.library_books),
-        label: 'Mediathek',
-      ),
-    ];
-
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        selectedItemColor: Color(0xFF00847E),
-        unselectedItemColor: Colors.grey,
-        items: _navigationItems,
-      ),
-    );
+    return _buildEtappeDetailsContent();
   }
 
   Widget _buildEtappeDetailsContent() {

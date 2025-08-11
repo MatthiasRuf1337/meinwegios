@@ -102,33 +102,49 @@ class MedienDatei {
   bool get istMP3 => typ == MedienTyp.mp3;
   bool get istBild => typ == MedienTyp.bild;
   bool get istAndere => typ == MedienTyp.andere;
+  bool get istVerlagsdatei => metadaten['isPreloaded'] == true;
 
   String get anzeigeName {
+    String baseName;
+
     if (istPDF) {
       // Benutzerfreundliche Namen für PDF-Dateien
       final name = dateiname.replaceAll('.pdf', '');
       switch (name) {
         case 'Die Magie des Pilgerns':
-          return 'Die Magie des Pilgerns';
+          baseName = 'Die Magie des Pilgerns';
+          break;
         case 'Mache dich auf den Weg':
-          return 'Mache dich auf den Weg';
+          baseName = 'Mache dich auf den Weg';
+          break;
         case 'Packliste':
-          return 'Packliste';
+          baseName = 'Packliste';
+          break;
         default:
-          return name;
+          baseName = name;
       }
     } else if (istMP3) {
       // Benutzerfreundliche Namen für MP3-Dateien
       final name = dateiname.replaceAll('.mp3', '');
       switch (name) {
         case 'Atem Ruhe Freundlichkeit':
-          return 'Atem Ruhe Freundlichkeit';
+          baseName = 'Atem Ruhe Freundlichkeit';
+          break;
         case '3 Minuten Atemraum':
-          return '3 Minuten Atemraum';
+          baseName = '3 Minuten Atemraum';
+          break;
         default:
-          return name;
+          baseName = name;
       }
+    } else {
+      baseName = dateiname;
     }
-    return dateiname;
+
+    // Tag für Verlagsdateien hinzufügen
+    if (istVerlagsdatei) {
+      return '$baseName (Verlagsdatei)';
+    }
+
+    return baseName;
   }
 }

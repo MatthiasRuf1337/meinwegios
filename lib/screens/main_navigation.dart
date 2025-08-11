@@ -27,7 +27,7 @@ class _MainNavigationState extends State<MainNavigation> {
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.play_arrow),
-      label: 'Etappe',
+      label: 'Neue Etappe',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.photo_library),

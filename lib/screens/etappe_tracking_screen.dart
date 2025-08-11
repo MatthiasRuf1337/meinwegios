@@ -614,8 +614,10 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       return;
     }
 
-    // Initiale Schritte beim Start abrufen
+    // Initiale Schritte beim Start abrufen - WICHTIG: Warten bis fertig!
+    print('Hole initiale Schritte...');
     await _getInitialSteps();
+    print('Initiale Schritte geholt: $_initialStepCount');
 
     // Kontinuierlicher Stream für Schritte
     try {
@@ -649,10 +651,12 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
 
   Future<void> _getInitialSteps() async {
     try {
+      print('Warte auf erste Schritt-Daten...');
       final stepCount = await Pedometer.stepCountStream.first;
       _initialStepCount = stepCount.steps;
       _lastStepCount = stepCount.steps;
-      print('Initiale Schritte: $_initialStepCount');
+      print(
+          'Initiale Schritte erfolgreich geholt: $_initialStepCount (Geräte-Gesamt)');
 
       // Sofort in Etappe speichern
       _saveStepData('START', _initialStepCount);
@@ -660,9 +664,11 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       // Initiale Schritte auch in der UI anzeigen
       if (mounted) {
         setState(() {
-          _stepCount = 0; // Startet bei 0
+          _stepCount = 0; // Startet bei 0 für diese Etappe
         });
       }
+
+      print('Etappe startet mit 0 Schritten (Basis: $_initialStepCount)');
     } catch (e) {
       print('Fehler beim Abrufen der initialen Schritte: $e');
       _initialStepCount = 0;
@@ -829,7 +835,10 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
               Navigator.pop(context);
               _finishEtappe(provider);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF00847E)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF00847E),
+              foregroundColor: Colors.white,
+            ),
             child: Text('Beenden'),
           ),
         ],
