@@ -66,8 +66,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
-		<string>background-processing</string>
-		<string>background-fetch</string>
+		<string>background-app-refresh</string>
 	</array>
 </dict>
 </plist> 
