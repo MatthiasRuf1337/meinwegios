@@ -102,90 +102,132 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
 
-                // Hauptinhalt
+                // Hauptinhalt (scrollbar + Bild unter dem Header)
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Titel
-                        Text(
-                          'Die App zu deinem Buch',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF00847E),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Bild unter dem grünen Balken
+                          Container(
+                            clipBehavior: Clip.antiAlias,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.06),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Image.asset(
+                                'assets/images/Marco_Bach_2025.jpg',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey.shade200,
+                                    alignment: Alignment.center,
+                                    child: Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.grey.shade500,
+                                      size: 48,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 16),
+                          const SizedBox(height: 20),
 
-                        // Einleitungstexte
-                        Text(
-                          'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise“.\nSie ist deine Begleitung unterwegs – digital, praktisch und persönlich.',
-                          style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.\nDort findest du alle Texte, Reflexionsseiten, thematischen Impulse und Zitate.',
-                          style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 24),
+                          // Titel
+                          const Text(
+                            'Die App zu deinem Buch',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF00847E),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
 
-                        // Funktionen
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Die App ergänzt dein Buch um wertvolle digitale Funktionen:',
+                          // Einleitungstexte
+                          Text(
+                            'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise“.\nSie ist deine Begleitung unterwegs – digital, praktisch und persönlich.',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.\nDort findest du alle Texte, Reflexionsseiten, thematischen Impulse und Zitate.',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Funktionen
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Die App ergänzt dein Buch um wertvolle digitale Funktionen:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade800,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildEmojiBullet('🗺', 'Strecke aufzeichnen oder Schritte zählen'),
+                          _buildEmojiBullet('📷', 'Bilder zu jeder Etappe festhalten'),
+                          _buildEmojiBullet('🎙', 'Gedanken als Audio aufnehmen'),
+                          _buildEmojiBullet('📖', 'E-Paper und Meditationen direkt in der App nutzen'),
+                          const SizedBox(height: 32),
+
+                          // Berechtigungen
+                          const Text(
+                            'Wichtiger Hinweis zur Nutzung',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.grey.shade800,
+                              color: Color(0xFF333333),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 12),
-                        _buildEmojiBullet('🗺', 'Strecke aufzeichnen oder Schritte zählen'),
-                        _buildEmojiBullet('📷', 'Bilder zu jeder Etappe festhalten'),
-                        _buildEmojiBullet('🎙', 'Gedanken als Audio aufnehmen'),
-                        _buildEmojiBullet('📖', 'E-Paper und Meditationen direkt in der App nutzen'),
-                        SizedBox(height: 32),
-
-                        // Berechtigungen
-                        Text(
-                          'Wichtiger Hinweis zur Nutzung',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade800,
+                          const SizedBox(height: 8),
+                          Text(
+                            'Damit alle Funktionen reibungslos arbeiten, fragt die App beim Start den Zugriff auf Standort, Kamera, Fotos, Aktivitätserkennung und Schrittzähler ab.\n\nDeine Privatsphäre hat oberste Priorität: Alle Daten bleiben ausschließlich auf deinem Handy – keine Weitergabe, kein Upload.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade700,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Damit alle Funktionen reibungslos arbeiten, fragt die App beim Start den Zugriff auf Standort, Kamera, Fotos, Aktivitätserkennung und Schrittzähler ab.\n\nDeine Privatsphäre hat oberste Priorität: Alle Daten bleiben ausschließlich auf deinem Handy – keine Weitergabe, kein Upload.',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade700,
+                          const SizedBox(height: 16),
+                          Text(
+                            'Benötigte Berechtigungen:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade700,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Benötigte Berechtigungen:',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade700,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 16),
-                        ..._permissions.map(
-                            (permission) => _buildPermissionItem(permission)),
-                      ],
+                          const SizedBox(height: 16),
+                          ..._permissions.map((permission) => _buildPermissionItem(permission)),
+                        ],
+                      ),
                     ),
                   ),
                 ),
