@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Etappe {
   final String id;
   final String name;
@@ -34,7 +36,8 @@ class Etappe {
       'status': status.index,
       'gesamtDistanz': gesamtDistanz,
       'schrittAnzahl': schrittAnzahl,
-      'gpsPunkte': gpsPunkte.map((punkt) => punkt.toMap()).toList(),
+      // In DB als TEXT (JSON) gespeichert
+      'gpsPunkte': jsonEncode(gpsPunkte.map((punkt) => punkt.toMap()).toList()),
       'notizen': notizen,
       'erstellungsDatum': erstellungsDatum.millisecondsSinceEpoch,
       'bildIds': bildIds,
@@ -46,17 +49,31 @@ class Etappe {
       id: map['id'],
       name: map['name'],
       startzeit: DateTime.fromMillisecondsSinceEpoch(map['startzeit']),
-      endzeit: map['endzeit'] != null 
+      endzeit: map['endzeit'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['endzeit'])
           : null,
       status: EtappenStatus.values[map['status']],
       gesamtDistanz: map['gesamtDistanz'] ?? 0.0,
       schrittAnzahl: map['schrittAnzahl'] ?? 0,
-      gpsPunkte: (map['gpsPunkte'] as List?)
-          ?.map((punkt) => GPSPunkt.fromMap(punkt))
-          .toList() ?? [],
+      // Aus DB (TEXT) JSON parsen, aber auch Liste unterstützen (Abwärtskompatibilität)
+      gpsPunkte: (() {
+        final raw = map['gpsPunkte'];
+        if (raw == null) return <GPSPunkt>[];
+        try {
+          if (raw is String) {
+            final decoded = jsonDecode(raw);
+            if (decoded is List) {
+              return decoded.map((e) => GPSPunkt.fromMap(e)).toList();
+            }
+          } else if (raw is List) {
+            return raw.map((e) => GPSPunkt.fromMap(e)).toList();
+          }
+        } catch (_) {}
+        return <GPSPunkt>[];
+      })(),
       notizen: map['notizen'],
-      erstellungsDatum: DateTime.fromMillisecondsSinceEpoch(map['erstellungsDatum']),
+      erstellungsDatum:
+          DateTime.fromMillisecondsSinceEpoch(map['erstellungsDatum']),
       bildIds: List<String>.from(map['bildIds'] ?? []),
     );
   }
@@ -99,7 +116,7 @@ class Etappe {
     final hours = duration.inHours;
     final minutes = duration.inMinutes % 60;
     final seconds = duration.inSeconds % 60;
-    
+
     if (hours > 0) {
       return '${hours}h ${minutes}m ${seconds}s';
     } else if (minutes > 0) {
@@ -158,4 +175,4 @@ class GPSPunkt {
       accuracy: map['accuracy'],
     );
   }
-} 
+}

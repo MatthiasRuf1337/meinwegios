@@ -26,7 +26,8 @@ class _MainNavigationState extends State<MainNavigation> {
       label: 'Etappen',
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.play_arrow),
+      icon: Icon(Icons.add_circle_outline),
+      activeIcon: Icon(Icons.add_circle),
       label: 'Neue Etappe',
     ),
     BottomNavigationBarItem(

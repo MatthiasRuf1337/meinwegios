@@ -26,6 +26,11 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   void initState() {
     super.initState();
     _initAudioPlayer();
+
+    // Test: Prüfe Thumbnail-Verfügbarkeit
+    print('🎵 Audio Player für: ${widget.medienDatei.dateiname}');
+    print('🎵 Thumbnail verfügbar: ${widget.medienDatei.hasThumbnail}');
+    print('🎵 Thumbnail-Pfad: ${widget.medienDatei.thumbnailPath}');
   }
 
   Future<void> _initAudioPlayer() async {

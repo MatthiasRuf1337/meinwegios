@@ -35,12 +35,16 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
   double _currentSpeed = 0.0;
   Position? _currentPosition;
   List<etappe_models.GPSPunkt> _gpsPoints = [];
+  etappe_models.GPSPunkt? _lastAcceptedPoint;
+  DateTime? _lastAcceptedTimestamp;
+  // double? _lastAcceptedAccuracy; // aktuell nicht genutzt
   final ImagePicker _picker = ImagePicker();
   Timer? _timer;
   Timer? _stepUpdateTimer; // Timer für Schrittabfrage
   StreamSubscription<Position>? _positionSubscription;
   DateTime? _appPausedTime; // Zeitpunkt als App pausiert wurde
-  bool _inBackground = false; // Guard: verhindert mehrfaches Speichern beim OS-Pause-Event
+  bool _inBackground =
+      false; // Guard: verhindert mehrfaches Speichern beim OS-Pause-Event
   DateTime? _lastPauseSaveAt; // Guard: entprellt manuelle Pause-Speicherung
 
   @override
@@ -67,6 +71,10 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         _distance = etappe.gesamtDistanz;
         _gpsPoints = List.from(etappe.gpsPunkte);
       });
+      if (_gpsPoints.isNotEmpty) {
+        _lastAcceptedPoint = _gpsPoints.last;
+        _lastAcceptedTimestamp = _gpsPoints.last.timestamp;
+      }
       print(
           'Geladene Daten: $elapsedTime, ${etappe.schrittAnzahl} Schritte, ${etappe.gesamtDistanz}m');
     }
@@ -366,8 +374,8 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
                 'Breitengrad', _currentPosition!.latitude.toStringAsFixed(6)),
             _buildGPSRow(
                 'Längengrad', _currentPosition!.longitude.toStringAsFixed(6)),
-            _buildGPSRow('Höhe',
-                '${_currentPosition!.altitude.toStringAsFixed(1)} m'),
+            _buildGPSRow(
+                'Höhe', '${_currentPosition!.altitude.toStringAsFixed(1)} m'),
             _buildGPSRow('Genauigkeit',
                 '${_currentPosition!.accuracy.toStringAsFixed(1)} m'),
           ] else ...[
@@ -566,7 +574,9 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         gesamtDistanz: _distance,
         gpsPunkte: _gpsPoints,
       );
+      // Persistiere sofort
       etappenProvider.updateAktuelleEtappe(updatedEtappe);
+      etappenProvider.updateEtappe(updatedEtappe);
     }
   }
 
@@ -575,36 +585,88 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     // Kontinuierliches GPS-Tracking mit Hintergrund-Unterstützung
     _positionSubscription = Geolocator.getPositionStream(
       locationSettings: LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 5, // Update alle 5 Meter für bessere Genauigkeit
-        timeLimit: Duration(seconds: 30), // Timeout für bessere Performance
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 3,
       ),
-    ).listen(
-      (Position position) {
-        print('GPS Update: ${position.latitude}, ${position.longitude}');
-        if (!_isPaused && mounted) {
-          setState(() {
-            _currentPosition = position;
-            _gpsPoints.add(etappe_models.GPSPunkt(
-              latitude: position.latitude,
-              longitude: position.longitude,
-              altitude: position.altitude,
-              timestamp: DateTime.now(),
-              accuracy: position.accuracy,
-            ));
-          });
+    ).listen((Position position) {
+      if (_isPaused || !mounted) return;
 
-          // Distanz berechnen
-          _calculateDistance();
+      final now = DateTime.now();
+      _currentPosition = position;
 
-          // Sofort aktualisieren
-          _updateEtappeData();
+      // Filter: schlechte Genauigkeit verwerfen (> 25 m)
+      final accuracy =
+          (position.accuracy.isFinite ? position.accuracy : 9999).toDouble();
+      if (accuracy > 25) {
+        return;
+      }
+
+      // Errechne inkrementelle Distanz nur von letzten akzeptierten Punkt
+      final currentPoint = etappe_models.GPSPunkt(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        altitude: position.altitude,
+        timestamp: now,
+        accuracy: accuracy.toDouble(),
+      );
+
+      double increment = 0.0;
+      if (_lastAcceptedPoint != null) {
+        final seconds = _lastAcceptedTimestamp == null
+            ? null
+            : now.difference(_lastAcceptedTimestamp!).inSeconds;
+        final deltaMeters = Geolocator.distanceBetween(
+          _lastAcceptedPoint!.latitude,
+          _lastAcceptedPoint!.longitude,
+          currentPoint.latitude,
+          currentPoint.longitude,
+        );
+
+        // Geschwindigkeit in m/s, prüfe unrealistische Sprünge (> 3.5 m/s ~ 12.6 km/h)
+        if (seconds != null && seconds > 0) {
+          final speedMetersPerSecond = deltaMeters / seconds;
+          if (speedMetersPerSecond <= 3.5 && deltaMeters >= 1) {
+            increment = deltaMeters;
+          } else {
+            // Verwerfe Sprung
+            increment = 0.0;
+          }
+        } else {
+          // Keine Zeitdifferenz messbar, kleinen Schritt akzeptieren
+          if (deltaMeters <= 10) {
+            increment = deltaMeters;
+          }
         }
-      },
-      onError: (error) {
-        print('GPS Fehler: $error');
-      },
-    );
+      }
+
+      if (increment > 0) {
+        _distance += increment;
+        _gpsPoints.add(currentPoint);
+        _lastAcceptedPoint = currentPoint;
+        _lastAcceptedTimestamp = now;
+        // _lastAcceptedAccuracy = accuracy;
+
+        // Geschwindigkeit schätzen aus letztem Intervall (km/h)
+        if (_gpsPoints.length >= 2) {
+          final prev = _gpsPoints[_gpsPoints.length - 2];
+          final secs = now.difference(prev.timestamp).inSeconds;
+          if (secs > 0) {
+            final dm = Geolocator.distanceBetween(
+              prev.latitude,
+              prev.longitude,
+              currentPoint.latitude,
+              currentPoint.longitude,
+            );
+            _currentSpeed = (dm / secs) * 3.6; // km/h
+          }
+        }
+
+        setState(() {});
+        _updateEtappeData();
+      }
+    }, onError: (error) {
+      print('GPS Fehler: $error');
+    });
   }
 
   void _startStepCounting() async {
@@ -766,23 +828,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     }
   } */
 
-  void _calculateDistance() {
-    if (_gpsPoints.length < 2) return;
-
-    double totalDistance = 0.0;
-    for (int i = 1; i < _gpsPoints.length; i++) {
-      totalDistance += Geolocator.distanceBetween(
-        _gpsPoints[i - 1].latitude,
-        _gpsPoints[i - 1].longitude,
-        _gpsPoints[i].latitude,
-        _gpsPoints[i].longitude,
-      );
-    }
-
-    setState(() {
-      _distance = totalDistance;
-    });
-  }
+  // Distanz wird inkrementell in _startGPSTracking() berechnet
 
   void _togglePause() async {
     setState(() {
@@ -792,7 +838,8 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     if (_isPaused) {
       // Entprellen: Nur einmal pro kurzer Zeitraum speichern
       final now = DateTime.now();
-      if (_lastPauseSaveAt == null || now.difference(_lastPauseSaveAt!).inMilliseconds > 800) {
+      if (_lastPauseSaveAt == null ||
+          now.difference(_lastPauseSaveAt!).inMilliseconds > 800) {
         _lastPauseSaveAt = now;
         await _saveCurrentSteps('PAUSE');
       } else {
@@ -877,7 +924,18 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       _saveStepData('STOP', finalStepCount.steps);
 
       // Finale Daten speichern
-      _updateEtappeData();
+      final current = provider.aktuelleEtappe;
+      if (current != null) {
+        final completed = current.copyWith(
+          schrittAnzahl: _stepCount,
+          gesamtDistanz: _distance,
+          gpsPunkte: _gpsPoints,
+          endzeit: DateTime.now(),
+          status: EtappenStatus.abgeschlossen,
+        );
+        provider.updateAktuelleEtappe(completed);
+        await provider.updateEtappe(completed);
+      }
     } catch (e) {
       print('Fehler beim Abrufen der finalen Schritte: $e');
     }
