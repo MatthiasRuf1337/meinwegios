@@ -78,6 +78,27 @@ else
     echo "✅ Generated.xcconfig already exists"
 fi
 
+# Zusätzlich: Generated.xcconfig im Repository-Verzeichnis erstellen
+echo "🔧 Creating Generated.xcconfig in repository root..."
+mkdir -p Flutter
+cat > Flutter/Generated.xcconfig << EOF
+// This is a generated file; do not edit or check into version control.
+FLUTTER_ROOT=/tmp/flutter
+FLUTTER_APPLICATION_PATH=/Volumes/workspace/repository
+COCOAPODS_PARALLEL_CODE_SIGN=true
+FLUTTER_TARGET=lib/main.dart
+FLUTTER_BUILD_DIR=build
+FLUTTER_BUILD_NAME=1.0.0
+FLUTTER_BUILD_NUMBER=1
+EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386
+EXCLUDED_ARCHS[sdk=iphoneos*]=armv7
+DART_OBFUSCATION=false
+TRACK_WIDGET_CREATION=true
+TREE_SHAKE_ICONS=false
+PACKAGE_CONFIG=.dart_tool/package_config.json
+EOF
+echo "✅ Generated.xcconfig created in repository root"
+
 # Verifizieren dass Generated.xcconfig erstellt wurde
 echo "🔍 Verifying Flutter generated files..."
 if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
