@@ -89,23 +89,5 @@ cd ..
 echo "📱 Building Flutter app with release configuration..."
 flutter build ios --release --no-codesign
 
-# Xcode Build mit Runner-Release Schema
-echo "🏗️ Building with Runner-Release schema..."
-# Wir sind jetzt im Projekt-Root, also cd ios
-cd ios
-if [ ! -d "Runner.xcworkspace" ]; then
-    echo "❌ Error: Runner.xcworkspace directory not found in ios directory"
-    echo "Current directory: $(pwd)"
-    echo "Available files:"
-    ls -la
-    exit 1
-fi
-
-if command -v xcodebuild >/dev/null 2>&1; then
-    xcodebuild -workspace Runner.xcworkspace -scheme Runner-Release -configuration Release archive -archivePath build/Runner.xcarchive
-else
-    echo "❌ Error: xcodebuild command not available"
-    exit 1
-fi
-
-echo "✅ Build completed successfully with Runner-Release schema!"
+echo "✅ Flutter build completed successfully!"
+echo "🚀 Xcode Cloud will now handle the Xcode build and code signing automatically"
