@@ -17,6 +17,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     'Aktivitätserkennung',
     'Fotos',
   ];
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollHint = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_showScrollHint && _scrollController.offset > 10) {
+        setState(() {
+          _showScrollHint = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,13 +124,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                 // Hauptinhalt (scrollbar + Bild unter dem Header)
                 Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        controller: _scrollController,
+                        physics: const BouncingScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
                           // Bild unter dem grünen Balken
                           Container(
                             clipBehavior: Clip.antiAlias,
@@ -234,6 +257,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ],
                       ),
                     ),
+                    ),
+                      if (_showScrollHint) _buildScrollHintOverlay(),
+                    ],
                   ),
                 ),
 
@@ -292,6 +318,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildScrollHintOverlay() {
+    return Positioned(
+      bottom: 8,
+      left: 0,
+      right: 0,
+      child: IgnorePointer(
+        ignoring: true,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.keyboard_arrow_down, color: Color(0x8000847E), size: 28),
+            Text(
+              'Nach unten scrollen',
+              style: TextStyle(color: Color(0x8000847E), fontSize: 12),
+            ),
+          ],
+        ),
       ),
     );
   }
