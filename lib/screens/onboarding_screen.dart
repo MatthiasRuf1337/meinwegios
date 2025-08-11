@@ -9,7 +9,6 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  int _currentStep = 0;
   final List<String> _permissions = [
     'Standort',
     'Kamera',
@@ -33,33 +32,80 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                Expanded(
+          child: Column(
+            children: [
+              // Grüner Header-Balken mit Logo
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                decoration: BoxDecoration(
+                  color: Color(0xFF00847E),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    // App Logo
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'icon.png',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.directions_walk,
+                              size: 30,
+                              color: Color(0xFF00847E),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    // App Name
+                    Text(
+                      'Mein Weg',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Hauptinhalt
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // App Icon
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          color: Color(0xFF00847E),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Icon(
-                          Icons.directions_walk,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 32),
-
                       // Titel
                       Text(
-                        'Willkommen bei MeinWeg!',
+                        'Willkommen bei Mein Weg!',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -92,30 +138,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       SizedBox(height: 32),
 
                       // Berechtigungen
-                      if (_currentStep == 0) ...[
-                        Text(
-                          'Für die volle Funktionalität benötigt die App folgende Berechtigungen:',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade700,
-                          ),
-                          textAlign: TextAlign.center,
+                      Text(
+                        'Für die volle Funktionalität benötigt die App folgende Berechtigungen:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade700,
                         ),
-                        SizedBox(height: 16),
-                        ..._permissions.map(
-                            (permission) => _buildPermissionItem(permission)),
-                      ],
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 16),
+                      ..._permissions.map(
+                          (permission) => _buildPermissionItem(permission)),
                     ],
                   ),
                 ),
+              ),
 
-                // Buttons
-                Column(
+              // Buttons
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
                   children: [
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () => _handleNextStep(),
+                        onPressed: () => _handleStart(),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF00847E),
                           foregroundColor: Colors.white,
@@ -125,7 +172,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         child: Text(
-                          _currentStep == 0 ? 'Verstanden' : 'Los geht\'s!',
+                          'Verstanden',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -134,20 +181,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                     SizedBox(height: 12),
-                    if (_currentStep == 0)
-                      TextButton(
-                        onPressed: () => _skipOnboarding(),
-                        child: Text(
-                          'Überspringen (nur für Tests)',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                          ),
+                    TextButton(
+                      onPressed: () => _skipOnboarding(),
+                      child: Text(
+                        'Überspringen (nur für Tests)',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
                         ),
                       ),
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -202,17 +248,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _handleNextStep() async {
-    if (_currentStep == 0) {
-      // Berechtigungen anfordern
-      await _requestPermissions();
-      setState(() {
-        _currentStep = 1;
-      });
-    } else {
-      // Onboarding abschließen
-      await _completeOnboarding();
-    }
+  void _handleStart() async {
+    // Berechtigungen anfordern und Onboarding direkt abschließen
+    await _requestPermissions();
+    await _completeOnboarding();
   }
 
   Future<void> _requestPermissions() async {

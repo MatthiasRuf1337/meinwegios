@@ -56,3 +56,4 @@ flutter:
     - assets/images/
     - assets/audio/
     - assets/pdf/
+    - icon.png

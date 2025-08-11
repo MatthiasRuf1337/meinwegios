@@ -80,10 +80,10 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     super.dispose();
   }
 
-    @override
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
- 
+
     switch (state) {
       case AppLifecycleState.paused:
         print('App pausiert - speichere aktuelle Zeit und Schritte');
@@ -594,23 +594,24 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     );
   }
 
-    void _startStepCounting() async {
+  void _startStepCounting() async {
     print('Starte Schrittzählung...');
-    
+
     // Berechtigung prüfen
     bool granted = await Permission.activityRecognition.isGranted;
     if (!granted) {
-      granted = await Permission.activityRecognition.request() == PermissionStatus.granted;
+      granted = await Permission.activityRecognition.request() ==
+          PermissionStatus.granted;
     }
-    
+
     if (!granted) {
       print('Aktivitätserkennung-Berechtigung verweigert');
       return;
     }
-    
+
     // Initiale Schritte beim Start abrufen
     await _getInitialSteps();
-    
+
     // Kontinuierlicher Stream für Schritte
     try {
       Pedometer.stepCountStream.listen(
@@ -621,7 +622,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
             setState(() {
               _stepCount = newSteps;
             });
-            
+
             // Alle 10 Schritte speichern
             if (newSteps % 10 == 0) {
               _saveStepData('UPDATE', event.steps);
@@ -643,7 +644,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       _initialStepCount = stepCount.steps;
       _lastStepCount = stepCount.steps;
       print('Initiale Schritte: $_initialStepCount');
-      
+
       // Sofort in Etappe speichern
       _saveStepData('START', _initialStepCount);
     } catch (e) {
@@ -654,7 +655,8 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
   }
 
   void _saveStepData(String action, int stepCount) {
-    final etappenProvider = Provider.of<EtappenProvider>(context, listen: false);
+    final etappenProvider =
+        Provider.of<EtappenProvider>(context, listen: false);
     if (etappenProvider.aktuelleEtappe != null) {
       final updatedEtappe = etappenProvider.aktuelleEtappe!.copyWith(
         schrittAnzahl: _stepCount,
@@ -783,7 +785,8 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
   Future<void> _getCurrentStepsForResume() async {
     try {
       final currentStepCount = await Pedometer.stepCountStream.first;
-      _initialStepCount = currentStepCount.steps - _stepCount; // Neue Basis setzen
+      _initialStepCount =
+          currentStepCount.steps - _stepCount; // Neue Basis setzen
       print('Neue Basis-Schritte nach Resume: $_initialStepCount');
     } catch (e) {
       print('Fehler beim Setzen der neuen Basis-Schritte: $e');
@@ -814,32 +817,32 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     );
   }
 
-    void _finishEtappe(EtappenProvider provider) async {
+  void _finishEtappe(EtappenProvider provider) async {
     print('Beende Etappe...');
-    
+
     // Finale Schritte abrufen und speichern
     try {
       final finalStepCount = await Pedometer.stepCountStream.first;
       final totalSteps = finalStepCount.steps - _initialStepCount;
       print(
           'Finale Schritte: $totalSteps (Gesamt: ${finalStepCount.steps}, Start: $_initialStepCount)');
-      
+
       setState(() {
         _stepCount = totalSteps;
       });
-      
+
       // Finale Schritte speichern
       _saveStepData('STOP', finalStepCount.steps);
-      
+
       // Finale Daten speichern
       _updateEtappeData();
     } catch (e) {
       print('Fehler beim Abrufen der finalen Schritte: $e');
     }
-    
+
     // Timer stoppen
     _stepUpdateTimer?.cancel();
-    
+
     // Etappe beenden und speichern
     provider.stopEtappe();
 
