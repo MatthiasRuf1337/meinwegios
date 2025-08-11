@@ -7,6 +7,7 @@ import 'dart:io';
 import '../providers/medien_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/medien_datei.dart';
+import '../services/thumbnail_service.dart';
 import 'mediathek_login_screen.dart';
 import 'pdf_viewer_screen.dart';
 import 'pdf_viewer_screen_alternative.dart';
@@ -223,24 +224,26 @@ class _MediathekScreenState extends State<MediathekScreen> {
     return Card(
       margin: EdgeInsets.only(bottom: 8.0),
       child: ListTile(
-        leading: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: medienDatei.typ == MedienTyp.pdf
-                ? Colors.red.shade100
-                : Colors.blue.shade100,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            medienDatei.typ == MedienTyp.pdf
-                ? Icons.picture_as_pdf
-                : Icons.audiotrack,
-            color: medienDatei.typ == MedienTyp.pdf
-                ? Colors.red.shade600
-                : Colors.blue.shade600,
-          ),
-        ),
+        leading: medienDatei.typ == MedienTyp.mp3
+            ? ThumbnailService.loadListThumbnail(medienDatei)
+            : Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: medienDatei.typ == MedienTyp.pdf
+                      ? Colors.red.shade100
+                      : Colors.blue.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  medienDatei.typ == MedienTyp.pdf
+                      ? Icons.picture_as_pdf
+                      : Icons.audiotrack,
+                  color: medienDatei.typ == MedienTyp.pdf
+                      ? Colors.red.shade600
+                      : Colors.blue.shade600,
+                ),
+              ),
         title: Text(
           medienDatei.anzeigeName,
           style: TextStyle(fontWeight: FontWeight.w500),

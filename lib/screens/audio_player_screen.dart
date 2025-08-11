@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import '../models/medien_datei.dart';
+import '../services/thumbnail_service.dart';
 import 'dart:io';
 
 class AudioPlayerScreen extends StatefulWidget {
@@ -200,26 +201,16 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       child: SafeArea(
         child: Column(
           children: [
-            // Album Art Placeholder
+            // Album Art mit Thumbnail
             Container(
               height: 200,
               width: 200,
               margin: EdgeInsets.all(24.0),
-              decoration: BoxDecoration(
-                color: Color(0xFF00847E),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.music_note,
-                size: 60,
-                color: Colors.white,
+              child: ThumbnailService.loadThumbnail(
+                widget.medienDatei,
+                width: 200,
+                height: 200,
+                fit: BoxFit.cover,
               ),
             ),
 

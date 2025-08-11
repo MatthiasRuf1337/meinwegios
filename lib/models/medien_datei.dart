@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 enum MedienTyp {
   pdf,
@@ -25,6 +26,26 @@ class MedienDatei {
     required this.importDatum,
     this.metadaten = const {},
   });
+
+  // Thumbnail-Pfad für MP3-Dateien
+  String? get thumbnailPath {
+    if (typ != MedienTyp.mp3) return null;
+
+    // Entferne .mp3 Erweiterung und füge .jpg hinzu
+    final baseName = dateiname.replaceAll('.mp3', '');
+    final thumbnailName = 'Thumbnail_$baseName.jpg';
+
+    // Prüfe ob Thumbnail im assets/images Ordner existiert
+    final thumbnailFile = File('assets/images/$thumbnailName');
+    if (thumbnailFile.existsSync()) {
+      return thumbnailFile.path;
+    }
+
+    return null;
+  }
+
+  // Prüft ob ein Thumbnail verfügbar ist
+  bool get hasThumbnail => thumbnailPath != null;
 
   Map<String, dynamic> toMap() {
     return {
