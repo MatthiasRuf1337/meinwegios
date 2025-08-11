@@ -46,12 +46,14 @@ class MeinWegApp extends StatelessWidget {
           return MaterialApp(
             title: 'MeinWeg - Etappen-Tracker',
             theme: ThemeData(
+              fontFamily: 'MuseoSans',
               colorScheme: ColorScheme.light(
                 primary: Color(0xFF00847E),
               ),
               brightness: Brightness.light,
             ),
             darkTheme: ThemeData(
+              fontFamily: 'MuseoSans',
               colorScheme: ColorScheme.dark(
                 primary: Color(0xFF00847E),
               ),
