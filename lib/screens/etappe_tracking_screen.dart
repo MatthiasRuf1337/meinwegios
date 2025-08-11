@@ -11,7 +11,6 @@ import '../models/etappe.dart' as etappe_models;
 import '../models/bild.dart';
 import '../providers/bilder_provider.dart';
 import '../services/database_service.dart';
-import 'dart:io';
 import 'dart:async';
 
 class EtappeTrackingScreen extends StatefulWidget {
@@ -26,12 +25,12 @@ class EtappeTrackingScreen extends StatefulWidget {
 
 class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     with WidgetsBindingObserver {
-  bool _isTracking = false;
+  // bool _isTracking = false; // nicht verwendet
   bool _isPaused = false;
   Duration _elapsedTime = Duration.zero;
   int _stepCount = 0;
   int _initialStepCount = 0; // Schritte beim Start
-  int _lastStepCount = 0; // Letzte abgefragte Schritte
+  // int _lastStepCount = 0; // nicht verwendet
   double _distance = 0.0;
   double _currentSpeed = 0.0;
   Position? _currentPosition;
@@ -41,6 +40,8 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
   Timer? _stepUpdateTimer; // Timer für Schrittabfrage
   StreamSubscription<Position>? _positionSubscription;
   DateTime? _appPausedTime; // Zeitpunkt als App pausiert wurde
+  bool _inBackground = false; // Guard: verhindert mehrfaches Speichern beim OS-Pause-Event
+  DateTime? _lastPauseSaveAt; // Guard: entprellt manuelle Pause-Speicherung
 
   @override
   void initState() {
@@ -88,15 +89,24 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       case AppLifecycleState.paused:
         print('App pausiert - speichere aktuelle Zeit und Schritte');
         _appPausedTime = DateTime.now();
-        _saveCurrentSteps('APP_PAUSE'); // Schritte speichern
-        _updateEtappeData(); // Finale Speicherung vor Pause
+        // Nur einmal speichern bis zum nächsten Resume
+        if (!_inBackground) {
+          _inBackground = true;
+          _saveCurrentSteps('APP_PAUSE'); // Schritte speichern
+          _updateEtappeData(); // Finale Speicherung vor Pause
+        }
         break;
       case AppLifecycleState.resumed:
         print('App wieder aufgenommen');
-        if (_appPausedTime != null && !_isPaused) {
-          // Zeit korrigieren basierend auf Pause
+        // Hintergrund-Guard zurücksetzen und Basis-Schritte einmalig setzen
+        _inBackground = false;
+        if (_appPausedTime != null) {
           final pauseDuration = DateTime.now().difference(_appPausedTime!);
           print('App war pausiert für: $pauseDuration');
+        }
+        // Wenn nicht manuell pausiert, Basis-Schritte nach App-Resume einmalig setzen
+        if (!_isPaused) {
+          _getCurrentStepsForResume();
         }
         break;
       case AppLifecycleState.detached:
@@ -357,9 +367,9 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
             _buildGPSRow(
                 'Längengrad', _currentPosition!.longitude.toStringAsFixed(6)),
             _buildGPSRow('Höhe',
-                '${_currentPosition!.altitude?.toStringAsFixed(1) ?? 'N/A'} m'),
+                '${_currentPosition!.altitude.toStringAsFixed(1)} m'),
             _buildGPSRow('Genauigkeit',
-                '${_currentPosition!.accuracy?.toStringAsFixed(1) ?? 'N/A'} m'),
+                '${_currentPosition!.accuracy.toStringAsFixed(1)} m'),
           ] else ...[
             Text(
               'GPS-Signal wird gesucht...',
@@ -493,9 +503,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     bool locationGranted = await Geolocator.isLocationServiceEnabled();
     print('Standort aktiviert: $locationGranted');
 
-    setState(() {
-      _isTracking = true;
-    });
+    // Tracking-Status wird implizit über Timer/Streams gesteuert
 
     // Timer für verstrichene Zeit
     _startTimer();
@@ -654,7 +662,6 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       print('Warte auf erste Schritt-Daten...');
       final stepCount = await Pedometer.stepCountStream.first;
       _initialStepCount = stepCount.steps;
-      _lastStepCount = stepCount.steps;
       print(
           'Initiale Schritte erfolgreich geholt: $_initialStepCount (Geräte-Gesamt)');
 
@@ -672,7 +679,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     } catch (e) {
       print('Fehler beim Abrufen der initialen Schritte: $e');
       _initialStepCount = 0;
-      _lastStepCount = 0;
+      // keine Verwendung von _lastStepCount
     }
   }
 
@@ -688,7 +695,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     }
   }
 
-  Future<void> _updateStepCount() async {
+  /* Future<void> _updateStepCount() async {
     try {
       final stepCount = await Pedometer.stepCountStream.first;
       final newSteps = stepCount.steps - _initialStepCount;
@@ -698,7 +705,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         setState(() {
           _stepCount = newSteps;
         });
-        _lastStepCount = stepCount.steps;
+        // keine Verwendung von _lastStepCount
 
         // Etappe aktualisieren
         _updateEtappeData();
@@ -706,9 +713,9 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     } catch (e) {
       print('Fehler beim Aktualisieren der Schritte: $e');
     }
-  }
+  } */
 
-  void _startAlternativeStepCounting() {
+  /* void _startAlternativeStepCounting() {
     print('Starte alternative Schrittzählung...');
     // Alternative: Schritte basierend auf GPS-Bewegung schätzen
     Timer.periodic(Duration(seconds: 5), (timer) {
@@ -721,9 +728,9 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         print('Geschätzte Schritte: $_stepCount (basierend auf ${_distance}m)');
       }
     });
-  }
+  } */
 
-  void _startManualStepCounting() {
+  /* void _startManualStepCounting() {
     print('Starte manuelle Schrittzählung...');
     // Einfache Schrittzählung basierend auf GPS-Bewegung
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -736,9 +743,9 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         }
       }
     });
-  }
+  } */
 
-  Future<void> _getCurrentLocation() async {
+  /* Future<void> _getCurrentLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
@@ -757,7 +764,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     } catch (e) {
       print('Fehler beim Abrufen der Position: $e');
     }
-  }
+  } */
 
   void _calculateDistance() {
     if (_gpsPoints.length < 2) return;
@@ -783,8 +790,14 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     });
 
     if (_isPaused) {
-      // Tracking pausieren - aktuelle Schritte speichern
-      await _saveCurrentSteps('PAUSE');
+      // Entprellen: Nur einmal pro kurzer Zeitraum speichern
+      final now = DateTime.now();
+      if (_lastPauseSaveAt == null || now.difference(_lastPauseSaveAt!).inMilliseconds > 800) {
+        _lastPauseSaveAt = now;
+        await _saveCurrentSteps('PAUSE');
+      } else {
+        print('PAUSE-Speicherung übersprungen (entprellt)');
+      }
     } else {
       // Tracking fortsetzen - neue Startschritte setzen
       await _getCurrentStepsForResume();
