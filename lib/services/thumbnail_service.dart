@@ -25,7 +25,6 @@ class ThumbnailService {
     // Prüfe ob die Datei existiert
     final file = File(thumbnailPath);
     if (!file.existsSync()) {
-      print('Thumbnail nicht gefunden: $thumbnailPath');
       return _buildDefaultIcon(width, height, borderRadius);
     }
 
@@ -48,7 +47,6 @@ class ThumbnailService {
           file,
           fit: fit,
           errorBuilder: (context, error, stackTrace) {
-            print('Fehler beim Laden des Thumbnails: $error');
             return _buildDefaultIcon(width, height, borderRadius);
           },
         ),

@@ -34,13 +34,13 @@ class MedienDatei {
     // Entferne .mp3 Erweiterung und füge .jpg hinzu
     final baseName = dateiname.replaceAll('.mp3', '');
     final thumbnailName = 'Thumbnail_$baseName.jpg';
-
+    
     // Prüfe ob Thumbnail im assets/images Ordner existiert
     final thumbnailFile = File('assets/images/$thumbnailName');
     if (thumbnailFile.existsSync()) {
       return thumbnailFile.path;
     }
-
+    
     return null;
   }
 

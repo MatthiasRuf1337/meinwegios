@@ -33,7 +33,7 @@ Dieser Ordner ist für Thumbnail-Bilder für MP3-Dateien bestimmt. Die Thumbnail
 - **Format**: JPG oder PNG
 - **Dateigröße**: Unter 1 MB pro Bild
 
-### Beispiel-Dateien
+### Verfügbare Thumbnails
 
 - `Thumbnail_Atem Ruhe Freundlichkeit.jpg` - Für die Atem-Meditation
 - `Thumbnail_3 Minuten Atemraum.jpg` - Für die 3-Minuten-Atemübung
