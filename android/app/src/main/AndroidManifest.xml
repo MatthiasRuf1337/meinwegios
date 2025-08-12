@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="Mein Weg - Meine Reise"
+        android:label="Mein Weg"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -44,7 +44,7 @@ class MeinWegApp extends StatelessWidget {
       child: Consumer<SettingsProvider>(
         builder: (context, settingsProvider, child) {
           return MaterialApp(
-            title: 'MeinWeg - Etappen-Tracker',
+            title: 'Mein Weg',
             theme: ThemeData(
               fontFamily: 'MuseoSans',
               colorScheme: ColorScheme.light(

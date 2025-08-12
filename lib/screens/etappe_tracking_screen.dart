@@ -77,6 +77,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       }
       print(
           'Geladene Daten: $elapsedTime, ${etappe.schrittAnzahl} Schritte, ${etappe.gesamtDistanz}m');
+      print('Bei fortgesetzter Etappe: Schrittzählung wird neu kalibriert...');
     }
   }
 
@@ -684,29 +685,27 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       return;
     }
 
-    // Initiale Schritte beim Start abrufen - WICHTIG: Warten bis fertig!
-    print('Hole initiale Schritte...');
-    await _getInitialSteps();
-    print('Initiale Schritte geholt: $_initialStepCount');
-
-    // Kontinuierlicher Stream für Schritte
+    // SOFORT den Stream starten, bevor wir die initialen Schritte holen
     try {
       Pedometer.stepCountStream.listen(
         (StepCount event) {
-          print(
-              'Schritt Update: ${event.steps} Schritte (Basis: $_initialStepCount)');
-          if (!_isPaused && mounted) {
-            final newSteps = event.steps - _initialStepCount;
+          // Nur verarbeiten wenn _initialStepCount bereits gesetzt ist
+          if (_initialStepCount > 0) {
             print(
-                'Berechnete Schritte: $newSteps (${event.steps} - $_initialStepCount)');
+                'Schritt Update: ${event.steps} Schritte (Basis: $_initialStepCount)');
+            if (!_isPaused && mounted) {
+              final newSteps = event.steps - _initialStepCount;
+              print(
+                  'Berechnete Schritte: $newSteps (${event.steps} - $_initialStepCount)');
 
-            setState(() {
-              _stepCount = newSteps;
-            });
+              setState(() {
+                _stepCount = newSteps;
+              });
 
-            // Alle 10 Schritte speichern
-            if (newSteps % 10 == 0) {
-              _saveStepData('UPDATE', event.steps);
+              // Bei den ersten Schritten sofort speichern, dann alle 10 Schritte
+              if (newSteps <= 5 || newSteps % 10 == 0) {
+                _saveStepData('UPDATE', event.steps);
+              }
             }
           }
         },
@@ -717,31 +716,54 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     } catch (e) {
       print('Fehler beim Starten des Schritt-Streams: $e');
     }
+
+    // Initiale Schritte NACH dem Stream-Start abrufen
+    print('Hole initiale Schritte...');
+    await _getInitialSteps();
+    print('Initiale Schritte geholt: $_initialStepCount');
   }
 
   Future<void> _getInitialSteps() async {
     try {
       print('Warte auf erste Schritt-Daten...');
       final stepCount = await Pedometer.stepCountStream.first;
-      _initialStepCount = stepCount.steps;
-      print(
-          'Initiale Schritte erfolgreich geholt: $_initialStepCount (Geräte-Gesamt)');
 
-      // Sofort in Etappe speichern
-      _saveStepData('START', _initialStepCount);
+      final etappenProvider =
+          Provider.of<EtappenProvider>(context, listen: false);
+      final currentEtappeSteps =
+          etappenProvider.aktuelleEtappe?.schrittAnzahl ?? 0;
 
-      // Initiale Schritte auch in der UI anzeigen
       if (mounted) {
         setState(() {
-          _stepCount = 0; // Startet bei 0 für diese Etappe
+          // Bei fortgesetzter Etappe: Basis so setzen, dass aktuelle Schritte beibehalten werden
+          _initialStepCount = stepCount.steps - currentEtappeSteps;
+          // _stepCount bleibt bei geladenen Werten aus _loadExistingData()
         });
       }
 
-      print('Etappe startet mit 0 Schritten (Basis: $_initialStepCount)');
+      print(
+          'Initiale Schritte geholt: Gerät hat ${stepCount.steps}, Etappe hat $_stepCount');
+      print(
+          'Neue Basis: $_initialStepCount (${stepCount.steps} - $_stepCount)');
+
+      // Sofort in Etappe speichern (nur wenn neue Etappe)
+      if (currentEtappeSteps == 0) {
+        _saveStepData('START', _initialStepCount);
+        print(
+            'Neue Etappe startet mit 0 Schritten (Basis: $_initialStepCount)');
+      } else {
+        print(
+            'Fortgesetzte Etappe mit $_stepCount Schritten (Basis: $_initialStepCount)');
+      }
+
+      print('Stream ist jetzt bereit für Live-Updates!');
     } catch (e) {
       print('Fehler beim Abrufen der initialen Schritte: $e');
-      _initialStepCount = 0;
-      // keine Verwendung von _lastStepCount
+      if (mounted) {
+        setState(() {
+          _initialStepCount = 0;
+        });
+      }
     }
   }
 
