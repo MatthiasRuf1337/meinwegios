@@ -458,3 +458,4 @@ class TrackingData {
     return '${currentSpeed.toStringAsFixed(1)} km/h';
   }
 }
+
