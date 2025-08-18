@@ -45,6 +45,10 @@ fi
 echo "📦 Installing Flutter dependencies..."
 flutter pub get
 
+# WICHTIG: Flutter für Release-Modus konfigurieren (behebt Debug-Modus Fehler)
+echo "🔧 Configuring Flutter for Release mode..."
+flutter build ios --config-only --release
+
 # Flutter iOS Engine precache (WICHTIG für pod install)
 echo "⚙️ Pre-caching Flutter iOS engine..."
 flutter precache --ios
