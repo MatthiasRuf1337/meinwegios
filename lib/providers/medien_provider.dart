@@ -25,7 +25,18 @@ class MedienProvider with ChangeNotifier {
 
     try {
       _medienDateien = await DatabaseService.instance.getMedienDateien();
-      _medienDateien.sort((a, b) => b.importDatum.compareTo(a.importDatum));
+      _medienDateien.sort((a, b) {
+        // Erst nach Buchsortierung, dann nach Importdatum
+        final buchSortA = a.buchSortierPrioritaet;
+        final buchSortB = b.buchSortierPrioritaet;
+
+        if (buchSortA != buchSortB) {
+          return buchSortA.compareTo(buchSortB);
+        }
+
+        // Bei gleicher Buchpriorität nach Importdatum (neueste zuerst)
+        return b.importDatum.compareTo(a.importDatum);
+      });
     } catch (e) {
       print('Fehler beim Laden der Medien-Dateien: $e');
     }
@@ -42,7 +53,18 @@ class MedienProvider with ChangeNotifier {
     try {
       await DatabaseService.instance.insertMedienDatei(medienDatei);
       _medienDateien.add(medienDatei);
-      _medienDateien.sort((a, b) => b.importDatum.compareTo(a.importDatum));
+      _medienDateien.sort((a, b) {
+        // Erst nach Buchsortierung, dann nach Importdatum
+        final buchSortA = a.buchSortierPrioritaet;
+        final buchSortB = b.buchSortierPrioritaet;
+
+        if (buchSortA != buchSortB) {
+          return buchSortA.compareTo(buchSortB);
+        }
+
+        // Bei gleicher Buchpriorität nach Importdatum (neueste zuerst)
+        return b.importDatum.compareTo(a.importDatum);
+      });
       notifyListeners();
     } catch (e) {
       print('Fehler beim Hinzufügen der Medien-Datei: $e');

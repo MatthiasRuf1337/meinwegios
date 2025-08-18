@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 enum MedienTyp {
   pdf,
@@ -34,13 +33,13 @@ class MedienDatei {
     // Entferne .mp3 Erweiterung und füge .jpg hinzu
     final baseName = dateiname.replaceAll('.mp3', '');
     final thumbnailName = 'Thumbnail_$baseName.jpg';
-    
-    // Prüfe ob Thumbnail im assets/images Ordner existiert
-    final thumbnailFile = File('assets/images/$thumbnailName');
-    if (thumbnailFile.existsSync()) {
-      return thumbnailFile.path;
+
+    // Prüfe ob das Asset für die bekannten Thumbnails verfügbar ist
+    if (thumbnailName == 'Thumbnail_3 Minuten Atemraum.jpg' ||
+        thumbnailName == 'Thumbnail_Atem Ruhe Freundlichkeit.jpg') {
+      return 'assets/images/$thumbnailName';
     }
-    
+
     return null;
   }
 
@@ -106,13 +105,29 @@ class MedienDatei {
   }
 
   String get formatierteGroesse {
+    String sizeText;
     if (groesse < 1024) {
-      return '${groesse} B';
+      sizeText = '${groesse} B';
     } else if (groesse < 1024 * 1024) {
-      return '${(groesse / 1024).toStringAsFixed(1)} KB';
+      sizeText = '${(groesse / 1024).toStringAsFixed(1)} KB';
     } else {
-      return '${(groesse / (1024 * 1024)).toStringAsFixed(1)} MB';
+      sizeText = '${(groesse / (1024 * 1024)).toStringAsFixed(1)} MB';
     }
+
+    // Dateityp und "Aus dem Buch"-Zusatz hinzufügen
+    if (istVerlagsdatei) {
+      String fileType = '';
+      if (istPDF) {
+        fileType = 'PDF';
+      } else if (istMP3) {
+        fileType = 'MP3';
+      } else {
+        fileType = typ.name.toUpperCase();
+      }
+      return '$sizeText, $fileType aus dem Buch';
+    }
+
+    return sizeText;
   }
 
   String get formatiertesImportDatum {
@@ -124,6 +139,21 @@ class MedienDatei {
   bool get istBild => typ == MedienTyp.bild;
   bool get istAndere => typ == MedienTyp.andere;
   bool get istVerlagsdatei => metadaten['isPreloaded'] == true;
+
+  // Sortierpriorität für "Aus dem Buch"-Dateien
+  int get buchSortierPrioritaet {
+    if (!istVerlagsdatei)
+      return 999; // Normale Dateien kommen nach den Buchdateien
+
+    final name = dateiname.toLowerCase();
+    if (name.contains('3 minuten atemraum')) return 1;
+    if (name.contains('atem ruhe freundlichkeit')) return 2;
+    if (name.contains('die magie des pilgerns')) return 3;
+    if (name.contains('mache dich auf den weg')) return 4;
+    if (name.contains('packliste')) return 5;
+
+    return 6; // Andere Buchdateien
+  }
 
   String get anzeigeName {
     String baseName;
@@ -159,11 +189,6 @@ class MedienDatei {
       }
     } else {
       baseName = dateiname;
-    }
-
-    // Tag für Verlagsdateien hinzufügen
-    if (istVerlagsdatei) {
-      return '$baseName (Verlagsdatei)';
     }
 
     return baseName;

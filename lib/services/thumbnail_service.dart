@@ -17,16 +17,10 @@ class ThumbnailService {
       return _buildDefaultIcon(width, height, borderRadius);
     }
 
-    final thumbnailPath = medienDatei.thumbnailPath;
-    if (thumbnailPath == null) {
-      return _buildDefaultIcon(width, height, borderRadius);
-    }
-
-    // Prüfe ob die Datei existiert
-    final file = File(thumbnailPath);
-    if (!file.existsSync()) {
-      return _buildDefaultIcon(width, height, borderRadius);
-    }
+    // Erstelle Thumbnail-Namen basierend auf MP3-Dateinamen
+    final baseName = medienDatei.dateiname.replaceAll('.mp3', '');
+    final thumbnailName = 'Thumbnail_$baseName.jpg';
+    final assetPath = 'assets/images/$thumbnailName';
 
     return Container(
       width: width,
@@ -43,10 +37,11 @@ class ThumbnailService {
       ),
       child: ClipRRect(
         borderRadius: borderRadius ?? BorderRadius.circular(20),
-        child: Image.file(
-          file,
+        child: Image.asset(
+          assetPath,
           fit: fit,
           errorBuilder: (context, error, stackTrace) {
+            // Fallback zu Standard-Icon wenn Thumbnail nicht gefunden wird
             return _buildDefaultIcon(width, height, borderRadius);
           },
         ),
@@ -65,15 +60,10 @@ class ThumbnailService {
       return _buildDefaultListIcon(width, height, borderRadius);
     }
 
-    final thumbnailPath = medienDatei.thumbnailPath;
-    if (thumbnailPath == null) {
-      return _buildDefaultListIcon(width, height, borderRadius);
-    }
-
-    final file = File(thumbnailPath);
-    if (!file.existsSync()) {
-      return _buildDefaultListIcon(width, height, borderRadius);
-    }
+    // Erstelle Thumbnail-Namen basierend auf MP3-Dateinamen
+    final baseName = medienDatei.dateiname.replaceAll('.mp3', '');
+    final thumbnailName = 'Thumbnail_$baseName.jpg';
+    final assetPath = 'assets/images/$thumbnailName';
 
     return Container(
       width: width,
@@ -83,8 +73,8 @@ class ThumbnailService {
       ),
       child: ClipRRect(
         borderRadius: borderRadius ?? BorderRadius.circular(8),
-        child: Image.file(
-          file,
+        child: Image.asset(
+          assetPath,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
             return _buildDefaultListIcon(width, height, borderRadius);
@@ -141,11 +131,13 @@ class ThumbnailService {
   static bool hasThumbnail(MedienDatei medienDatei) {
     if (medienDatei.typ != MedienTyp.mp3) return false;
 
-    final thumbnailPath = medienDatei.thumbnailPath;
-    if (thumbnailPath == null) return false;
+    // Erstelle Thumbnail-Namen basierend auf MP3-Dateinamen
+    final baseName = medienDatei.dateiname.replaceAll('.mp3', '');
+    final thumbnailName = 'Thumbnail_$baseName.jpg';
 
-    final file = File(thumbnailPath);
-    return file.existsSync();
+    // Prüfe ob das Asset verfügbar ist (für die bekannten Thumbnails)
+    return thumbnailName == 'Thumbnail_3 Minuten Atemraum.jpg' ||
+        thumbnailName == 'Thumbnail_Atem Ruhe Freundlichkeit.jpg';
   }
 
   /// Gibt eine Liste aller verfügbaren Thumbnails zurück

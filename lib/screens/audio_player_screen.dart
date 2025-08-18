@@ -206,23 +206,23 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       child: SafeArea(
         child: Column(
           children: [
-            // Album Art mit Thumbnail
+            // Album Art mit Thumbnail - noch größeres Cover
             Container(
-              height: 200,
-              width: 200,
-              margin: EdgeInsets.all(24.0),
+              height: 350,
+              width: 350,
+              margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: ThumbnailService.loadThumbnail(
                 widget.medienDatei,
-                width: 200,
-                height: 200,
+                width: 350,
+                height: 350,
                 fit: BoxFit.cover,
               ),
             ),
 
-            // Audio Info
+            // Audio Info - weniger Abstand zum Bild
             Expanded(
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import '../providers/etappen_provider.dart';
 import '../providers/bilder_provider.dart';
 import '../models/etappe.dart';
@@ -93,12 +91,12 @@ class _ArchivScreenState extends State<ArchivScreen> {
           ),
           _buildStatItem(
             'Distanz',
-            provider.getGesamtDistanz().toStringAsFixed(1) + ' km',
+            _formatGesamtDistanz(provider.getGesamtDistanz()),
             Icons.straighten,
           ),
           _buildStatItem(
             'Schritte',
-            '${provider.getGesamtSchritte()}',
+            _formatGesamtSchritte(provider.getGesamtSchritte()),
             Icons.directions_walk,
           ),
         ],
@@ -349,6 +347,24 @@ class _ArchivScreenState extends State<ArchivScreen> {
         ],
       ),
     );
+  }
+
+  String _formatGesamtDistanz(double distanceInMeters) {
+    if (distanceInMeters < 1000) {
+      return '${distanceInMeters.toStringAsFixed(0)} m';
+    } else {
+      return '${(distanceInMeters / 1000).toStringAsFixed(2)} km';
+    }
+  }
+
+  String _formatGesamtSchritte(int totalSteps) {
+    if (totalSteps >= 1000000) {
+      return '${(totalSteps / 1000000).toStringAsFixed(1)}M';
+    } else if (totalSteps >= 1000) {
+      return '${(totalSteps / 1000).toStringAsFixed(1)}k';
+    } else {
+      return '$totalSteps';
+    }
   }
 
   List<Etappe> _getFilteredEtappen(List<Etappe> etappen) {

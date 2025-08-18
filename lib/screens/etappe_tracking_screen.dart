@@ -463,20 +463,6 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
             ),
           ],
         ),
-        SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () => _showMap(),
-            icon: Icon(Icons.map),
-            label: Text('Karte anzeigen'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF00847E),
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -1033,12 +1019,6 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
   void _addNote() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Notiz-Funktion wird implementiert...')),
-    );
-  }
-
-  void _showMap() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Karten-Funktion wird implementiert...')),
     );
   }
 }

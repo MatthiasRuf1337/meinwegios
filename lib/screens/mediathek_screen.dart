@@ -160,7 +160,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           ),
           SizedBox(width: 8),
           FilterChip(
-            label: Text('Verlagsdateien'),
+            label: Text('Aus dem Buch'),
             selected: _showOnlyVerlagsdateien,
             onSelected: (selected) {
               setState(() {
@@ -246,18 +246,24 @@ class _MediathekScreenState extends State<MediathekScreen> {
               ),
         title: Text(
           medienDatei.anzeigeName,
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               medienDatei.formatierteGroesse,
-              style: TextStyle(color: Colors.grey.shade600),
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 12,
+              ),
             ),
             Text(
               medienDatei.formatiertesImportDatum,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 10),
             ),
           ],
         ),
