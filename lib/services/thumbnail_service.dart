@@ -26,13 +26,12 @@ class ThumbnailService {
           medienDatei.dateiname.replaceAll('.pdf', '').replaceAll(' ', '_');
     }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
-    final assetPath = 'assets/images/$thumbnailName';
+    String assetPath = 'assets/images/$thumbnailName';
     
-    // Debug-Ausgabe
-    print('🖼️ Thumbnail Debug - Datei: ${medienDatei.dateiname}');
-    print('🖼️ Thumbnail Debug - BaseName: $baseName');
-    print('🖼️ Thumbnail Debug - ThumbnailName: $thumbnailName');
-    print('🖼️ Thumbnail Debug - AssetPath: $assetPath');
+    // Spezielle Behandlung für Packliste (Hardcoded-Fix für TestFlight)
+    if (medienDatei.dateiname.toLowerCase().contains('packliste')) {
+      assetPath = 'assets/images/Thumbnail_Packliste.jpg';
+    }
 
     return Container(
       width: width,
@@ -53,9 +52,7 @@ class ThumbnailService {
           assetPath,
           fit: fit,
           errorBuilder: (context, error, stackTrace) {
-            // Debug-Ausgabe bei Asset-Fehler
-            print('❌ Asset-Fehler für: $assetPath');
-            print('❌ Fehler: $error');
+
             // Fallback zu Standard-Icon wenn Thumbnail nicht gefunden wird
             return _buildDefaultIcon(medienDatei, width, height, borderRadius);
           },
@@ -84,13 +81,12 @@ class ThumbnailService {
           medienDatei.dateiname.replaceAll('.pdf', '').replaceAll(' ', '_');
     }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
-    final assetPath = 'assets/images/$thumbnailName';
+    String assetPath = 'assets/images/$thumbnailName';
     
-    // Debug-Ausgabe für Listen-Thumbnails
-    print('📋 List Thumbnail Debug - Datei: ${medienDatei.dateiname}');
-    print('📋 List Thumbnail Debug - BaseName: $baseName');
-    print('📋 List Thumbnail Debug - ThumbnailName: $thumbnailName');
-    print('📋 List Thumbnail Debug - AssetPath: $assetPath');
+    // Spezielle Behandlung für Packliste (Hardcoded-Fix für TestFlight)
+    if (medienDatei.dateiname.toLowerCase().contains('packliste')) {
+      assetPath = 'assets/images/Thumbnail_Packliste.jpg';
+    }
 
     return Container(
       width: width,
@@ -104,9 +100,7 @@ class ThumbnailService {
           assetPath,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            // Debug-Ausgabe bei Asset-Fehler für Listen-Thumbnails
-            print('❌ List Asset-Fehler für: $assetPath');
-            print('❌ List Fehler: $error');
+
             return _buildDefaultListIcon(
                 medienDatei, width, height, borderRadius);
           },
