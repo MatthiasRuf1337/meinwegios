@@ -27,7 +27,7 @@ class ThumbnailService {
     }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
     String assetPath = 'assets/images/$thumbnailName';
-    
+
     // Spezielle Behandlung für Packliste (Hardcoded-Fix für TestFlight)
     if (medienDatei.dateiname.toLowerCase().contains('packliste')) {
       assetPath = 'assets/images/Thumbnail_Packliste.jpg';
@@ -52,7 +52,6 @@ class ThumbnailService {
           assetPath,
           fit: fit,
           errorBuilder: (context, error, stackTrace) {
-
             // Fallback zu Standard-Icon wenn Thumbnail nicht gefunden wird
             return _buildDefaultIcon(medienDatei, width, height, borderRadius);
           },
@@ -82,7 +81,7 @@ class ThumbnailService {
     }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
     String assetPath = 'assets/images/$thumbnailName';
-    
+
     // Spezielle Behandlung für Packliste (Hardcoded-Fix für TestFlight)
     if (medienDatei.dateiname.toLowerCase().contains('packliste')) {
       assetPath = 'assets/images/Thumbnail_Packliste.jpg';
@@ -100,7 +99,6 @@ class ThumbnailService {
           assetPath,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-
             return _buildDefaultListIcon(
                 medienDatei, width, height, borderRadius);
           },
