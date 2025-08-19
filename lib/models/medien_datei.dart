@@ -47,7 +47,7 @@ class MedienDatei {
       'Thumbnail_Mache_dich_auf_den_Weg.jpg',
       'Thumbnail_Packliste.jpg',
     ];
-    
+
     if (knownThumbnails.contains(thumbnailName)) {
       return 'assets/images/$thumbnailName';
     }

@@ -52,3 +52,4 @@ Die App verwendet automatisch das neue System. Der alte `etappe_tracking_screen.
 2. Bei erfolgreichen Tests: Alte Dateien entfernen
 3. Weitere Optimierungen basierend auf Nutzerfeedback
 
+

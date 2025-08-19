@@ -26,7 +26,6 @@ class TrackingServiceV2 {
   Position? _currentPosition;
   Position? _lastValidPosition;
   List<GPSPunkt> _gpsPoints = [];
-  double _totalDistance = 0.0;
   double _currentSpeed = 0.0;
 
   // Schritt-Daten
@@ -34,6 +33,12 @@ class TrackingServiceV2 {
   int? _initialStepCount;
   bool _stepTrackingEnabled = false;
   bool _useGPSStepEstimation = false;
+
+  // Hybrid-Distanzberechnung
+  double _stepBasedDistance = 0.0;
+  double _averageStepLength = 0.7; // Startwert: 70cm
+  List<double> _recentStepLengths = [];
+  int _lastStepCountForDistance = 0;
 
   // Callbacks
   Function(TrackingData)? _onTrackingUpdate;
@@ -47,7 +52,7 @@ class TrackingServiceV2 {
         isPaused: _isPaused,
         elapsedTime: _getElapsedTime(),
         totalSteps: _totalSteps,
-        totalDistance: _totalDistance,
+        totalDistance: _stepBasedDistance, // Verwende Schritt-basierte Distanz
         currentSpeed: _currentSpeed,
         currentPosition: _currentPosition,
         gpsPoints: List.unmodifiable(_gpsPoints),
@@ -188,9 +193,9 @@ class TrackingServiceV2 {
     // Geschwindigkeit berechnen (m/s zu km/h)
     _currentSpeed = (position.speed * 3.6).clamp(0.0, 50.0);
 
-    // Distanz berechnen
+    // GPS-Distanz berechnen für Validierung
     if (_lastValidPosition != null) {
-      final distance = Geolocator.distanceBetween(
+      final gpsDistance = Geolocator.distanceBetween(
         _lastValidPosition!.latitude,
         _lastValidPosition!.longitude,
         position.latitude,
@@ -198,10 +203,7 @@ class TrackingServiceV2 {
       );
 
       // Filter für realistische Bewegung
-      if (_isRealisticMovement(distance, position)) {
-        _totalDistance += distance;
-        _lastValidPosition = position;
-
+      if (_isRealisticMovement(gpsDistance, position)) {
         // GPS-Punkt hinzufügen
         _gpsPoints.add(GPSPunkt(
           latitude: position.latitude,
@@ -211,9 +213,14 @@ class TrackingServiceV2 {
           accuracy: position.accuracy,
         ));
 
+        // Hybrid-Distanzberechnung: GPS zur Schrittlängen-Kalibrierung nutzen
+        _validateAndCalibrateWithGPS(gpsDistance);
+
+        _lastValidPosition = position;
+
         // GPS-basierte Schritt-Schätzung falls Pedometer nicht funktioniert
         if (_useGPSStepEstimation) {
-          _estimateStepsFromGPS(distance);
+          _estimateStepsFromGPS(gpsDistance);
         }
       }
     } else {
@@ -326,8 +333,16 @@ class TrackingServiceV2 {
 
     // Validierung: Schritte können nur steigen
     if (newSteps >= _totalSteps && newSteps >= 0) {
+      final stepDifference = newSteps - _totalSteps;
       _totalSteps = newSteps;
-      print('TrackingServiceV2: Schritte aktualisiert: $_totalSteps');
+
+      // Schritt-basierte Distanz aktualisieren
+      if (stepDifference > 0) {
+        _updateStepBasedDistance(stepDifference);
+      }
+
+      print(
+          'TrackingServiceV2: Schritte aktualisiert: $_totalSteps, Distanz: ${_stepBasedDistance.toStringAsFixed(1)}m');
       _notifyUpdate();
     }
   }
@@ -335,12 +350,80 @@ class TrackingServiceV2 {
   // GPS-basierte Schritt-Schätzung
   void _estimateStepsFromGPS(double distance) {
     // Durchschnittliche Schrittlänge: ca. 0.7 Meter
-    final estimatedSteps = (distance / 0.7).round();
+    final estimatedSteps = (distance / _averageStepLength).round();
+    final stepDifference = estimatedSteps;
     _totalSteps += estimatedSteps;
+
+    // Schritt-basierte Distanz auch bei GPS-Schätzung aktualisieren
+    if (stepDifference > 0) {
+      _updateStepBasedDistance(stepDifference);
+    }
 
     if (estimatedSteps > 0) {
       print(
           'TrackingServiceV2: GPS-Schätzung: +$estimatedSteps Schritte (${distance.toStringAsFixed(1)}m)');
+    }
+  }
+
+  // Schritt-basierte Distanz aktualisieren
+  void _updateStepBasedDistance(int newSteps) {
+    final additionalDistance = newSteps * _averageStepLength;
+    _stepBasedDistance += additionalDistance;
+    _lastStepCountForDistance = _totalSteps;
+  }
+
+  // GPS-Validierung und Schrittlängen-Kalibrierung
+  void _validateAndCalibrateWithGPS(double gpsDistance) {
+    // Nur kalibrieren wenn wir echte Schritte haben (nicht GPS-geschätzt)
+    if (!_stepTrackingEnabled || _useGPSStepEstimation) return;
+
+    // Berechne erwartete Distanz basierend auf aktuellen Schritten
+    final stepsSinceLastGPS = _totalSteps - _lastStepCountForDistance;
+    if (stepsSinceLastGPS <= 0) return;
+
+    final expectedStepDistance = stepsSinceLastGPS * _averageStepLength;
+
+    // Plausibilitätsprüfung: GPS vs Schritt-Distanz
+    final deviation = (gpsDistance - expectedStepDistance).abs();
+    final deviationPercent = expectedStepDistance > 0
+        ? (deviation / expectedStepDistance) * 100
+        : 100;
+
+    print(
+        'TrackingServiceV2: GPS: ${gpsDistance.toStringAsFixed(1)}m, Schritte: ${expectedStepDistance.toStringAsFixed(1)}m, Abweichung: ${deviationPercent.toStringAsFixed(1)}%');
+
+    if (deviationPercent <= 30.0 && expectedStepDistance > 0) {
+      // GPS ist plausibel - zur Schrittlängen-Kalibrierung nutzen
+      final measuredStepLength = gpsDistance / stepsSinceLastGPS;
+
+      // Nur realistische Schrittlängen akzeptieren (40cm - 120cm)
+      if (measuredStepLength >= 0.4 && measuredStepLength <= 1.2) {
+        _calibrateStepLength(measuredStepLength);
+        print(
+            'TrackingServiceV2: Schrittlänge kalibriert: ${_averageStepLength.toStringAsFixed(2)}m');
+      }
+    } else {
+      print(
+          'TrackingServiceV2: GPS verworfen - zu große Abweichung (${deviationPercent.toStringAsFixed(1)}%)');
+    }
+  }
+
+  // Schrittlängen-Kalibrierung
+  void _calibrateStepLength(double measuredStepLength) {
+    _recentStepLengths.add(measuredStepLength);
+
+    // Nur die letzten 10 Messungen behalten
+    if (_recentStepLengths.length > 10) {
+      _recentStepLengths.removeAt(0);
+    }
+
+    // Gleitender Durchschnitt für stabilere Kalibrierung
+    if (_recentStepLengths.length >= 3) {
+      final sum = _recentStepLengths.reduce((a, b) => a + b);
+      final newAverage = sum / _recentStepLengths.length;
+
+      // Sanfte Anpassung: 70% alter Wert + 30% neuer Wert
+      _averageStepLength = (_averageStepLength * 0.7) + (newAverage * 0.3);
     }
   }
 
@@ -382,20 +465,28 @@ class TrackingServiceV2 {
     _currentPosition = null;
     _lastValidPosition = null;
     _gpsPoints.clear();
-    _totalDistance = 0.0;
     _currentSpeed = 0.0;
     _totalSteps = 0;
     _initialStepCount = null;
     _stepTrackingEnabled = false;
     _useGPSStepEstimation = false;
+
+    // Hybrid-Distanzberechnung zurücksetzen
+    _stepBasedDistance = 0.0;
+    _averageStepLength = 0.7; // Zurück zum Standardwert
+    _recentStepLengths.clear();
+    _lastStepCountForDistance = 0;
   }
 
   // Bestehende Etappe fortsetzen
   void resumeFromEtappe(Etappe etappe) {
     _trackingStartTime = etappe.startzeit;
     _totalSteps = etappe.schrittAnzahl;
-    _totalDistance = etappe.gesamtDistanz;
     _gpsPoints = List.from(etappe.gpsPunkte);
+
+    // Schritt-basierte Distanz aus gespeicherten Daten berechnen
+    _stepBasedDistance = _totalSteps * _averageStepLength;
+    _lastStepCountForDistance = _totalSteps;
 
     if (_gpsPoints.isNotEmpty) {
       final lastPoint = _gpsPoints.last;
@@ -458,4 +549,3 @@ class TrackingData {
     return '${currentSpeed.toStringAsFixed(1)} km/h';
   }
 }
-

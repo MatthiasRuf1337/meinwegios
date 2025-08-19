@@ -22,7 +22,8 @@ class ThumbnailService {
     if (medienDatei.typ == MedienTyp.mp3) {
       baseName = medienDatei.dateiname.replaceAll('.mp3', '');
     } else {
-      baseName = medienDatei.dateiname.replaceAll('.pdf', '').replaceAll(' ', '_');
+      baseName =
+          medienDatei.dateiname.replaceAll('.pdf', '').replaceAll(' ', '_');
     }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
     final assetPath = 'assets/images/$thumbnailName';
@@ -70,7 +71,8 @@ class ThumbnailService {
     if (medienDatei.typ == MedienTyp.mp3) {
       baseName = medienDatei.dateiname.replaceAll('.mp3', '');
     } else {
-      baseName = medienDatei.dateiname.replaceAll('.pdf', '').replaceAll(' ', '_');
+      baseName =
+          medienDatei.dateiname.replaceAll('.pdf', '').replaceAll(' ', '_');
     }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
     final assetPath = 'assets/images/$thumbnailName';
@@ -87,7 +89,8 @@ class ThumbnailService {
           assetPath,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            return _buildDefaultListIcon(medienDatei, width, height, borderRadius);
+            return _buildDefaultListIcon(
+                medienDatei, width, height, borderRadius);
           },
         ),
       ),
@@ -95,11 +98,11 @@ class ThumbnailService {
   }
 
   /// Erstellt ein Standard-Icon für Dateien ohne Thumbnail
-  static Widget _buildDefaultIcon(
-      MedienDatei medienDatei, double width, double height, BorderRadius? borderRadius) {
+  static Widget _buildDefaultIcon(MedienDatei medienDatei, double width,
+      double height, BorderRadius? borderRadius) {
     Color backgroundColor;
     IconData iconData;
-    
+
     if (medienDatei.typ == MedienTyp.mp3) {
       backgroundColor = Color(0xFF00847E);
       iconData = Icons.music_note;
@@ -110,7 +113,7 @@ class ThumbnailService {
       backgroundColor = Colors.grey.shade600;
       iconData = Icons.insert_drive_file;
     }
-    
+
     return Container(
       width: width,
       height: height,
@@ -134,12 +137,12 @@ class ThumbnailService {
   }
 
   /// Erstellt ein Standard-Icon für Listen
-  static Widget _buildDefaultListIcon(
-      MedienDatei medienDatei, double width, double height, BorderRadius? borderRadius) {
+  static Widget _buildDefaultListIcon(MedienDatei medienDatei, double width,
+      double height, BorderRadius? borderRadius) {
     Color backgroundColor;
     Color iconColor;
     IconData iconData;
-    
+
     if (medienDatei.typ == MedienTyp.mp3) {
       backgroundColor = Colors.blue.shade100;
       iconColor = Colors.blue.shade600;
@@ -153,7 +156,7 @@ class ThumbnailService {
       iconColor = Colors.grey.shade600;
       iconData = Icons.insert_drive_file;
     }
-    
+
     return Container(
       width: width,
       height: height,
@@ -171,14 +174,16 @@ class ThumbnailService {
 
   /// Prüft ob ein Thumbnail für eine MP3- oder PDF-Datei verfügbar ist
   static bool hasThumbnail(MedienDatei medienDatei) {
-    if (medienDatei.typ != MedienTyp.mp3 && medienDatei.typ != MedienTyp.pdf) return false;
+    if (medienDatei.typ != MedienTyp.mp3 && medienDatei.typ != MedienTyp.pdf)
+      return false;
 
     // Erstelle Thumbnail-Namen basierend auf Dateinamen
     String baseName;
     if (medienDatei.typ == MedienTyp.mp3) {
       baseName = medienDatei.dateiname.replaceAll('.mp3', '');
     } else {
-      baseName = medienDatei.dateiname.replaceAll('.pdf', '').replaceAll(' ', '_');
+      baseName =
+          medienDatei.dateiname.replaceAll('.pdf', '').replaceAll(' ', '_');
     }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
 
@@ -190,7 +195,7 @@ class ThumbnailService {
       'Thumbnail_Mache_dich_auf_den_Weg.jpg',
       'Thumbnail_Packliste.jpg',
     ];
-    
+
     return knownThumbnails.contains(thumbnailName);
   }
 
