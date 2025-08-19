@@ -26,17 +26,29 @@ class MedienDatei {
     this.metadaten = const {},
   });
 
-  // Thumbnail-Pfad für MP3-Dateien
+  // Thumbnail-Pfad für MP3- und PDF-Dateien
   String? get thumbnailPath {
-    if (typ != MedienTyp.mp3) return null;
+    if (typ != MedienTyp.mp3 && typ != MedienTyp.pdf) return null;
 
-    // Entferne .mp3 Erweiterung und füge .jpg hinzu
-    final baseName = dateiname.replaceAll('.mp3', '');
+    // Erstelle Thumbnail-Namen basierend auf Dateinamen
+    String baseName;
+    if (typ == MedienTyp.mp3) {
+      baseName = dateiname.replaceAll('.mp3', '');
+    } else {
+      baseName = dateiname.replaceAll('.pdf', '').replaceAll(' ', '_');
+    }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
 
     // Prüfe ob das Asset für die bekannten Thumbnails verfügbar ist
-    if (thumbnailName == 'Thumbnail_3 Minuten Atemraum.jpg' ||
-        thumbnailName == 'Thumbnail_Atem Ruhe Freundlichkeit.jpg') {
+    final knownThumbnails = [
+      'Thumbnail_3 Minuten Atemraum.jpg',
+      'Thumbnail_Atem Ruhe Freundlichkeit.jpg',
+      'Thumbnail_Die_Magie_des_Pilgerns.jpg',
+      'Thumbnail_Mache_dich_auf_den_Weg.jpg',
+      'Thumbnail_Packliste.jpg',
+    ];
+    
+    if (knownThumbnails.contains(thumbnailName)) {
       return 'assets/images/$thumbnailName';
     }
 
@@ -162,7 +174,7 @@ class MedienDatei {
       // Benutzerfreundliche Namen für PDF-Dateien
       final name = dateiname.replaceAll('.pdf', '');
       final nameLower = name.toLowerCase();
-      
+
       // Case-insensitive Vergleich für benutzerfreundliche Namen
       if (nameLower == 'die magie des pilgerns') {
         baseName = 'Die Magie des Pilgerns';
@@ -177,7 +189,7 @@ class MedienDatei {
       // Benutzerfreundliche Namen für MP3-Dateien
       final name = dateiname.replaceAll('.mp3', '');
       final nameLower = name.toLowerCase();
-      
+
       // Case-insensitive Vergleich für benutzerfreundliche Namen
       if (nameLower == 'atem ruhe freundlichkeit') {
         baseName = 'Atem Ruhe Freundlichkeit';

@@ -224,26 +224,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
     return Card(
       margin: EdgeInsets.only(bottom: 8.0),
       child: ListTile(
-        leading: medienDatei.typ == MedienTyp.mp3
-            ? ThumbnailService.loadListThumbnail(medienDatei)
-            : Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: medienDatei.typ == MedienTyp.pdf
-                      ? Colors.red.shade100
-                      : Colors.blue.shade100,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  medienDatei.typ == MedienTyp.pdf
-                      ? Icons.picture_as_pdf
-                      : Icons.audiotrack,
-                  color: medienDatei.typ == MedienTyp.pdf
-                      ? Colors.red.shade600
-                      : Colors.blue.shade600,
-                ),
-              ),
+        leading: ThumbnailService.loadListThumbnail(medienDatei),
         title: Text(
           medienDatei.anzeigeName,
           style: TextStyle(
