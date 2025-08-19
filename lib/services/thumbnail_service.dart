@@ -27,6 +27,12 @@ class ThumbnailService {
     }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
     final assetPath = 'assets/images/$thumbnailName';
+    
+    // Debug-Ausgabe
+    print('🖼️ Thumbnail Debug - Datei: ${medienDatei.dateiname}');
+    print('🖼️ Thumbnail Debug - BaseName: $baseName');
+    print('🖼️ Thumbnail Debug - ThumbnailName: $thumbnailName');
+    print('🖼️ Thumbnail Debug - AssetPath: $assetPath');
 
     return Container(
       width: width,
@@ -76,6 +82,12 @@ class ThumbnailService {
     }
     final thumbnailName = 'Thumbnail_$baseName.jpg';
     final assetPath = 'assets/images/$thumbnailName';
+    
+    // Debug-Ausgabe für Listen-Thumbnails
+    print('📋 List Thumbnail Debug - Datei: ${medienDatei.dateiname}');
+    print('📋 List Thumbnail Debug - BaseName: $baseName');
+    print('📋 List Thumbnail Debug - ThumbnailName: $thumbnailName');
+    print('📋 List Thumbnail Debug - AssetPath: $assetPath');
 
     return Container(
       width: width,
