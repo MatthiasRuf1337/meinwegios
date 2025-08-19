@@ -55,6 +55,12 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/Thumbnail_3 Minuten Atemraum.jpg
+    - assets/images/Thumbnail_Atem Ruhe Freundlichkeit.jpg
+    - assets/images/Thumbnail_Die_Magie_des_Pilgerns.jpg
+    - assets/images/Thumbnail_Mache_dich_auf_den_Weg.jpg
+    - assets/images/Thumbnail_Packliste.jpg
+    - assets/images/Marco_Bach_2025.jpg
     - assets/audio/
     - assets/pdf/
     - icon.png

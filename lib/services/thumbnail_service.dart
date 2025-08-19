@@ -53,6 +53,9 @@ class ThumbnailService {
           assetPath,
           fit: fit,
           errorBuilder: (context, error, stackTrace) {
+            // Debug-Ausgabe bei Asset-Fehler
+            print('❌ Asset-Fehler für: $assetPath');
+            print('❌ Fehler: $error');
             // Fallback zu Standard-Icon wenn Thumbnail nicht gefunden wird
             return _buildDefaultIcon(medienDatei, width, height, borderRadius);
           },
@@ -101,6 +104,9 @@ class ThumbnailService {
           assetPath,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
+            // Debug-Ausgabe bei Asset-Fehler für Listen-Thumbnails
+            print('❌ List Asset-Fehler für: $assetPath');
+            print('❌ List Fehler: $error');
             return _buildDefaultListIcon(
                 medienDatei, width, height, borderRadius);
           },
