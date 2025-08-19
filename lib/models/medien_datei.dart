@@ -161,31 +161,30 @@ class MedienDatei {
     if (istPDF) {
       // Benutzerfreundliche Namen für PDF-Dateien
       final name = dateiname.replaceAll('.pdf', '');
-      switch (name) {
-        case 'Die Magie des Pilgerns':
-          baseName = 'Die Magie des Pilgerns';
-          break;
-        case 'Mache dich auf den Weg':
-          baseName = 'Mache dich auf den Weg';
-          break;
-        case 'Packliste':
-          baseName = 'Packliste';
-          break;
-        default:
-          baseName = name;
+      final nameLower = name.toLowerCase();
+      
+      // Case-insensitive Vergleich für benutzerfreundliche Namen
+      if (nameLower == 'die magie des pilgerns') {
+        baseName = 'Die Magie des Pilgerns';
+      } else if (nameLower == 'mache dich auf den weg') {
+        baseName = 'Mache dich auf den Weg';
+      } else if (nameLower == 'packliste') {
+        baseName = 'Packliste';
+      } else {
+        baseName = name;
       }
     } else if (istMP3) {
       // Benutzerfreundliche Namen für MP3-Dateien
       final name = dateiname.replaceAll('.mp3', '');
-      switch (name) {
-        case 'Atem Ruhe Freundlichkeit':
-          baseName = 'Atem Ruhe Freundlichkeit';
-          break;
-        case '3 Minuten Atemraum':
-          baseName = '3 Minuten Atemraum';
-          break;
-        default:
-          baseName = name;
+      final nameLower = name.toLowerCase();
+      
+      // Case-insensitive Vergleich für benutzerfreundliche Namen
+      if (nameLower == 'atem ruhe freundlichkeit') {
+        baseName = 'Atem Ruhe Freundlichkeit';
+      } else if (nameLower == '3 minuten atemraum') {
+        baseName = '3 Minuten Atemraum';
+      } else {
+        baseName = name;
       }
     } else {
       baseName = dateiname;
