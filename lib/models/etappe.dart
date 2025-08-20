@@ -127,6 +127,9 @@ class Etappe {
   }
 
   String get formatierteDistanz {
+    if (!gesamtDistanz.isFinite || gesamtDistanz.isNaN) {
+      return '0 m';
+    }
     if (gesamtDistanz < 1000) {
       return '${gesamtDistanz.toStringAsFixed(0)} m';
     } else {

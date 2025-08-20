@@ -7,20 +7,29 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../models/etappe.dart';
 import '../models/bild.dart';
+import '../models/notiz.dart';
 import '../providers/etappen_provider.dart';
 import '../providers/bilder_provider.dart';
+import '../providers/notiz_provider.dart';
 import '../services/database_service.dart';
 import '../services/permission_service.dart';
 import 'bild_detail_screen.dart';
 import 'galerie_screen.dart';
 import 'mediathek_screen.dart';
 import 'etappe_start_screen.dart';
+import '../widgets/audio_recording_widget.dart';
+import 'main_navigation.dart';
 import 'dart:io';
 
 class EtappeDetailScreen extends StatefulWidget {
   final Etappe etappe;
+  final bool fromCompletedScreen;
 
-  const EtappeDetailScreen({Key? key, required this.etappe}) : super(key: key);
+  const EtappeDetailScreen({
+    Key? key,
+    required this.etappe,
+    this.fromCompletedScreen = false,
+  }) : super(key: key);
 
   @override
   _EtappeDetailScreenState createState() => _EtappeDetailScreenState();
@@ -40,7 +49,27 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
         title: Text('Etappen-Details'),
         backgroundColor: Color(0xFF00847E),
         foregroundColor: Colors.white,
+        leading: widget.fromCompletedScreen
+            ? IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  MainNavigationController.switchToTab(
+                      0); // Zum Archiv-Tab wechseln
+                },
+              )
+            : null,
         actions: [
+          if (widget.fromCompletedScreen)
+            IconButton(
+              icon: Icon(Icons.list),
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                // Wechsle zum Etappen-Tab (Index 0)
+                MainNavigationController.switchToTab(0);
+              },
+              tooltip: 'Zur Etappen-Übersicht',
+            ),
           IconButton(
             icon: Icon(Icons.edit),
             onPressed: () => _editEtappe(context),
@@ -51,8 +80,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
           ),
         ],
       ),
-      body: Consumer2<EtappenProvider, BilderProvider>(
-        builder: (context, etappenProvider, bilderProvider, child) {
+      body: Consumer3<EtappenProvider, BilderProvider, NotizProvider>(
+        builder:
+            (context, etappenProvider, bilderProvider, notizProvider, child) {
           // Verwende die aktuelle Etappe aus dem Widget
           final etappe = widget.etappe;
           final bilder = bilderProvider.getBilderByEtappe(widget.etappe.id);
@@ -305,6 +335,151 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     ),
                   ),
                 ),
+                SizedBox(height: 16),
+
+                // Notizen-Sektion
+                Builder(
+                  builder: (context) {
+                    final notizen =
+                        notizProvider.getNotizenByEtappe(widget.etappe.id);
+                    return Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Notizen',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.add),
+                                  onPressed: () => _showNotizDialog(),
+                                  tooltip: 'Notiz hinzufügen',
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 16),
+                            if (notizen.isEmpty)
+                              Container(
+                                padding: EdgeInsets.all(20),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.note_add,
+                                      size: 48,
+                                      color: Colors.grey[400],
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'Noch keine Notizen vorhanden',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else
+                              ListView.separated(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: notizen.length,
+                                separatorBuilder: (context, index) => Divider(),
+                                itemBuilder: (context, index) {
+                                  final notiz = notizen[index];
+                                  return ListTile(
+                                    title: Text(
+                                      notiz.titel.isNotEmpty
+                                          ? notiz.titel
+                                          : 'Ohne Titel',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 4),
+                                        Text(
+                                          notiz.inhalt,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          'Erstellt: ${notiz.formatierteErstellungszeit}',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                        if (notiz.bearbeitetAm != null)
+                                          Text(
+                                            'Bearbeitet: ${DateFormat('dd.MM.yyyy HH:mm').format(notiz.bearbeitetAm!)}',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    trailing: PopupMenuButton<String>(
+                                      onSelected: (value) {
+                                        if (value == 'edit') {
+                                          _showNotizDialog(
+                                              existingNotiz: notiz);
+                                        } else if (value == 'delete') {
+                                          _confirmDeleteNotiz(notiz);
+                                        }
+                                      },
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: 'edit',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.edit, size: 18),
+                                              SizedBox(width: 8),
+                                              Text('Bearbeiten'),
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          value: 'delete',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.delete,
+                                                  size: 18, color: Colors.red),
+                                              SizedBox(width: 8),
+                                              Text('Löschen',
+                                                  style: TextStyle(
+                                                      color: Colors.red)),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: 16),
+
+                // Audio-Aufnahmen Sektion
+                AudioRecordingWidget(etappenId: widget.etappe.id),
               ],
             ),
           );
@@ -1009,6 +1184,213 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showNotizDialog({Notiz? existingNotiz}) {
+    final titelController =
+        TextEditingController(text: existingNotiz?.titel ?? '');
+    final inhaltController =
+        TextEditingController(text: existingNotiz?.inhalt ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(existingNotiz != null ? 'Notiz bearbeiten' : 'Neue Notiz'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titelController,
+                decoration: InputDecoration(
+                  labelText: 'Titel (optional)',
+                  hintText: 'z.B. Wichtige Beobachtung',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.title),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: inhaltController,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  labelText: 'Notiz *',
+                  hintText: 'Ihre Notiz hier eingeben...',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.note),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          if (existingNotiz != null)
+            TextButton(
+              onPressed: () async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Notiz löschen'),
+                    content: Text('Möchten Sie diese Notiz wirklich löschen?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text('Abbrechen'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text('Löschen'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirmed == true) {
+                  try {
+                    final notizProvider =
+                        Provider.of<NotizProvider>(context, listen: false);
+                    await notizProvider.deleteNotiz(existingNotiz.id);
+
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Notiz gelöscht!'),
+                        backgroundColor: Color(0xFF00847E),
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Fehler beim Löschen: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+              child: Text('Löschen', style: TextStyle(color: Colors.red)),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (inhaltController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Bitte geben Sie eine Notiz ein')),
+                );
+                return;
+              }
+
+              try {
+                final notizProvider =
+                    Provider.of<NotizProvider>(context, listen: false);
+
+                if (existingNotiz != null) {
+                  // Bestehende Notiz aktualisieren
+                  final updatedNotiz = existingNotiz.copyWith(
+                    titel: titelController.text.trim(),
+                    inhalt: inhaltController.text.trim(),
+                    bearbeitetAm: DateTime.now(),
+                  );
+                  await notizProvider.updateNotiz(updatedNotiz);
+
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Notiz aktualisiert!'),
+                      backgroundColor: Color(0xFF00847E),
+                    ),
+                  );
+                } else {
+                  // Neue Notiz erstellen
+                  final notiz = Notiz(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    titel: titelController.text.trim(),
+                    inhalt: inhaltController.text.trim(),
+                    erstelltAm: DateTime.now(),
+                    etappenId: widget.etappe.id,
+                  );
+
+                  await notizProvider.addNotiz(notiz);
+
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Notiz hinzugefügt!'),
+                      backgroundColor: Color(0xFF00847E),
+                    ),
+                  );
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Fehler beim Speichern: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF00847E),
+              foregroundColor: Colors.white,
+            ),
+            child: Text(existingNotiz != null ? 'Aktualisieren' : 'Speichern'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteNotiz(Notiz notiz) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Notiz löschen'),
+        content: Text('Möchten Sie diese Notiz wirklich löschen?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                final notizProvider =
+                    Provider.of<NotizProvider>(context, listen: false);
+                await notizProvider.deleteNotiz(notiz.id);
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Notiz gelöscht!'),
+                    backgroundColor: Color(0xFF00847E),
+                  ),
+                );
+              } catch (e) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Fehler beim Löschen: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
             child: Text('Löschen'),
           ),
         ],

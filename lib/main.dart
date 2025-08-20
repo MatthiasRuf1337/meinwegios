@@ -11,6 +11,8 @@ import 'providers/etappen_provider.dart';
 import 'providers/bilder_provider.dart';
 import 'providers/medien_provider.dart';
 import 'providers/settings_provider.dart';
+import 'providers/audio_provider.dart';
+import 'providers/notiz_provider.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/main_navigation.dart';
 import 'services/database_service.dart';
@@ -40,6 +42,8 @@ class MeinWegApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EtappenProvider()),
         ChangeNotifierProvider(create: (_) => BilderProvider()),
         ChangeNotifierProvider(create: (_) => MedienProvider()),
+        ChangeNotifierProvider(create: (_) => AudioProvider()),
+        ChangeNotifierProvider(create: (_) => NotizProvider()),
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settingsProvider, child) {

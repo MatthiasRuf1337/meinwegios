@@ -5,6 +5,7 @@ import '../providers/etappen_provider.dart';
 import '../models/etappe.dart';
 import '../services/permission_service.dart';
 import 'etappe_tracking_screen_new.dart';
+import 'etappe_detail_screen.dart';
 
 class EtappeStartScreen extends StatefulWidget {
   @override
@@ -121,15 +122,15 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         ),
         SizedBox(height: 16),
 
-        // Notizen
+        // Beschreibung
         TextField(
           controller: _notizenController,
           maxLines: 3,
           decoration: InputDecoration(
-            labelText: 'Notizen (optional)',
+            labelText: 'Beschreibung (optional)',
             hintText: 'Zusätzliche Informationen zur Etappe...',
             border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.note),
+            prefixIcon: Icon(Icons.description),
           ),
         ),
       ],
@@ -261,7 +262,16 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
       _nameController.clear();
       _notizenController.clear();
 
-      _showSuccessDialog('Etappe erfolgreich erstellt!');
+      // Direkt zu den Etappen-Details navigieren
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EtappeDetailScreen(
+            etappe: etappe,
+            fromCompletedScreen: false,
+          ),
+        ),
+      );
     } catch (e) {
       _showErrorDialog('Fehler beim Erstellen der Etappe: $e');
     } finally {

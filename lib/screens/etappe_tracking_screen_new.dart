@@ -2,12 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import '../providers/etappen_provider.dart';
 import '../providers/bilder_provider.dart';
+import '../providers/audio_provider.dart';
+import '../providers/notiz_provider.dart';
 import '../models/etappe.dart';
 import '../models/bild.dart';
+import '../models/audio_aufnahme.dart';
+import '../models/notiz.dart';
 import '../services/database_service.dart';
 import '../services/tracking_service_v2.dart';
+import '../services/audio_recording_service.dart';
+import 'etappe_completed_screen.dart';
+import 'dart:io';
+import 'dart:async';
 
 class EtappeTrackingScreenNew extends StatefulWidget {
   final Etappe etappe;
@@ -24,19 +34,36 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     with WidgetsBindingObserver {
   final TrackingServiceV2 _trackingService = TrackingServiceV2();
   final ImagePicker _picker = ImagePicker();
+  final AudioRecordingService _audioService = AudioRecordingService();
 
   TrackingData? _currentTrackingData;
   String? _errorMessage;
+  Timer? _uiUpdateTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initializeTracking();
+
+    // Provider laden
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<BilderProvider>(context, listen: false).loadBilder();
+      Provider.of<AudioProvider>(context, listen: false).loadAudioAufnahmen();
+      Provider.of<NotizProvider>(context, listen: false).loadNotizen();
+    });
+
+    // Timer für UI-Updates (für Audio-Button-Status)
+    _uiUpdateTimer = Timer.periodic(Duration(milliseconds: 500), (timer) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
   void dispose() {
+    _uiUpdateTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -139,14 +166,41 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             backgroundColor: Color(0xFF00847E),
             foregroundColor: Colors.white,
             actions: [
-              IconButton(
-                icon: Icon(
-                    _trackingService.isPaused ? Icons.play_arrow : Icons.pause),
-                onPressed: _togglePause,
+              Container(
+                margin: EdgeInsets.only(right: 8),
+                child: ElevatedButton.icon(
+                  onPressed: _togglePause,
+                  icon: Icon(
+                    _trackingService.isPaused ? Icons.play_arrow : Icons.pause,
+                    size: 18,
+                  ),
+                  label: Text(
+                    _trackingService.isPaused ? 'Start' : 'Pause',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _trackingService.isPaused
+                        ? Colors.green
+                        : Colors.orange,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    minimumSize: Size(0, 36),
+                  ),
+                ),
               ),
-              IconButton(
-                icon: Icon(Icons.stop),
-                onPressed: () => _stopTracking(etappenProvider),
+              Container(
+                margin: EdgeInsets.only(right: 16),
+                child: ElevatedButton.icon(
+                  onPressed: () => _stopTracking(etappenProvider),
+                  icon: Icon(Icons.stop, size: 18),
+                  label: Text('Stop', style: TextStyle(fontSize: 12)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    minimumSize: Size(0, 36),
+                  ),
+                ),
               ),
             ],
           ),
@@ -229,12 +283,9 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
           _buildLiveStatistics(),
           SizedBox(height: 24),
 
-          // GPS Information
-          _buildGPSInfo(),
+          // Medien-Sektion
+          _buildMedienSection(),
           SizedBox(height: 24),
-
-          // Action Buttons
-          _buildActionButtons(),
         ],
       ),
     );
@@ -364,124 +415,357 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     );
   }
 
-  Widget _buildGPSInfo() {
-    final data = _currentTrackingData!;
+  Widget _buildMedienSection() {
+    return Consumer3<BilderProvider, AudioProvider, NotizProvider>(
+      builder: (context, bilderProvider, audioProvider, notizProvider, child) {
+        final bilder = bilderProvider.getBilderByEtappe(widget.etappe.id);
+        final audioAufnahmen =
+            audioProvider.getAudioAufnahmenByEtappe(widget.etappe.id);
+        final notizen = notizProvider.getNotizenByEtappe(widget.etappe.id);
 
+        return Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade200,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Medien',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _audioService.isRecording
+                        ? _recordAudio
+                        : _showActionMenu,
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: _audioService.isRecording
+                            ? Colors.red
+                            : Color(0xFF00847E),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _audioService.isRecording ? Icons.stop : Icons.add,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              if (bilder.isEmpty && audioAufnahmen.isEmpty && notizen.isEmpty)
+                _buildEmptyMediaState()
+              else
+                _buildMediaContent(bilder, audioAufnahmen, notizen),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyMediaState() {
     return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 4,
-            offset: Offset(0, 2),
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Icon(
+            Icons.photo_library_outlined,
+            size: 48,
+            color: Colors.grey.shade400,
+          ),
+          SizedBox(height: 12),
+          Text(
+            'Noch keine Medien hinzugefügt',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Tippe auf + um Fotos, Audio oder Notizen hinzuzufügen',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade500,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'GPS-Informationen',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16),
-          if (data.currentPosition != null) ...[
-            _buildGPSRow('Breitengrad',
-                data.currentPosition!.latitude.toStringAsFixed(6)),
-            _buildGPSRow('Längengrad',
-                data.currentPosition!.longitude.toStringAsFixed(6)),
-            _buildGPSRow('Höhe',
-                '${data.currentPosition!.altitude.toStringAsFixed(1)} m'),
-            _buildGPSRow('Genauigkeit',
-                '${data.currentPosition!.accuracy.toStringAsFixed(1)} m'),
-          ] else ...[
-            Text(
-              'GPS-Signal wird gesucht...',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontStyle: FontStyle.italic,
+    );
+  }
+
+  Widget _buildMediaContent(List bilder, List audioAufnahmen, List notizen) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (bilder.isNotEmpty) ...[
+          Row(
+            children: [
+              Icon(Icons.photo, size: 16, color: Colors.blue),
+              SizedBox(width: 8),
+              Text(
+                '${bilder.length} Foto${bilder.length != 1 ? 's' : ''}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
+          SizedBox(height: 8),
+        ],
+
+        if (audioAufnahmen.isNotEmpty) ...[
+          Row(
+            children: [
+              Icon(Icons.mic, size: 16, color: Color(0xFF00847E)),
+              SizedBox(width: 8),
+              Text(
+                '${audioAufnahmen.length} Audio-Aufnahme${audioAufnahmen.length != 1 ? 'n' : ''}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+        ],
+
+        if (notizen.isNotEmpty) ...[
+          Row(
+            children: [
+              Icon(Icons.note, size: 16, color: Colors.orange),
+              SizedBox(width: 8),
+              Text(
+                '${notizen.length} Notiz${notizen.length != 1 ? 'en' : ''}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+        ],
+
+        // Vorschau der letzten Medien
+        if (bilder.isNotEmpty ||
+            audioAufnahmen.isNotEmpty ||
+            notizen.isNotEmpty) ...[
           SizedBox(height: 8),
           Text(
-            'GPS-Punkte: ${data.gpsPoints.length}',
+            'Zuletzt hinzugefügt:',
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey.shade600,
             ),
           ),
+          SizedBox(height: 8),
+          _buildRecentMediaPreview(bilder, audioAufnahmen, notizen),
         ],
-      ),
-    );
-  }
-
-  Widget _buildGPSRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _takePhoto,
-            icon: Icon(Icons.camera_alt),
-            label: Text('Foto'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-        SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _addNote,
-            icon: Icon(Icons.note_add),
-            label: Text('Notiz'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
       ],
+    );
+  }
+
+  Widget _buildRecentMediaPreview(
+      List bilder, List audioAufnahmen, List notizen) {
+    return Container(
+      height: 60,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          // Letzte Bilder
+          ...bilder.take(3).map((bild) => Container(
+                margin: EdgeInsets.only(right: 8),
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    File(bild.dateipfad),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade200,
+                        child: Icon(Icons.image, color: Colors.grey.shade400),
+                      );
+                    },
+                  ),
+                ),
+              )),
+
+          // Audio-Aufnahmen
+          ...audioAufnahmen.take(2).map((audio) => Container(
+                margin: EdgeInsets.only(right: 8),
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Color(0xFF00847E).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Color(0xFF00847E).withOpacity(0.3)),
+                ),
+                child: Icon(
+                  Icons.audiotrack,
+                  color: Color(0xFF00847E),
+                  size: 24,
+                ),
+              )),
+
+          // Notizen
+          ...notizen.take(2).map((notiz) => Container(
+                margin: EdgeInsets.only(right: 8),
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                ),
+                child: Icon(
+                  Icons.note,
+                  color: Colors.orange,
+                  size: 24,
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
+  void _showActionMenu() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle-Bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            SizedBox(height: 20),
+
+            Text(
+              'Inhalte zur Etappe hinzufügen',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 20),
+
+            // Action-Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildActionMenuItem(
+                  icon: Icons.camera_alt,
+                  label: 'Foto',
+                  color: Colors.blue,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _takePhoto();
+                  },
+                ),
+                _buildActionMenuItem(
+                  icon: _audioService.isRecording ? Icons.stop : Icons.mic,
+                  label: _audioService.isRecording ? 'Stopp' : 'Audio',
+                  color: _audioService.isRecording
+                      ? Colors.red
+                      : Color(0xFF00847E),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _recordAudio();
+                  },
+                ),
+                _buildActionMenuItem(
+                  icon: Icons.note_add,
+                  label: 'Notiz',
+                  color: Colors.orange,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _addNote();
+                  },
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionMenuItem({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -522,10 +806,11 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     // Tracking stoppen und finale Daten abrufen
     final finalData = await _trackingService.stopTracking();
 
-    // Finale Daten in Etappe speichern
+    // Finale Daten in Etappe speichern - NaN-Werte vermeiden
     final completedEtappe = widget.etappe.copyWith(
-      schrittAnzahl: finalData.totalSteps,
-      gesamtDistanz: finalData.totalDistance,
+      schrittAnzahl: finalData.totalSteps.isFinite ? finalData.totalSteps : 0,
+      gesamtDistanz:
+          finalData.totalDistance.isFinite ? finalData.totalDistance : 0.0,
       gpsPunkte: finalData.gpsPoints,
       endzeit: DateTime.now(),
       status: EtappenStatus.abgeschlossen,
@@ -535,13 +820,15 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     await provider.updateEtappe(completedEtappe);
     provider.stopEtappe();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-            'Etappe beendet! ${finalData.totalSteps} Schritte, ${finalData.formattedDistance}'),
-        backgroundColor: Color(0xFF00847E),
-      ),
-    );
+    // Direkt zur Abgeschlossen-Seite navigieren
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EtappeCompletedScreen(etappe: completedEtappe),
+        ),
+      );
+    }
   }
 
   Future<void> _takePhoto() async {
@@ -555,11 +842,21 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         // Position abrufen
         Position? position = _currentTrackingData?.currentPosition;
 
+        // Bild dauerhaft in das App-Dokumente-Verzeichnis kopieren
+        final appDocsDir = await getApplicationDocumentsDirectory();
+        final bilderDir = Directory(p.join(appDocsDir.path, 'bilder'));
+        if (!bilderDir.existsSync()) {
+          await bilderDir.create(recursive: true);
+        }
+        final newFileName = 'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final newPath = p.join(bilderDir.path, newFileName);
+        final savedFile = await File(photo.path).copy(newPath);
+
         // Bild in Datenbank speichern
         final bild = Bild(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
-          dateiname: 'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg',
-          dateipfad: photo.path,
+          dateiname: newFileName,
+          dateipfad: savedFile.path, // Dauerhafter Pfad statt temporärer
           latitude: position?.latitude,
           longitude: position?.longitude,
           aufnahmeZeit: DateTime.now(),
@@ -594,9 +891,199 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     }
   }
 
+  Future<void> _recordAudio() async {
+    if (_audioService.isRecording) {
+      // Aufnahme stoppen
+      try {
+        final audioAufnahme =
+            await _audioService.stopRecording(widget.etappe.id);
+
+        if (audioAufnahme != null) {
+          // Audio in Provider hinzufügen
+          final audioProvider =
+              Provider.of<AudioProvider>(context, listen: false);
+          await audioProvider.addAudioAufnahme(audioAufnahme);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Audio-Aufnahme gespeichert!'),
+              backgroundColor: Color(0xFF00847E),
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Stoppen der Aufnahme: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
+      // Aufnahme starten
+      final success = await _audioService.startRecording();
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Audio-Aufnahme gestartet'),
+            backgroundColor: Color(0xFF00847E),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Starten der Aufnahme'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   void _addNote() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Notiz-Funktion wird implementiert...')),
+    final notizProvider = Provider.of<NotizProvider>(context, listen: false);
+    final existingNotizen = notizProvider.getNotizenByEtappe(widget.etappe.id);
+
+    // Wenn bereits eine Notiz existiert, diese bearbeiten, sonst neue erstellen
+    if (existingNotizen.isNotEmpty) {
+      _showNotizDialog(existingNotiz: existingNotizen.first);
+    } else {
+      _showNotizDialog();
+    }
+  }
+
+  void _showNotizDialog({Notiz? existingNotiz}) {
+    final TextEditingController titelController = TextEditingController(
+      text: existingNotiz?.titel ?? 'Live-Tracking Notiz',
+    );
+    final TextEditingController inhaltController = TextEditingController(
+      text: existingNotiz?.inhalt ?? '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+            existingNotiz != null ? 'Notiz bearbeiten' : 'Notiz hinzufügen'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titelController,
+              decoration: InputDecoration(
+                labelText: 'Titel',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: inhaltController,
+              decoration: InputDecoration(
+                labelText: 'Notiz',
+                border: OutlineInputBorder(),
+                hintText: 'Hier können Sie Ihre Notizen eingeben...',
+              ),
+              maxLines: 5,
+              minLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          if (existingNotiz != null)
+            TextButton(
+              onPressed: () async {
+                try {
+                  final notizProvider =
+                      Provider.of<NotizProvider>(context, listen: false);
+                  await notizProvider.deleteNotiz(existingNotiz.id);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Notiz gelöscht!'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Fehler beim Löschen: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: Text('Löschen', style: TextStyle(color: Colors.red)),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (inhaltController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Bitte geben Sie eine Notiz ein')),
+                );
+                return;
+              }
+
+              try {
+                final notizProvider =
+                    Provider.of<NotizProvider>(context, listen: false);
+
+                if (existingNotiz != null) {
+                  // Bestehende Notiz aktualisieren
+                  final updatedNotiz = existingNotiz.copyWith(
+                    titel: titelController.text.trim(),
+                    inhalt: inhaltController.text.trim(),
+                    bearbeitetAm: DateTime.now(),
+                  );
+                  await notizProvider.updateNotiz(updatedNotiz);
+
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Notiz aktualisiert!'),
+                      backgroundColor: Color(0xFF00847E),
+                    ),
+                  );
+                } else {
+                  // Neue Notiz erstellen
+                  final notiz = Notiz(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    titel: titelController.text.trim(),
+                    inhalt: inhaltController.text.trim(),
+                    erstelltAm: DateTime.now(),
+                    etappenId: widget.etappe.id,
+                  );
+
+                  await notizProvider.addNotiz(notiz);
+
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Notiz hinzugefügt!'),
+                      backgroundColor: Color(0xFF00847E),
+                    ),
+                  );
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Fehler beim Speichern: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF00847E),
+              foregroundColor: Colors.white,
+            ),
+            child: Text(existingNotiz != null ? 'Aktualisieren' : 'Speichern'),
+          ),
+        ],
+      ),
     );
   }
 }

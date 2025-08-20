@@ -7,6 +7,8 @@ import 'package:path_provider/path_provider.dart';
 import '../models/etappe.dart';
 import '../models/bild.dart';
 import '../models/medien_datei.dart';
+import '../models/audio_aufnahme.dart';
+import '../models/notiz.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
@@ -30,8 +32,9 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 3,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
   }
 
@@ -79,6 +82,64 @@ class DatabaseService {
         metadaten TEXT
       )
     ''');
+
+    // Audio-Aufnahmen Tabelle
+    await db.execute('''
+      CREATE TABLE audio_aufnahmen (
+        id TEXT PRIMARY KEY,
+        dateiname TEXT NOT NULL,
+        dateipfad TEXT NOT NULL,
+        aufnahmeZeit INTEGER NOT NULL,
+        dauer INTEGER NOT NULL,
+        etappenId TEXT NOT NULL,
+        notiz TEXT,
+        metadaten TEXT
+      )
+    ''');
+
+    // Notizen Tabelle
+    await db.execute('''
+      CREATE TABLE notizen (
+        id TEXT PRIMARY KEY,
+        titel TEXT NOT NULL,
+        inhalt TEXT NOT NULL,
+        erstellt_am INTEGER NOT NULL,
+        bearbeitet_am INTEGER,
+        etappen_id TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Audio-Aufnahmen Tabelle hinzufügen
+      await db.execute('''
+        CREATE TABLE audio_aufnahmen (
+          id TEXT PRIMARY KEY,
+          dateiname TEXT NOT NULL,
+          dateipfad TEXT NOT NULL,
+          aufnahmeZeit INTEGER NOT NULL,
+          dauer INTEGER NOT NULL,
+          etappenId TEXT NOT NULL,
+          notiz TEXT,
+          metadaten TEXT
+        )
+      ''');
+    }
+    
+    if (oldVersion < 3) {
+      // Notizen Tabelle hinzufügen
+      await db.execute('''
+        CREATE TABLE notizen (
+          id TEXT PRIMARY KEY,
+          titel TEXT NOT NULL,
+          inhalt TEXT NOT NULL,
+          erstellt_am INTEGER NOT NULL,
+          bearbeitet_am INTEGER,
+          etappen_id TEXT NOT NULL
+        )
+      ''');
+    }
   }
 
   // Etappen Operationen
@@ -182,6 +243,58 @@ class DatabaseService {
       'medien_dateien',
       where: 'id = ?',
       whereArgs: [medienDateiId],
+    );
+  }
+
+  // Audio-Aufnahmen Operationen
+  Future<void> insertAudioAufnahme(AudioAufnahme audioAufnahme) async {
+    final db = await database;
+    await db.insert(
+      'audio_aufnahmen',
+      audioAufnahme.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<AudioAufnahme>> getAllAudioAufnahmen() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('audio_aufnahmen');
+
+    return List.generate(maps.length, (i) {
+      return AudioAufnahme.fromMap(maps[i]);
+    });
+  }
+
+  Future<List<AudioAufnahme>> getAudioAufnahmenByEtappe(
+      String etappenId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'audio_aufnahmen',
+      where: 'etappenId = ?',
+      whereArgs: [etappenId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return AudioAufnahme.fromMap(maps[i]);
+    });
+  }
+
+  Future<void> deleteAudioAufnahme(String audioId) async {
+    final db = await database;
+    await db.delete(
+      'audio_aufnahmen',
+      where: 'id = ?',
+      whereArgs: [audioId],
+    );
+  }
+
+  Future<void> updateAudioAufnahme(AudioAufnahme audioAufnahme) async {
+    final db = await database;
+    await db.update(
+      'audio_aufnahmen',
+      audioAufnahme.toMap(),
+      where: 'id = ?',
+      whereArgs: [audioAufnahme.id],
     );
   }
 
@@ -334,11 +447,53 @@ class DatabaseService {
   Future<Directory> getAppDirectory() async {
     final appDir = await getApplicationDocumentsDirectory();
     final medienDir = Directory('${appDir.path}/medien');
-    
+
     if (!await medienDir.exists()) {
       await medienDir.create(recursive: true);
     }
-    
+
     return medienDir;
+  }
+
+  // Notizen Operationen
+  Future<void> insertNotiz(Notiz notiz) async {
+    final db = await database;
+    await db.insert('notizen', notiz.toMap());
+  }
+
+  Future<List<Notiz>> getAllNotizen() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('notizen');
+    return List.generate(maps.length, (i) => Notiz.fromMap(maps[i]));
+  }
+
+  Future<void> updateNotiz(Notiz notiz) async {
+    final db = await database;
+    await db.update(
+      'notizen',
+      notiz.toMap(),
+      where: 'id = ?',
+      whereArgs: [notiz.id],
+    );
+  }
+
+  Future<void> deleteNotiz(String id) async {
+    final db = await database;
+    await db.delete(
+      'notizen',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<Notiz>> getNotizenByEtappe(String etappenId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'notizen',
+      where: 'etappen_id = ?',
+      whereArgs: [etappenId],
+      orderBy: 'erstellt_am DESC',
+    );
+    return List.generate(maps.length, (i) => Notiz.fromMap(maps[i]));
   }
 }

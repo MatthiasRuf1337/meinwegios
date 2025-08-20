@@ -7,6 +7,7 @@ import '../providers/bilder_provider.dart';
 import '../models/etappe.dart';
 import '../models/bild.dart';
 import 'etappe_detail_screen.dart';
+import 'main_navigation.dart';
 
 class ArchivScreen extends StatefulWidget {
   @override
@@ -392,12 +393,28 @@ class _ArchivScreenState extends State<ArchivScreen> {
   }
 
   void _openEtappeDetail(Etappe etappe) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EtappeDetailScreen(etappe: etappe),
-      ),
-    );
+    // Wenn die Etappe aktiv ist, zum Live-Tracking wechseln
+    if (etappe.status == EtappenStatus.aktiv) {
+      // Zeige Feedback und wechsle zum Live-Tracking Tab
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Aktive Etappe! Wechsle zum Live-Tracking...'),
+          backgroundColor: Color(0xFF00847E),
+          duration: Duration(seconds: 1),
+        ),
+      );
+
+      // Verwende einen globalen Key oder Callback zum Tab-Wechsel
+      MainNavigationController.switchToTab(1);
+    } else {
+      // Normale Etappen-Details öffnen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EtappeDetailScreen(etappe: etappe),
+        ),
+      );
+    }
   }
 
   void _showSearchDialog() {

@@ -4,8 +4,29 @@ import 'archiv_screen.dart';
 import 'etappe_start_screen.dart';
 import 'galerie_screen.dart';
 import 'mediathek_screen.dart';
+import 'etappe_detail_screen.dart';
+import '../models/etappe.dart';
+
+// Globaler Controller für Tab-Navigation
+class MainNavigationController {
+  static _MainNavigationState? _instance;
+
+  static void _setInstance(_MainNavigationState instance) {
+    _instance = instance;
+  }
+
+  static void switchToTab(int index) {
+    _instance?.switchToTab(index);
+  }
+}
 
 class MainNavigation extends StatefulWidget {
+  final int? initialTab;
+  final Etappe? etappeToShow;
+
+  const MainNavigation({Key? key, this.initialTab, this.etappeToShow})
+      : super(key: key);
+
   @override
   _MainNavigationState createState() => _MainNavigationState();
 }
@@ -13,32 +34,62 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    ArchivScreen(),
-    EtappeStartScreen(),
-    GalerieScreen(),
-    MediathekScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    MainNavigationController._setInstance(this);
+    _currentIndex = widget.initialTab ?? 0;
+  }
 
-  final List<BottomNavigationBarItem> _navigationItems = [
-    BottomNavigationBarItem(
-      icon: Icon(Icons.archive),
-      label: 'Etappen',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.add_circle_outline),
-      activeIcon: Icon(Icons.add_circle),
-      label: 'Neue Etappe',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.photo_library),
-      label: 'Galerie',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.library_books),
-      label: 'Mediathek',
-    ),
-  ];
+  void switchToTab(int index) {
+    if (mounted) {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+  }
+
+  List<Widget> get _screens {
+    // Wenn eine spezielle Etappe angezeigt werden soll, ersetze das Archiv
+    if (widget.etappeToShow != null) {
+      return [
+        EtappeDetailScreen(
+            etappe: widget.etappeToShow!, fromCompletedScreen: false),
+        EtappeStartScreen(),
+        GalerieScreen(),
+        MediathekScreen(),
+      ];
+    }
+
+    return [
+      ArchivScreen(),
+      EtappeStartScreen(),
+      GalerieScreen(),
+      MediathekScreen(),
+    ];
+  }
+
+  List<BottomNavigationBarItem> get _navigationItems {
+    return [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.archive),
+        label: 'Etappen',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.add_circle_outline),
+        activeIcon: Icon(Icons.add_circle),
+        label: 'Neue Etappe',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.photo_library),
+        label: 'Galerie',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.library_books),
+        label: 'Mediathek',
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +107,20 @@ class _MainNavigationState extends State<MainNavigation> {
           type: BottomNavigationBarType.fixed,
           currentIndex: _currentIndex,
           onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
+            // Wenn auf Etappen-Tab geklickt wird und eine spezielle Etappe angezeigt wird,
+            // zurück zum normalen Archiv navigieren
+            if (index == 0 && widget.etappeToShow != null) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MainNavigation(),
+                ),
+              );
+            } else {
+              setState(() {
+                _currentIndex = index;
+              });
+            }
           },
           selectedItemColor: Color(0xFF00847E),
           unselectedItemColor: Colors.grey,

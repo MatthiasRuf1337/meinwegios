@@ -6,12 +6,14 @@ class PermissionService {
     if (Platform.isIOS) {
       await requestLocationPermission();
       await requestCameraPermission();
+      await requestMicrophonePermission();
       await requestPhotosPermission();
       await requestActivityRecognitionPermission();
     } else {
       await requestLocationPermission();
       await requestStoragePermission();
       await requestCameraPermission();
+      await requestMicrophonePermission();
       await requestActivityRecognitionPermission();
       await requestPhotosPermission();
     }
@@ -37,6 +39,14 @@ class PermissionService {
     ph.PermissionStatus status = await ph.Permission.camera.status;
     if (status.isDenied) {
       status = await ph.Permission.camera.request();
+    }
+    return status.isGranted;
+  }
+
+  static Future<bool> requestMicrophonePermission() async {
+    ph.PermissionStatus status = await ph.Permission.microphone.status;
+    if (status.isDenied) {
+      status = await ph.Permission.microphone.request();
     }
     return status.isGranted;
   }
@@ -88,6 +98,10 @@ class PermissionService {
     return await ph.Permission.camera.isGranted;
   }
 
+  static Future<bool> checkMicrophonePermission() async {
+    return await ph.Permission.microphone.isGranted;
+  }
+
   static Future<bool> checkStoragePermission() async {
     return Platform.isIOS ? true : await ph.Permission.storage.isGranted;
   }
@@ -106,16 +120,23 @@ class PermissionService {
     if (Platform.isIOS) {
       bool location = await checkLocationPermission();
       bool camera = await checkCameraPermission();
+      bool microphone = await checkMicrophonePermission();
       bool sensors = await checkActivityRecognitionPermission();
       bool photos = await checkPhotosPermission();
-      return location && camera && sensors && photos;
+      return location && camera && microphone && sensors && photos;
     } else {
       bool location = await checkLocationPermission();
       bool camera = await checkCameraPermission();
+      bool microphone = await checkMicrophonePermission();
       bool storage = await checkStoragePermission();
       bool activityRecognition = await checkActivityRecognitionPermission();
       bool photos = await checkPhotosPermission();
-      return location && camera && storage && activityRecognition && photos;
+      return location &&
+          camera &&
+          microphone &&
+          storage &&
+          activityRecognition &&
+          photos;
     }
   }
 
@@ -135,6 +156,8 @@ class PermissionService {
         return 'Die App benötigt Zugriff auf den Standort, um Ihre Etappen mit GPS zu verfolgen.';
       case ph.Permission.camera:
         return 'Die App benötigt Zugriff auf die Kamera, um Bilder während Ihrer Etappen aufzunehmen.';
+      case ph.Permission.microphone:
+        return 'Die App benötigt Zugriff auf das Mikrofon, um Audioaufnahmen während Ihrer Etappen zu erstellen.';
       case ph.Permission.storage:
         return 'Die App benötigt Zugriff auf den Speicher, um Bilder und Dateien zu speichern.';
       case ph.Permission.activityRecognition:

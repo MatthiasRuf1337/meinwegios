@@ -216,10 +216,6 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
           _buildLiveStatistics(),
           SizedBox(height: 24),
 
-          // GPS Information
-          _buildGPSInfo(),
-          SizedBox(height: 24),
-
           // Action Buttons
           _buildActionButtons(),
         ],
