@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 import '../providers/etappen_provider.dart';
 import '../models/etappe.dart';
+import '../models/wetter_daten.dart';
 import '../services/permission_service.dart';
+import '../services/wetter_service.dart';
+import '../widgets/wetter_widget.dart';
 import 'etappe_tracking_screen_new.dart';
 import 'etappe_detail_screen.dart';
 
@@ -16,6 +20,17 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _notizenController = TextEditingController();
   bool _isLoading = false;
+
+  // Wetter-Daten
+  WetterDaten? _aktuellesWetter;
+  bool _wetterLoading = false;
+  String? _wetterError;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentWeather();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +55,10 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
               children: [
                 // Header
                 _buildHeader(),
+                SizedBox(height: 24),
+
+                // Wetter-Widget
+                _buildWetterSection(),
                 SizedBox(height: 24),
 
                 // Formular
@@ -216,6 +235,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             ? null
             : _notizenController.text.trim(),
         erstellungsDatum: DateTime.now(),
+        startWetter: _aktuellesWetter,
       );
 
       await provider.addEtappe(etappe);
@@ -337,5 +357,107 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildWetterSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Aktuelle Wetterbedingungen',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF00847E),
+          ),
+        ),
+        SizedBox(height: 12),
+        WetterWidget(
+          wetterDaten: _aktuellesWetter,
+          isLoading: _wetterLoading,
+          errorMessage: _wetterError,
+          onRefresh: _loadCurrentWeather,
+        ),
+        if (_aktuellesWetter != null) ...[
+          SizedBox(height: 12),
+          _buildWetterWarnung(),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildWetterWarnung() {
+    if (_aktuellesWetter == null) return SizedBox.shrink();
+
+    final warnung = WetterService.getWetterWarnung(_aktuellesWetter!);
+    if (warnung == null) return SizedBox.shrink();
+
+    return WetterWarnungWidget(warnung: warnung);
+  }
+
+  Future<void> _loadCurrentWeather() async {
+    setState(() {
+      _wetterLoading = true;
+      _wetterError = null;
+    });
+
+    try {
+      WetterDaten? wetter;
+
+      if (WetterService.isConfigured) {
+        // Versuche echte Wetterdaten zu laden
+        Position? position = await _getCurrentPosition();
+        if (position != null) {
+          wetter = await WetterService.getAktuellesWetter(
+            position.latitude,
+            position.longitude,
+          );
+        }
+      }
+
+      // Fallback auf Demo-Daten wenn nötig
+      wetter ??= WetterService.getDemoWetter();
+
+      setState(() {
+        _aktuellesWetter = wetter;
+        _wetterLoading = false;
+        _wetterError = null;
+      });
+    } catch (e) {
+      setState(() {
+        _wetterLoading = false;
+        _wetterError =
+            null; // Keine Fehleranzeige, da Demo-Daten verwendet werden
+        _aktuellesWetter = WetterService.getDemoWetter();
+      });
+    }
+  }
+
+  Future<Position?> _getCurrentPosition() async {
+    try {
+      // Standort-Berechtigung prüfen
+      bool hasPermission = await PermissionService.checkLocationPermission();
+      if (!hasPermission) {
+        hasPermission = await PermissionService.requestLocationPermission();
+        if (!hasPermission) {
+          throw Exception('Standort-Berechtigung erforderlich');
+        }
+      }
+
+      // Standort-Service prüfen
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        throw Exception('Standort-Service ist deaktiviert');
+      }
+
+      // Aktuelle Position abrufen
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 10),
+      );
+    } catch (e) {
+      print('Fehler beim Abrufen der Position: $e');
+      return null;
+    }
   }
 }

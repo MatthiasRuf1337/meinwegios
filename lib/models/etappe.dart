@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'wetter_daten.dart';
 
 class Etappe {
   final String id;
@@ -12,6 +13,8 @@ class Etappe {
   final String? notizen;
   final DateTime erstellungsDatum;
   final List<String> bildIds;
+  final WetterDaten? startWetter;
+  final List<WetterDaten> wetterVerlauf;
 
   Etappe({
     required this.id,
@@ -25,6 +28,8 @@ class Etappe {
     this.notizen,
     required this.erstellungsDatum,
     this.bildIds = const [],
+    this.startWetter,
+    this.wetterVerlauf = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -41,6 +46,8 @@ class Etappe {
       'notizen': notizen,
       'erstellungsDatum': erstellungsDatum.millisecondsSinceEpoch,
       'bildIds': bildIds,
+      'startWetter': startWetter?.toJson(),
+      'wetterVerlauf': jsonEncode(wetterVerlauf.map((w) => w.toMap()).toList()),
     };
   }
 
@@ -75,6 +82,24 @@ class Etappe {
       erstellungsDatum:
           DateTime.fromMillisecondsSinceEpoch(map['erstellungsDatum']),
       bildIds: List<String>.from(map['bildIds'] ?? []),
+      startWetter: map['startWetter'] != null
+          ? WetterDaten.fromJson(map['startWetter'])
+          : null,
+      wetterVerlauf: (() {
+        final raw = map['wetterVerlauf'];
+        if (raw == null) return <WetterDaten>[];
+        try {
+          if (raw is String) {
+            final decoded = jsonDecode(raw);
+            if (decoded is List) {
+              return decoded.map((e) => WetterDaten.fromMap(e)).toList();
+            }
+          } else if (raw is List) {
+            return raw.map((e) => WetterDaten.fromMap(e)).toList();
+          }
+        } catch (_) {}
+        return <WetterDaten>[];
+      })(),
     );
   }
 
@@ -90,6 +115,8 @@ class Etappe {
     String? notizen,
     DateTime? erstellungsDatum,
     List<String>? bildIds,
+    WetterDaten? startWetter,
+    List<WetterDaten>? wetterVerlauf,
   }) {
     return Etappe(
       id: id ?? this.id,
@@ -103,6 +130,8 @@ class Etappe {
       notizen: notizen ?? this.notizen,
       erstellungsDatum: erstellungsDatum ?? this.erstellungsDatum,
       bildIds: bildIds ?? this.bildIds,
+      startWetter: startWetter ?? this.startWetter,
+      wetterVerlauf: wetterVerlauf ?? this.wetterVerlauf,
     );
   }
 

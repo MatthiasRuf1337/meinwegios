@@ -10,11 +10,14 @@ import '../providers/audio_provider.dart';
 import '../providers/notiz_provider.dart';
 import '../models/etappe.dart';
 import '../models/bild.dart';
-import '../models/audio_aufnahme.dart';
+
 import '../models/notiz.dart';
 import '../services/database_service.dart';
 import '../services/tracking_service_v2.dart';
 import '../services/audio_recording_service.dart';
+import '../services/wetter_service.dart';
+import '../models/wetter_daten.dart';
+import '../widgets/wetter_widget.dart';
 import 'etappe_completed_screen.dart';
 import 'dart:io';
 import 'dart:async';
@@ -40,6 +43,10 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
   String? _errorMessage;
   Timer? _uiUpdateTimer;
 
+  // Wetter-Daten
+  WetterDaten? _aktuellesWetter;
+  Timer? _wetterUpdateTimer;
+
   @override
   void initState() {
     super.initState();
@@ -59,11 +66,15 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         setState(() {});
       }
     });
+
+    // Wetter initialisieren
+    _initializeWeather();
   }
 
   @override
   void dispose() {
     _uiUpdateTimer?.cancel();
+    _wetterUpdateTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -337,6 +348,16 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
               color: data.isPaused ? Colors.orange.shade700 : Color(0xFF00847E),
             ),
           ),
+
+          // Kompaktes Wetter-Widget
+          if (_aktuellesWetter != null) ...[
+            SizedBox(height: 12),
+            WetterWidget(
+              wetterDaten: _aktuellesWetter,
+              compact: true,
+              onRefresh: _updateWeather,
+            ),
+          ],
         ],
       ),
     );
@@ -814,6 +835,8 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       gpsPunkte: finalData.gpsPoints,
       endzeit: DateTime.now(),
       status: EtappenStatus.abgeschlossen,
+      // Wetter-Verlauf wird beim Stop finalisiert
+      wetterVerlauf: widget.etappe.wetterVerlauf,
     );
 
     provider.updateAktuelleEtappe(completedEtappe);
@@ -1085,5 +1108,71 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         ],
       ),
     );
+  }
+
+  void _initializeWeather() {
+    // Startdaten aus Etappe verwenden falls vorhanden
+    if (widget.etappe.startWetter != null) {
+      _aktuellesWetter = widget.etappe.startWetter;
+    }
+
+    // Periodische Updates alle 30 Minuten
+    _wetterUpdateTimer = Timer.periodic(Duration(minutes: 30), (timer) {
+      _updateWeather();
+    });
+
+    // Initiales Update nach 5 Sekunden
+    Timer(Duration(seconds: 5), () {
+      _updateWeather();
+    });
+  }
+
+  Future<void> _updateWeather() async {
+    if (!WetterService.isConfigured) {
+      return;
+    }
+
+    try {
+      final trackingData = _currentTrackingData;
+      if (trackingData?.currentPosition == null) {
+        return;
+      }
+
+      final position = trackingData!.currentPosition!;
+      final wetter = await WetterService.getAktuellesWetter(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (wetter != null && mounted) {
+        setState(() {
+          _aktuellesWetter = wetter;
+        });
+
+        // Wetter-Verlauf zur Etappe hinzufügen
+        _addWeatherToEtappe(wetter);
+      }
+    } catch (e) {
+      print('Fehler beim Aktualisieren der Wetterdaten: $e');
+    }
+  }
+
+  void _addWeatherToEtappe(WetterDaten wetter) {
+    final etappenProvider =
+        Provider.of<EtappenProvider>(context, listen: false);
+    final currentEtappe = etappenProvider.aktuelleEtappe;
+
+    if (currentEtappe != null) {
+      final updatedWetterVerlauf =
+          List<WetterDaten>.from(currentEtappe.wetterVerlauf);
+      updatedWetterVerlauf.add(wetter);
+
+      final updatedEtappe = currentEtappe.copyWith(
+        wetterVerlauf: updatedWetterVerlauf,
+      );
+
+      etappenProvider.updateAktuelleEtappe(updatedEtappe);
+      etappenProvider.updateEtappe(updatedEtappe);
+    }
   }
 }

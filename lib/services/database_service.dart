@@ -32,7 +32,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -52,7 +52,9 @@ class DatabaseService {
         gpsPunkte TEXT,
         notizen TEXT,
         erstellungsDatum INTEGER NOT NULL,
-        bildIds TEXT
+        bildIds TEXT,
+        startWetter TEXT,
+        wetterVerlauf TEXT
       )
     ''');
 
@@ -126,7 +128,7 @@ class DatabaseService {
         )
       ''');
     }
-    
+
     if (oldVersion < 3) {
       // Notizen Tabelle hinzufügen
       await db.execute('''
@@ -139,6 +141,12 @@ class DatabaseService {
           etappen_id TEXT NOT NULL
         )
       ''');
+    }
+
+    if (oldVersion < 4) {
+      // Wetter-Spalten zur Etappen-Tabelle hinzufügen
+      await db.execute('ALTER TABLE etappen ADD COLUMN startWetter TEXT');
+      await db.execute('ALTER TABLE etappen ADD COLUMN wetterVerlauf TEXT');
     }
   }
 
