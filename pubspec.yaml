@@ -14,6 +14,10 @@ dependencies:
   geolocator: ^10.1.0
   google_maps_flutter: ^2.5.0
 
+  # OpenStreetMap
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
+
   # Schrittzählung
   pedometer: ^3.0.0
 

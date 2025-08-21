@@ -18,6 +18,7 @@ import '../services/audio_recording_service.dart';
 import '../services/wetter_service.dart';
 import '../models/wetter_daten.dart';
 import '../widgets/wetter_widget.dart';
+import '../widgets/live_map_widget.dart';
 import 'etappe_completed_screen.dart';
 import 'dart:io';
 import 'dart:async';
@@ -325,21 +326,29 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       ),
       child: Column(
         children: [
-          Icon(
-            data.isPaused ? Icons.pause_circle : Icons.play_circle,
-            size: 48,
-            color: data.isPaused ? Colors.orange : Color(0xFF00847E),
+          // Status und Icon in einer Zeile (breiter, niedriger)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                data.isPaused ? Icons.pause_circle : Icons.play_circle,
+                size: 32,
+                color: data.isPaused ? Colors.orange : Color(0xFF00847E),
+              ),
+              SizedBox(width: 12),
+              Text(
+                data.isPaused ? 'PAUSIERT' : 'TRACKING AKTIV',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: data.isPaused
+                      ? Colors.orange.shade800
+                      : Color(0xFF00847E),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 12),
-          Text(
-            data.isPaused ? 'PAUSIERT' : 'TRACKING AKTIV',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: data.isPaused ? Colors.orange.shade800 : Color(0xFF00847E),
-            ),
-          ),
-          SizedBox(height: 8),
           Text(
             data.formattedElapsedTime,
             style: TextStyle(
@@ -406,6 +415,22 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                     'Geschwindigkeit', data.formattedSpeed, Icons.speed),
               ),
             ],
+          ),
+          SizedBox(height: 16),
+
+          // Live-Karte
+          Text(
+            'Live-Karte',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF00847E),
+            ),
+          ),
+          SizedBox(height: 8),
+          LiveMapWidget(
+            trackingData: data,
+            height: 250,
           ),
         ],
       ),

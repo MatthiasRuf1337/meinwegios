@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math';
 import '../models/etappe.dart';
+import '../widgets/static_route_map_widget.dart';
 import 'etappe_detail_screen.dart';
 import 'main_navigation.dart'; // For navigating back to main tabs
 
@@ -126,6 +127,59 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     Icons.calendar_today,
                     Colors.purple.shade700,
                   ),
+
+                  // Route-Karte (nur wenn GPS-Daten vorhanden)
+                  if (widget.etappe.gpsPunkte.isNotEmpty) ...[
+                    SizedBox(height: 24),
+                    Card(
+                      margin: EdgeInsets.symmetric(vertical: 8),
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.map,
+                                    size: 30, color: Color(0xFF00847E)),
+                                SizedBox(width: 16),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Deine Route',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'Deine aufgezeichnete Strecke',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color(0xFF00847E),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 16),
+                            StaticRouteMapWidget(
+                              etappe: widget.etappe,
+                              height: 250,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+
                   SizedBox(height: 32),
 
                   // Aktionen

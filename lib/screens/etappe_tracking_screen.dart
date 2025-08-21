@@ -244,21 +244,27 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       ),
       child: Column(
         children: [
-          Icon(
-            _isPaused ? Icons.pause_circle : Icons.play_circle,
-            size: 48,
-            color: _isPaused ? Colors.orange : Color(0xFF00847E),
+          // Status und Icon in einer Zeile (breiter, niedriger)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                _isPaused ? Icons.pause_circle : Icons.play_circle,
+                size: 32,
+                color: _isPaused ? Colors.orange : Color(0xFF00847E),
+              ),
+              SizedBox(width: 12),
+              Text(
+                _isPaused ? 'PAUSIERT' : 'TRACKING AKTIV',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: _isPaused ? Colors.orange.shade800 : Color(0xFF00847E),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 12),
-          Text(
-            _isPaused ? 'PAUSIERT' : 'TRACKING AKTIV',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: _isPaused ? Colors.orange.shade800 : Color(0xFF00847E),
-            ),
-          ),
-          SizedBox(height: 8),
           Text(
             _formatDuration(_elapsedTime),
             style: TextStyle(

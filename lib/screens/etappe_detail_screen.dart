@@ -18,6 +18,7 @@ import 'galerie_screen.dart';
 import 'mediathek_screen.dart';
 import 'etappe_start_screen.dart';
 import '../widgets/audio_recording_widget.dart';
+import '../widgets/static_route_map_widget.dart';
 import 'main_navigation.dart';
 import 'dart:io';
 
@@ -186,6 +187,39 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                   ),
                 ),
                 SizedBox(height: 16),
+
+                // Route-Karte (nur wenn GPS-Daten vorhanden)
+                if (etappe.gpsPunkte.isNotEmpty)
+                  Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Gelaufene Route',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Deine aufgezeichnete Strecke auf der Karte',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          StaticRouteMapWidget(
+                            etappe: etappe,
+                            height: 300,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (etappe.gpsPunkte.isNotEmpty) SizedBox(height: 16),
 
                 // Bilder-Sektion
                 Card(
