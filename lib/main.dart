@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -49,6 +50,16 @@ class MeinWegApp extends StatelessWidget {
         builder: (context, settingsProvider, child) {
           return MaterialApp(
             title: 'Mein Weg',
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [
+              Locale('de', 'DE'), // Deutsch
+              Locale('en', 'US'), // Englisch als Fallback
+            ],
+            locale: Locale('de', 'DE'), // Standard auf Deutsch setzen
             theme: ThemeData(
               fontFamily: 'MuseoSans',
               colorScheme: ColorScheme.light(

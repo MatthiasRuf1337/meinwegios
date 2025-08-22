@@ -94,7 +94,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
       decoration: BoxDecoration(
         color: Color(0xFF00847E),
         boxShadow: [
@@ -105,55 +105,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ],
       ),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              // App Logo
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+          // App Logo
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    'icon.png',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.directions_walk,
-                        size: 30,
-                        color: Color(0xFF00847E),
-                      );
-                    },
-                  ),
-                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                'icon.png',
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.directions_walk,
+                    size: 24,
+                    color: Color(0xFF00847E),
+                  );
+                },
               ),
-              SizedBox(width: 16),
-              // App Name
-              Text(
-                'Mein Weg – Meine Reise',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ],
+            ),
           ),
-          SizedBox(height: 16),
           // Step Indikator
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -168,6 +154,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               _buildStepIndicator(1),
             ],
           ),
+          // Platzhalter für symmetrisches Layout
+          SizedBox(width: 40),
         ],
       ),
     );
@@ -242,7 +230,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             'Die App zu deinem Buch',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF00847E),
             ),
@@ -250,7 +238,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 16),
           // Einleitungstexte
           Text(
-            'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise".\nSie ist deine Begleitung unterwegs – digital, praktisch und persönlich.',
+            'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise".',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey.shade700,
@@ -259,7 +247,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.\nDort findest du alle Texte, Reflexionsseiten, thematischen Impulse und Zitate.',
+            'Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Dort findest du alle Texte, Reflexionsseiten, thematischen Impulse und Zitate.',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey.shade700,
@@ -271,7 +268,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Die App ergänzt dein Buch um wertvolle digitale Funktionen:',
+              'Die App ergänzt dein Buch um:',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -280,11 +277,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          _buildEmojiBullet('🗺', 'Strecke aufzeichnen oder Schritte zählen'),
+          _buildEmojiBullet('🗺', 'Strecke und Schritte aufzeichnen'),
           _buildEmojiBullet('📷', 'Bilder zu jeder Etappe festhalten'),
           _buildEmojiBullet('🎙', 'Gedanken als Audio aufnehmen'),
-          _buildEmojiBullet(
-              '📖', 'E-Paper und Meditationen direkt in der App nutzen'),
+          _buildEmojiBullet('📖', 'E-Paper & Meditationen integriert'),
           const SizedBox(height: 40),
         ],
       ),
@@ -297,17 +293,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Column(
         children: [
           const SizedBox(height: 40),
-          Icon(
-            Icons.security,
-            size: 80,
-            color: Color(0xFF00847E),
-          ),
-          const SizedBox(height: 24),
+          // Titel
           const Text(
             'Datenschutz & Berechtigungen',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF00847E),
             ),
@@ -338,7 +329,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Deine Privatsphäre hat oberste Priorität',
+                  'Deine Privatsphäre hat Priorität',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
