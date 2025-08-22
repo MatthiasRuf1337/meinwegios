@@ -8,6 +8,7 @@ import '../models/etappe.dart';
 import '../models/bild.dart';
 import 'etappe_detail_screen.dart';
 import 'main_navigation.dart';
+import '../widgets/wetter_widget.dart';
 
 class ArchivScreen extends StatefulWidget {
   @override
@@ -240,6 +241,15 @@ class _ArchivScreenState extends State<ArchivScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
+                  // Wetter-Info anzeigen (kompakt)
+                  if (etappe.startWetter != null) ...[
+                    SizedBox(height: 8),
+                    WetterWidget(
+                      wetterDaten: etappe.startWetter,
+                      compact: true,
+                    ),
+                  ],
+
                   // Bild-Anzahl anzeigen
                   if (etappenBilder.isNotEmpty) ...[
                     SizedBox(height: 8),
