@@ -18,6 +18,7 @@ class TrackingServiceV2 {
   // Tracking-Status
   bool _isTracking = false;
   bool _isPaused = false;
+  bool _isPausedBySpeed = false; // Pausiert wegen zu hoher Geschwindigkeit
   DateTime? _trackingStartTime;
   DateTime? _pausedAt;
   Duration _pausedDuration = Duration.zero;
@@ -40,6 +41,12 @@ class TrackingServiceV2 {
   List<double> _recentStepLengths = [];
   int _lastStepCountForDistance = 0;
 
+  // Geschwindigkeits-Überwachung
+  static const double _maxWalkingSpeed =
+      12.0; // km/h - Grenzwert für Laufen/Wandern
+  Function(String, double)?
+      _onSpeedWarning; // Callback für Geschwindigkeits-Warnung
+
   // Callbacks
   Function(TrackingData)? _onTrackingUpdate;
   Function(String)? _onError;
@@ -47,9 +54,11 @@ class TrackingServiceV2 {
   // Getter
   bool get isTracking => _isTracking;
   bool get isPaused => _isPaused;
+  bool get isPausedBySpeed => _isPausedBySpeed;
   TrackingData get currentData => TrackingData(
         isTracking: _isTracking,
         isPaused: _isPaused,
+        isPausedBySpeed: _isPausedBySpeed,
         elapsedTime: _getElapsedTime(),
         totalSteps: _totalSteps,
         totalDistance: _stepBasedDistance, // Verwende Schritt-basierte Distanz
@@ -77,6 +86,7 @@ class TrackingServiceV2 {
   Future<bool> startTracking({
     Function(TrackingData)? onUpdate,
     Function(String)? onError,
+    Function(String, double)? onSpeedWarning,
   }) async {
     if (_isTracking) return false;
 
@@ -84,6 +94,7 @@ class TrackingServiceV2 {
 
     _onTrackingUpdate = onUpdate;
     _onError = onError;
+    _onSpeedWarning = onSpeedWarning;
 
     // Berechtigungen prüfen
     if (!await _checkPermissions()) {
@@ -186,12 +197,18 @@ class TrackingServiceV2 {
 
   // GPS-Position Update
   void _onPositionUpdate(Position position) {
-    if (!_isTracking || _isPaused) return;
+    if (!_isTracking) return;
 
     _currentPosition = position;
 
     // Geschwindigkeit berechnen (m/s zu km/h)
     _currentSpeed = (position.speed * 3.6).clamp(0.0, 50.0);
+
+    // Geschwindigkeits-Überwachung
+    _checkSpeedAndPause();
+
+    // Wenn pausiert (manuell oder durch Geschwindigkeit), keine GPS-Punkte aufzeichnen
+    if (_isPaused) return;
 
     // GPS-Distanz berechnen für Validierung
     if (_lastValidPosition != null) {
@@ -236,6 +253,42 @@ class TrackingServiceV2 {
     }
 
     _notifyUpdate();
+  }
+
+  // Geschwindigkeits-Überwachung und automatisches Pausieren
+  void _checkSpeedAndPause() {
+    if (_currentSpeed > _maxWalkingSpeed) {
+      // Zu schnell - automatisch pausieren
+      if (!_isPausedBySpeed) {
+        _isPausedBySpeed = true;
+        _isPaused = true;
+        _pausedAt = DateTime.now();
+
+        // Warnung senden
+        _onSpeedWarning?.call(
+            'Achtung: Du bewegst dich zu schnell (${_currentSpeed.toStringAsFixed(1)} km/h). '
+            'Tracking wird pausiert - Fahrzeug erkannt.',
+            _currentSpeed);
+
+        print(
+            'TrackingServiceV2: Tracking pausiert - zu hohe Geschwindigkeit: ${_currentSpeed.toStringAsFixed(1)} km/h');
+      }
+    } else {
+      // Normale Geschwindigkeit - automatisch fortsetzen wenn durch Geschwindigkeit pausiert
+      if (_isPausedBySpeed) {
+        _isPausedBySpeed = false;
+        _isPaused = false;
+
+        // Pausierte Zeit hinzufügen
+        if (_pausedAt != null) {
+          _pausedDuration += DateTime.now().difference(_pausedAt!);
+          _pausedAt = null;
+        }
+
+        print(
+            'TrackingServiceV2: Tracking fortgesetzt - normale Geschwindigkeit: ${_currentSpeed.toStringAsFixed(1)} km/h');
+      }
+    }
   }
 
   // Prüfe ob Bewegung realistisch ist
@@ -462,6 +515,7 @@ class TrackingServiceV2 {
     _trackingStartTime = null;
     _pausedAt = null;
     _pausedDuration = Duration.zero;
+    _isPausedBySpeed = false;
     _currentPosition = null;
     _lastValidPosition = null;
     _gpsPoints.clear();
@@ -510,6 +564,7 @@ class TrackingServiceV2 {
 class TrackingData {
   final bool isTracking;
   final bool isPaused;
+  final bool isPausedBySpeed;
   final Duration elapsedTime;
   final int totalSteps;
   final double totalDistance;
@@ -520,6 +575,7 @@ class TrackingData {
   TrackingData({
     required this.isTracking,
     required this.isPaused,
+    this.isPausedBySpeed = false,
     required this.elapsedTime,
     required this.totalSteps,
     required this.totalDistance,

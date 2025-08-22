@@ -113,6 +113,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     final success = await _trackingService.startTracking(
       onUpdate: _onTrackingUpdate,
       onError: _onTrackingError,
+      onSpeedWarning: _onSpeedWarning,
     );
 
     if (!success) {
@@ -141,6 +142,34 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       setState(() {
         _errorMessage = error;
       });
+    }
+  }
+
+  void _onSpeedWarning(String message, double speed) {
+    if (mounted) {
+      // Sofortige UI-Aktualisierung
+      setState(() {});
+
+      // SnackBar-Warnung anzeigen
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.white),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  message,
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange.shade700,
+          duration: Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -311,17 +340,21 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: data.isPaused
-              ? [Colors.orange.shade50, Colors.orange.shade100]
+              ? (data.isPausedBySpeed
+                  ? [Colors.red.shade50, Colors.red.shade100]
+                  : [Colors.orange.shade50, Colors.orange.shade100])
               : [
-                  Color(0xFF5A7D7D).withOpacity(0.1),
-                  Color(0xFF5A7D7D).withOpacity(0.2)
+                  Color(0xFF00847E).withOpacity(0.1),
+                  Color(0xFF00847E).withOpacity(0.2)
                 ],
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: data.isPaused
-              ? Colors.orange.shade200
-              : Color(0xFF5A7D7D).withOpacity(0.3),
+              ? (data.isPausedBySpeed
+                  ? Colors.red.shade200
+                  : Colors.orange.shade200)
+              : Color(0xFF00847E).withOpacity(0.3),
         ),
       ),
       child: Column(
@@ -331,19 +364,27 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                data.isPaused ? Icons.pause_circle : Icons.play_circle,
+                data.isPaused
+                    ? (data.isPausedBySpeed ? Icons.speed : Icons.pause_circle)
+                    : Icons.play_circle,
                 size: 32,
-                color: data.isPaused ? Colors.orange : Color(0xFF5A7D7D),
+                color: data.isPaused
+                    ? (data.isPausedBySpeed ? Colors.red : Colors.orange)
+                    : Color(0xFF00847E),
               ),
               SizedBox(width: 12),
               Text(
-                data.isPaused ? 'PAUSIERT' : 'TRACKING AKTIV',
+                data.isPaused
+                    ? (data.isPausedBySpeed ? 'ZU SCHNELL' : 'PAUSIERT')
+                    : 'TRACKING AKTIV',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: data.isPaused
-                      ? Colors.orange.shade800
-                      : Color(0xFF5A7D7D),
+                      ? (data.isPausedBySpeed
+                          ? Colors.red.shade800
+                          : Colors.orange.shade800)
+                      : Color(0xFF00847E),
                 ),
               ),
             ],
@@ -354,7 +395,11 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: data.isPaused ? Colors.orange.shade700 : Color(0xFF5A7D7D),
+              color: data.isPaused
+                  ? (data.isPausedBySpeed
+                      ? Colors.red.shade700
+                      : Colors.orange.shade700)
+                  : Color(0xFF00847E),
             ),
           ),
 
