@@ -19,6 +19,7 @@ import 'mediathek_screen.dart';
 import 'etappe_start_screen.dart';
 import '../widgets/audio_recording_widget.dart';
 import '../widgets/static_route_map_widget.dart';
+import '../widgets/wetter_widget.dart';
 import 'main_navigation.dart';
 import 'dart:io';
 
@@ -187,6 +188,64 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                   ),
                 ),
                 SizedBox(height: 16),
+
+                // Wetter-Informationen (wenn vorhanden)
+                if (etappe.startWetter != null ||
+                    etappe.wetterVerlauf.isNotEmpty)
+                  Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Wetterbedingungen',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 16),
+
+                          // Start-Wetter
+                          if (etappe.startWetter != null) ...[
+                            Text(
+                              'Wetter beim Start',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            WetterWidget(
+                              wetterDaten: etappe.startWetter,
+                              compact: false,
+                            ),
+                          ],
+
+                          // Wetter-Verlauf
+                          if (etappe.wetterVerlauf.isNotEmpty) ...[
+                            if (etappe.startWetter != null)
+                              SizedBox(height: 16),
+                            Text(
+                              'Wetter-Verlauf (${etappe.wetterVerlauf.length} Updates)',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            _buildWetterVerlauf(etappe.wetterVerlauf),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                if (etappe.startWetter != null ||
+                    etappe.wetterVerlauf.isNotEmpty)
+                  SizedBox(height: 16),
 
                 // Route-Karte (nur wenn GPS-Daten vorhanden)
                 if (etappe.gpsPunkte.isNotEmpty)
@@ -1428,6 +1487,71 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
             child: Text('Löschen'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildWetterVerlauf(List wetterVerlauf) {
+    if (wetterVerlauf.isEmpty) return SizedBox.shrink();
+
+    return Container(
+      height: 120,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: wetterVerlauf.length,
+        itemBuilder: (context, index) {
+          final wetter = wetterVerlauf[index];
+          return Container(
+            width: 200,
+            margin: EdgeInsets.only(right: 12),
+            child: Card(
+              elevation: 2,
+              child: Padding(
+                padding: EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          wetter.wetterEmoji,
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          wetter.formatierteTemperatur,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF00847E),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      wetter.beschreibung,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      DateFormat('HH:mm').format(wetter.zeitstempel),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
