@@ -16,6 +16,7 @@ import 'providers/audio_provider.dart';
 import 'providers/notiz_provider.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/main_navigation.dart';
+import 'screens/zitat_screen.dart';
 import 'services/database_service.dart';
 import 'services/permission_service.dart';
 
@@ -48,6 +49,29 @@ class MeinWegApp extends StatelessWidget {
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settingsProvider, child) {
+          if (settingsProvider.isLoading) {
+            return MaterialApp(
+              home: Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            );
+          }
+
+          Widget homeScreen;
+
+          if (settingsProvider.isFirstAppUsage) {
+            // Erste App-Nutzung: Onboarding
+            homeScreen = OnboardingScreen();
+          } else if (settingsProvider.shouldShowZitat()) {
+            // Zitat anzeigen (täglich oder bei App-Start)
+            homeScreen = ZitatScreen();
+          } else {
+            // Normale App-Navigation
+            homeScreen = MainNavigation();
+          }
+
           return MaterialApp(
             title: 'Mein Weg',
             localizationsDelegates: [
@@ -74,9 +98,7 @@ class MeinWegApp extends StatelessWidget {
               ),
               brightness: Brightness.dark,
             ),
-            home: settingsProvider.isFirstAppUsage
-                ? OnboardingScreen()
-                : MainNavigation(),
+            home: homeScreen,
             debugShowCheckedModeBanner: false,
           );
         },

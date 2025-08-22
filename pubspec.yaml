@@ -75,6 +75,7 @@ flutter:
     - assets/audio/
     - assets/pdf/
     - icon.png
+    - Zitate.csv
 
   fonts:
     - family: MuseoSans

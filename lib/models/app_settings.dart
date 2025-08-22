@@ -3,12 +3,16 @@ class AppSettings {
   final String mediathekPIN;
   final bool onboardingAbgeschlossen;
   final DateTime? letzteMediathekAnmeldung;
+  final int aktuellerZitatIndex;
+  final DateTime? letztesZitatDatum;
 
   AppSettings({
     this.ersteAppNutzung = true,
     this.mediathekPIN = '1234',
     this.onboardingAbgeschlossen = false,
     this.letzteMediathekAnmeldung,
+    this.aktuellerZitatIndex = 0,
+    this.letztesZitatDatum,
   });
 
   Map<String, dynamic> toMap() {
@@ -16,7 +20,10 @@ class AppSettings {
       'ersteAppNutzung': ersteAppNutzung,
       'mediathekPIN': mediathekPIN,
       'onboardingAbgeschlossen': onboardingAbgeschlossen,
-      'letzteMediathekAnmeldung': letzteMediathekAnmeldung?.millisecondsSinceEpoch,
+      'letzteMediathekAnmeldung':
+          letzteMediathekAnmeldung?.millisecondsSinceEpoch,
+      'aktuellerZitatIndex': aktuellerZitatIndex,
+      'letztesZitatDatum': letztesZitatDatum?.millisecondsSinceEpoch,
     };
   }
 
@@ -28,6 +35,10 @@ class AppSettings {
       letzteMediathekAnmeldung: map['letzteMediathekAnmeldung'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['letzteMediathekAnmeldung'])
           : null,
+      aktuellerZitatIndex: map['aktuellerZitatIndex'] ?? 0,
+      letztesZitatDatum: map['letztesZitatDatum'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['letztesZitatDatum'])
+          : null,
     );
   }
 
@@ -36,12 +47,18 @@ class AppSettings {
     String? mediathekPIN,
     bool? onboardingAbgeschlossen,
     DateTime? letzteMediathekAnmeldung,
+    int? aktuellerZitatIndex,
+    DateTime? letztesZitatDatum,
   }) {
     return AppSettings(
       ersteAppNutzung: ersteAppNutzung ?? this.ersteAppNutzung,
       mediathekPIN: mediathekPIN ?? this.mediathekPIN,
-      onboardingAbgeschlossen: onboardingAbgeschlossen ?? this.onboardingAbgeschlossen,
-      letzteMediathekAnmeldung: letzteMediathekAnmeldung ?? this.letzteMediathekAnmeldung,
+      onboardingAbgeschlossen:
+          onboardingAbgeschlossen ?? this.onboardingAbgeschlossen,
+      letzteMediathekAnmeldung:
+          letzteMediathekAnmeldung ?? this.letzteMediathekAnmeldung,
+      aktuellerZitatIndex: aktuellerZitatIndex ?? this.aktuellerZitatIndex,
+      letztesZitatDatum: letztesZitatDatum ?? this.letztesZitatDatum,
     );
   }
-} 
+}
