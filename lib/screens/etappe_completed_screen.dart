@@ -60,7 +60,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
-                        colors: [Color(0xFF00847E), Color(0xFF00A09A)],
+                        colors: [Color(0xFF5A7D7D), Color(0xFF00A09A)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -86,7 +86,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF00847E),
+                      color: Color(0xFF5A7D7D),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -144,7 +144,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                             Row(
                               children: [
                                 Icon(Icons.map,
-                                    size: 30, color: Color(0xFF00847E)),
+                                    size: 30, color: Color(0xFF5A7D7D)),
                                 SizedBox(width: 16),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,7 +162,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                                       'Deine aufgezeichnete Strecke',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Color(0xFF00847E),
+                                        color: Color(0xFF5A7D7D),
                                       ),
                                     ),
                                   ],
@@ -198,7 +198,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     icon: Icon(Icons.photo_library),
                     label: Text('Bilder & Audio hinzufügen'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF00847E),
+                      backgroundColor: Color(0xFF5A7D7D),
                       foregroundColor: Colors.white,
                       padding:
                           EdgeInsets.symmetric(horizontal: 30, vertical: 15),
@@ -216,7 +216,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     icon: Icon(Icons.celebration),
                     label: Text('Nochmal feiern!'),
                     style: TextButton.styleFrom(
-                      foregroundColor: Color(0xFF00847E),
+                      foregroundColor: Color(0xFF5A7D7D),
                     ),
                   ),
                   SizedBox(height: 16),
@@ -260,7 +260,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                   Colors.pink,
                   Colors.orange,
                   Colors.purple,
-                  Color(0xFF00847E),
+                  Color(0xFF5A7D7D),
                   Colors.red,
                   Colors.yellow,
                 ],

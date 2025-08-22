@@ -157,7 +157,7 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                       Polyline(
                         points: _getRoutePoints(),
                         strokeWidth: 4.0,
-                        color: Color(0xFF00847E),
+                        color: Color(0xFF5A7D7D),
                       ),
                     ],
                   ),
@@ -193,7 +193,7 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                         height: 30,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Color(0xFF00847E),
+                            color: Color(0xFF5A7D7D),
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
                           ),
@@ -221,7 +221,7 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                       mini: true,
                       heroTag: "fullscreen",
                       backgroundColor: Colors.white,
-                      foregroundColor: Color(0xFF00847E),
+                      foregroundColor: Color(0xFF5A7D7D),
                       onPressed: () {
                         _showFullscreenMap(context);
                       },
@@ -235,9 +235,9 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                     mini: true,
                     heroTag: "follow",
                     backgroundColor:
-                        _isFollowingUser ? Color(0xFF00847E) : Colors.white,
+                        _isFollowingUser ? Color(0xFF5A7D7D) : Colors.white,
                     foregroundColor:
-                        _isFollowingUser ? Colors.white : Color(0xFF00847E),
+                        _isFollowingUser ? Colors.white : Color(0xFF5A7D7D),
                     onPressed: _toggleFollowMode,
                     child: Icon(Icons.my_location, size: 20),
                   ),
@@ -249,7 +249,7 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                     mini: true,
                     heroTag: "zoomIn",
                     backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF00847E),
+                    foregroundColor: Color(0xFF5A7D7D),
                     onPressed: _zoomIn,
                     child: Icon(Icons.add, size: 20),
                   ),
@@ -261,7 +261,7 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                     mini: true,
                     heroTag: "zoomOut",
                     backgroundColor: Colors.white,
-                    foregroundColor: Color(0xFF00847E),
+                    foregroundColor: Color(0xFF5A7D7D),
                     onPressed: _zoomOut,
                     child: Icon(Icons.remove, size: 20),
                   ),
@@ -297,7 +297,7 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Color(0xFF00847E),
+                    color: Color(0xFF5A7D7D),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -322,7 +322,7 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
         builder: (context) => Scaffold(
           appBar: AppBar(
             title: Text('Live-Karte'),
-            backgroundColor: Color(0xFF00847E),
+            backgroundColor: Color(0xFF5A7D7D),
             foregroundColor: Colors.white,
           ),
           body: LiveMapWidget(

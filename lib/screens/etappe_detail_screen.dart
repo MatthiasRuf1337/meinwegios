@@ -48,7 +48,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Etappen-Details'),
-        backgroundColor: Color(0xFF00847E),
+        backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
         leading: widget.fromCompletedScreen
             ? IconButton(
@@ -278,7 +278,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                   icon: Icon(Icons.add_a_photo),
                                   label: Text('Bild hinzufügen'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFF00847E),
+                                    backgroundColor: Color(0xFF5A7D7D),
                                     foregroundColor: Colors.white,
                                   ),
                                 ),
@@ -528,8 +528,8 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF00847E).withOpacity(0.1),
-            Color(0xFF00847E).withOpacity(0.2)
+            Color(0xFF5A7D7D).withOpacity(0.1),
+            Color(0xFF5A7D7D).withOpacity(0.2)
           ],
         ),
         borderRadius: BorderRadius.circular(12),
@@ -539,7 +539,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.directions_walk, color: Color(0xFF00847E)),
+              Icon(Icons.directions_walk, color: Color(0xFF5A7D7D)),
               SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -547,7 +547,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF00847E),
+                    color: Color(0xFF5A7D7D),
                   ),
                 ),
               ),
@@ -558,7 +558,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
           Text(
             'Erstellt am ${DateFormat('dd.MM.yyyy HH:mm').format(widget.etappe.erstellungsDatum)}',
             style: TextStyle(
-              color: Color(0xFF00847E).withOpacity(0.8),
+              color: Color(0xFF5A7D7D).withOpacity(0.8),
               fontSize: 14,
             ),
           ),
@@ -614,14 +614,14 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Color(0xFF00847E), size: 24),
+        Icon(icon, color: Color(0xFF5A7D7D), size: 24),
         SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF00847E),
+            color: Color(0xFF5A7D7D),
           ),
         ),
         Text(
@@ -749,7 +749,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                 children: [
                   IconButton(
                     onPressed: () => _showImageSourceDialog(),
-                    icon: Icon(Icons.add_a_photo, color: Color(0xFF00847E)),
+                    icon: Icon(Icons.add_a_photo, color: Color(0xFF5A7D7D)),
                     tooltip: 'Bild hinzufügen',
                   ),
                 ],
@@ -806,7 +806,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
             icon: Icon(Icons.add_a_photo),
             label: Text('Bild hinzufügen'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF00847E),
+              backgroundColor: Color(0xFF5A7D7D),
               foregroundColor: Colors.white,
             ),
           ),
@@ -952,7 +952,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
         text = 'Pausiert';
         break;
       case EtappenStatus.abgeschlossen:
-        color = Color(0xFF00847E);
+        color = Color(0xFF5A7D7D);
         text = 'Abgeschlossen';
         break;
     }
@@ -984,7 +984,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.camera_alt, color: Color(0xFF00847E)),
+              leading: Icon(Icons.camera_alt, color: Color(0xFF5A7D7D)),
               title: Text('Kamera'),
               subtitle: Text('Neues Foto aufnehmen'),
               onTap: () {
@@ -993,7 +993,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library, color: Color(0xFF00847E)),
+              leading: Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
               title: Text('Galerie'),
               subtitle: Text('Bild aus Galerie auswählen'),
               onTap: () {
@@ -1138,7 +1138,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Bild erfolgreich hinzugefügt!'),
-          backgroundColor: Color(0xFF00847E),
+          backgroundColor: Color(0xFF5A7D7D),
         ),
       );
     } catch (e) {
@@ -1298,7 +1298,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Notiz gelöscht!'),
-                        backgroundColor: Color(0xFF00847E),
+                        backgroundColor: Color(0xFF5A7D7D),
                       ),
                     );
                   } catch (e) {
@@ -1343,7 +1343,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Notiz aktualisiert!'),
-                      backgroundColor: Color(0xFF00847E),
+                      backgroundColor: Color(0xFF5A7D7D),
                     ),
                   );
                 } else {
@@ -1362,7 +1362,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Notiz hinzugefügt!'),
-                      backgroundColor: Color(0xFF00847E),
+                      backgroundColor: Color(0xFF5A7D7D),
                     ),
                   );
                 }
@@ -1376,7 +1376,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF00847E),
+              backgroundColor: Color(0xFF5A7D7D),
               foregroundColor: Colors.white,
             ),
             child: Text(existingNotiz != null ? 'Aktualisieren' : 'Speichern'),
@@ -1408,7 +1408,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Notiz gelöscht!'),
-                    backgroundColor: Color(0xFF00847E),
+                    backgroundColor: Color(0xFF5A7D7D),
                   ),
                 );
               } catch (e) {

@@ -63,14 +63,14 @@ class MeinWegApp extends StatelessWidget {
             theme: ThemeData(
               fontFamily: 'MuseoSans',
               colorScheme: ColorScheme.light(
-                primary: Color(0xFF00847E),
+                primary: Color(0xFF5A7D7D),
               ),
               brightness: Brightness.light,
             ),
             darkTheme: ThemeData(
               fontFamily: 'MuseoSans',
               colorScheme: ColorScheme.dark(
-                primary: Color(0xFF00847E),
+                primary: Color(0xFF5A7D7D),
               ),
               brightness: Brightness.dark,
             ),

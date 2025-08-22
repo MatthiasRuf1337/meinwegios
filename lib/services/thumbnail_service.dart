@@ -114,7 +114,7 @@ class ThumbnailService {
     IconData iconData;
 
     if (medienDatei.typ == MedienTyp.mp3) {
-      backgroundColor = Color(0xFF00847E);
+      backgroundColor = Color(0xFF5A7D7D);
       iconData = Icons.music_note;
     } else if (medienDatei.typ == MedienTyp.pdf) {
       backgroundColor = Colors.red.shade600;

@@ -24,7 +24,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Etappen'),
-        backgroundColor: Color(0xFF00847E),
+        backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -78,9 +78,9 @@ class _ArchivScreenState extends State<ArchivScreen> {
       margin: EdgeInsets.all(16),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF00847E).withOpacity(0.1),
+        color: Color(0xFF5A7D7D).withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Color(0xFF00847E).withOpacity(0.3)),
+        border: Border.all(color: Color(0xFF5A7D7D).withOpacity(0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -108,14 +108,14 @@ class _ArchivScreenState extends State<ArchivScreen> {
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Color(0xFF00847E), size: 24),
+        Icon(icon, color: Color(0xFF5A7D7D), size: 24),
         SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF00847E),
+            color: Color(0xFF5A7D7D),
           ),
         ),
         Text(
@@ -280,7 +280,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
         text = 'Pausiert';
         break;
       case EtappenStatus.abgeschlossen:
-        color = Color(0xFF00847E);
+        color = Color(0xFF5A7D7D);
         text = 'Abgeschlossen';
         break;
     }
@@ -399,7 +399,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Aktive Etappe! Wechsle zum Live-Tracking...'),
-          backgroundColor: Color(0xFF00847E),
+          backgroundColor: Color(0xFF5A7D7D),
           duration: Duration(seconds: 1),
         ),
       );

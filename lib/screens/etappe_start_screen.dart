@@ -37,7 +37,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Etappe starten'),
-        backgroundColor: Color(0xFF00847E),
+        backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
       ),
       body: Consumer<EtappenProvider>(
@@ -81,8 +81,8 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF00847E).withOpacity(0.1),
-            Color(0xFF00847E).withOpacity(0.2)
+            Color(0xFF5A7D7D).withOpacity(0.1),
+            Color(0xFF5A7D7D).withOpacity(0.2)
           ],
         ),
         borderRadius: BorderRadius.circular(12),
@@ -92,7 +92,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
           Icon(
             Icons.directions_walk,
             size: 48,
-            color: Color(0xFF00847E),
+            color: Color(0xFF5A7D7D),
           ),
           SizedBox(height: 12),
           Text(
@@ -100,7 +100,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF00847E),
+              color: Color(0xFF5A7D7D),
             ),
           ),
           SizedBox(height: 8),
@@ -108,7 +108,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             'Erstelle eine neue Etappe und beginne mit dem Tracking',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Color(0xFF00847E).withOpacity(0.8),
+              color: Color(0xFF5A7D7D).withOpacity(0.8),
             ),
           ),
         ],
@@ -170,7 +170,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
               style: TextStyle(fontSize: 16),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF00847E),
+              backgroundColor: Color(0xFF5A7D7D),
               foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -368,7 +368,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF00847E),
+            color: Color(0xFF5A7D7D),
           ),
         ),
         SizedBox(height: 12),

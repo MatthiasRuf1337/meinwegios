@@ -69,7 +69,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Aufnahme gespeichert!'),
-          backgroundColor: Color(0xFF00847E),
+          backgroundColor: Color(0xFF5A7D7D),
         ),
       );
     } else {
@@ -184,7 +184,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Icon(Icons.mic, color: Color(0xFF00847E)),
+                    Icon(Icons.mic, color: Color(0xFF5A7D7D)),
                   ],
                 ),
                 SizedBox(height: 16),
@@ -264,7 +264,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                 icon: Icon(Icons.mic),
                 label: Text('Aufnahme starten'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF00847E),
+                  backgroundColor: Color(0xFF5A7D7D),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
@@ -321,10 +321,10 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       margin: EdgeInsets.only(bottom: 8),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isPlaying ? Color(0xFF00847E).withOpacity(0.1) : Colors.white,
+        color: isPlaying ? Color(0xFF5A7D7D).withOpacity(0.1) : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isPlaying ? Color(0xFF00847E) : Colors.grey.shade300,
+          color: isPlaying ? Color(0xFF5A7D7D) : Colors.grey.shade300,
         ),
       ),
       child: Row(
@@ -334,7 +334,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
             onPressed: () => _playAudio(audio),
             icon: Icon(
               isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Color(0xFF00847E),
+              color: Color(0xFF5A7D7D),
             ),
           ),
 

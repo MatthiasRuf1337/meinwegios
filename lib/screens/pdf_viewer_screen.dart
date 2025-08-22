@@ -25,7 +25,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.medienDatei.dateiname),
-        backgroundColor: Color(0xFF00847E),
+        backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -94,7 +94,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               icon: Icon(Icons.refresh),
               label: Text('Erneut versuchen'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF00847E),
+                backgroundColor: Color(0xFF5A7D7D),
                 foregroundColor: Colors.white,
               ),
             ),
@@ -112,7 +112,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00847E)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5A7D7D)),
             ),
             SizedBox(height: 16),
             Text(
@@ -212,7 +212,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           IconButton(
             icon: Icon(Icons.arrow_back_ios, size: 20),
             onPressed: _currentPage > 1 ? _previousPage : null,
-            color: _currentPage > 1 ? Color(0xFF00847E) : Colors.grey,
+            color: _currentPage > 1 ? Color(0xFF5A7D7D) : Colors.grey,
           ),
           Expanded(
             child: Text(
@@ -220,14 +220,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF00847E),
+                color: Color(0xFF5A7D7D),
               ),
             ),
           ),
           IconButton(
             icon: Icon(Icons.arrow_forward_ios, size: 20),
             onPressed: _currentPage < _totalPages ? _nextPage : null,
-            color: _currentPage < _totalPages ? Color(0xFF00847E) : Colors.grey,
+            color: _currentPage < _totalPages ? Color(0xFF5A7D7D) : Colors.grey,
           ),
         ],
       ),
@@ -257,7 +257,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Lesezeichen hinzugefügt!'),
-        backgroundColor: Color(0xFF00847E),
+        backgroundColor: Color(0xFF5A7D7D),
       ),
     );
   }
@@ -284,12 +284,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Suche wird implementiert...'),
-                  backgroundColor: Color(0xFF00847E),
+                  backgroundColor: Color(0xFF5A7D7D),
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF00847E),
+              backgroundColor: Color(0xFF5A7D7D),
               foregroundColor: Colors.white,
             ),
             child: Text('Suchen'),
@@ -303,7 +303,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('PDF wird geteilt...'),
-        backgroundColor: Color(0xFF00847E),
+        backgroundColor: Color(0xFF5A7D7D),
       ),
     );
   }

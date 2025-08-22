@@ -22,7 +22,7 @@ class _PDFViewerSimpleState extends State<PDFViewerSimple> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.medienDatei.dateiname),
-        backgroundColor: Color(0xFF00847E),
+        backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -82,7 +82,7 @@ class _PDFViewerSimpleState extends State<PDFViewerSimple> {
               icon: Icon(Icons.refresh),
               label: Text('Erneut versuchen'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF00847E),
+                backgroundColor: Color(0xFF5A7D7D),
                 foregroundColor: Colors.white,
               ),
             ),
@@ -100,7 +100,7 @@ class _PDFViewerSimpleState extends State<PDFViewerSimple> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00847E)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5A7D7D)),
             ),
             SizedBox(height: 16),
             Text(
@@ -130,7 +130,7 @@ class _PDFViewerSimpleState extends State<PDFViewerSimple> {
             Icon(
               Icons.picture_as_pdf,
               size: 80,
-              color: Color(0xFF00847E),
+              color: Color(0xFF5A7D7D),
             ),
             SizedBox(height: 24),
             Text(
@@ -174,7 +174,7 @@ class _PDFViewerSimpleState extends State<PDFViewerSimple> {
               icon: Icon(Icons.open_in_new),
               label: Text('PDF in Standard-App öffnen'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF00847E),
+                backgroundColor: Color(0xFF5A7D7D),
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),

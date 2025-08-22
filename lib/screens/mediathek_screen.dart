@@ -44,7 +44,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
         return Scaffold(
           appBar: AppBar(
             title: Text('Mediathek'),
-            backgroundColor: Color(0xFF00847E),
+            backgroundColor: Color(0xFF5A7D7D),
             foregroundColor: Colors.white,
             actions: [
               IconButton(
@@ -85,7 +85,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => _importMedia(context),
-            backgroundColor: Color(0xFF00847E),
+            backgroundColor: Color(0xFF5A7D7D),
             child: Icon(Icons.add, color: Colors.white),
             tooltip: 'Medien importieren',
           ),
@@ -131,8 +131,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 _selectedType = null;
               });
             },
-            selectedColor: Color(0xFF00847E).withOpacity(0.2),
-            checkmarkColor: Color(0xFF00847E),
+            selectedColor: Color(0xFF5A7D7D).withOpacity(0.2),
+            checkmarkColor: Color(0xFF5A7D7D),
           ),
           SizedBox(width: 8),
           FilterChip(
@@ -143,8 +143,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 _selectedType = selected ? MedienTyp.pdf : null;
               });
             },
-            selectedColor: Color(0xFF00847E).withOpacity(0.2),
-            checkmarkColor: Color(0xFF00847E),
+            selectedColor: Color(0xFF5A7D7D).withOpacity(0.2),
+            checkmarkColor: Color(0xFF5A7D7D),
           ),
           SizedBox(width: 8),
           FilterChip(
@@ -155,8 +155,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 _selectedType = selected ? MedienTyp.mp3 : null;
               });
             },
-            selectedColor: Color(0xFF00847E).withOpacity(0.2),
-            checkmarkColor: Color(0xFF00847E),
+            selectedColor: Color(0xFF5A7D7D).withOpacity(0.2),
+            checkmarkColor: Color(0xFF5A7D7D),
           ),
           SizedBox(width: 8),
           FilterChip(
@@ -171,8 +171,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 }
               });
             },
-            selectedColor: Color(0xFF00847E).withOpacity(0.2),
-            checkmarkColor: Color(0xFF00847E),
+            selectedColor: Color(0xFF5A7D7D).withOpacity(0.2),
+            checkmarkColor: Color(0xFF5A7D7D),
           ),
         ],
       ),
@@ -346,7 +346,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Teilen-Funktion wird implementiert...'),
-        backgroundColor: Color(0xFF00847E),
+        backgroundColor: Color(0xFF5A7D7D),
       ),
     );
   }
@@ -397,7 +397,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
             ),
             SizedBox(height: 20),
             ListTile(
-              leading: Icon(Icons.photo_camera, color: Color(0xFF00847E)),
+              leading: Icon(Icons.photo_camera, color: Color(0xFF5A7D7D)),
               title: Text('Kamera'),
               subtitle: Text('Foto aufnehmen'),
               onTap: () {
@@ -406,7 +406,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library, color: Color(0xFF00847E)),
+              leading: Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
               title: Text('Galerie'),
               subtitle: Text('Foto aus Galerie wählen'),
               onTap: () {
@@ -415,7 +415,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.folder_open, color: Color(0xFF00847E)),
+              leading: Icon(Icons.folder_open, color: Color(0xFF5A7D7D)),
               title: Text('Datei auswählen'),
               subtitle: Text('PDF, MP3, Bilder oder andere Dateien'),
               onTap: () {
@@ -513,7 +513,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           SnackBar(
             content: Text(
                 'Datei erfolgreich importiert: ${file.path.split('/').last}'),
-            backgroundColor: Color(0xFF00847E),
+            backgroundColor: Color(0xFF5A7D7D),
           ),
         );
       } else {
@@ -660,12 +660,12 @@ class _MediathekScreenState extends State<MediathekScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('PIN erfolgreich geändert'),
-                  backgroundColor: Color(0xFF00847E),
+                  backgroundColor: Color(0xFF5A7D7D),
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF00847E),
+              backgroundColor: Color(0xFF5A7D7D),
               foregroundColor: Colors.white,
             ),
             child: Text('Ändern'),
@@ -682,7 +682,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Erfolgreich abgemeldet'),
-        backgroundColor: Color(0xFF00847E),
+        backgroundColor: Color(0xFF5A7D7D),
       ),
     );
   }

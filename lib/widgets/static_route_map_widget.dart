@@ -183,7 +183,7 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
                     Polyline(
                       points: routePoints,
                       strokeWidth: 4.0,
-                      color: const Color(0xFF00847E),
+                      color: const Color(0xFF5A7D7D),
                     ),
                   ],
                 ),
@@ -248,7 +248,7 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
                       mini: true,
                       heroTag: "fullscreen_static",
                       backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF00847E),
+                      foregroundColor: const Color(0xFF5A7D7D),
                       onPressed: () {
                         _showFullscreenMap(context);
                       },
@@ -262,7 +262,7 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
                     mini: true,
                     heroTag: "fit_route",
                     backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF00847E),
+                    foregroundColor: const Color(0xFF5A7D7D),
                     onPressed: _resetView,
                     child: const Icon(Icons.center_focus_strong, size: 20),
                   ),
@@ -274,7 +274,7 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
                     mini: true,
                     heroTag: "zoomIn_static",
                     backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF00847E),
+                    foregroundColor: const Color(0xFF5A7D7D),
                     onPressed: _zoomIn,
                     child: const Icon(Icons.add, size: 20),
                   ),
@@ -286,7 +286,7 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
                     mini: true,
                     heroTag: "zoomOut_static",
                     backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF00847E),
+                    foregroundColor: const Color(0xFF5A7D7D),
                     onPressed: _zoomOut,
                     child: const Icon(Icons.remove, size: 20),
                   ),
@@ -301,7 +301,7 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00847E),
+                  color: const Color(0xFF5A7D7D),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -371,7 +371,7 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
         builder: (context) => Scaffold(
           appBar: AppBar(
             title: Text('Route: ${widget.etappe.name}'),
-            backgroundColor: const Color(0xFF00847E),
+            backgroundColor: const Color(0xFF5A7D7D),
             foregroundColor: Colors.white,
           ),
           body: StaticRouteMapWidget(

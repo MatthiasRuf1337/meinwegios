@@ -10,15 +10,10 @@ class MediathekLoginScreen extends StatefulWidget {
 
 class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
   final TextEditingController _pinController = TextEditingController();
-  final List<TextEditingController> _digitControllers = List.generate(
-    4, 
-    (index) => TextEditingController()
-  );
-  final List<FocusNode> _focusNodes = List.generate(
-    4, 
-    (index) => FocusNode()
-  );
-  
+  final List<TextEditingController> _digitControllers =
+      List.generate(4, (index) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
+
   bool _isLoading = false;
   String _errorMessage = '';
 
@@ -43,7 +38,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF00847E).withOpacity(0.1),
+              Color(0xFF5A7D7D).withOpacity(0.1),
               Colors.white,
             ],
           ),
@@ -57,21 +52,20 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
                 // Header
                 _buildHeader(),
                 SizedBox(height: 48),
-                
+
                 // PIN Eingabe
                 _buildPINInput(),
                 SizedBox(height: 24),
-                
+
                 // Fehlermeldung
-                if (_errorMessage.isNotEmpty)
-                  _buildErrorMessage(),
-                
+                if (_errorMessage.isNotEmpty) _buildErrorMessage(),
+
                 SizedBox(height: 32),
-                
+
                 // Login Button
                 _buildLoginButton(),
                 SizedBox(height: 16),
-                
+
                 // Info Text
                 _buildInfoText(),
               ],
@@ -89,7 +83,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: Color(0xFF00847E),
+            color: Color(0xFF5A7D7D),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Icon(
@@ -104,7 +98,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF00847E),
+            color: Color(0xFF5A7D7D),
           ),
         ),
         SizedBox(height: 8),
@@ -157,7 +151,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF00847E), width: 2),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
                   ),
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -206,7 +200,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : _validatePIN,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF00847E),
+          backgroundColor: Color(0xFF5A7D7D),
           foregroundColor: Colors.white,
           padding: EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
@@ -261,25 +255,25 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
     // Simuliere Netzwerk-Verzögerung
     await Future.delayed(Duration(milliseconds: 500));
 
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
     final enteredPIN = _pinController.text;
 
     if (settingsProvider.validateMediathekPIN(enteredPIN)) {
       // Erfolgreiche Anmeldung
       await settingsProvider.setLastMediathekLogin(DateTime.now());
-      
+
       // PIN-Felder zurücksetzen
       for (var controller in _digitControllers) {
         controller.clear();
       }
       _focusNodes[0].requestFocus();
-      
     } else {
       // Fehlgeschlagene Anmeldung
       setState(() {
         _errorMessage = 'Falscher PIN-Code. Bitte versuche es erneut.';
       });
-      
+
       // PIN-Felder zurücksetzen
       for (var controller in _digitControllers) {
         controller.clear();
@@ -291,4 +285,4 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
       _isLoading = false;
     });
   }
-} 
+}
