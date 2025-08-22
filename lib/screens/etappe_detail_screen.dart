@@ -107,8 +107,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                               child: Text(
                                 etappe.name,
                                 style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade600,
                                 ),
                               ),
                             ),
@@ -121,7 +122,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                           Text(
                             etappe.notizen!,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               color: Colors.grey[600],
                             ),
                           ),
@@ -141,8 +142,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                         Text(
                           'Statistiken',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade600,
                           ),
                         ),
                         SizedBox(height: 16),
@@ -201,8 +203,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                           Text(
                             'Wetterbedingungen',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade600,
                             ),
                           ),
                           SizedBox(height: 16),
@@ -212,7 +215,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                             Text(
                               'Wetter beim Start',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.grey[700],
                               ),
@@ -231,7 +234,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                             Text(
                               'Wetter-Verlauf (${etappe.wetterVerlauf.length} Updates)',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.grey[700],
                               ),
@@ -258,8 +261,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                           Text(
                             'Gelaufene Route',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade600,
                             ),
                           ),
                           SizedBox(height: 8),
@@ -293,8 +297,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                             Text(
                               'Bilder',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade600,
                               ),
                             ),
                             Row(
@@ -327,7 +332,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                 Text(
                                   'Noch keine Bilder',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     color: Colors.grey[600],
                                   ),
                                 ),
@@ -447,8 +452,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                 Text(
                                   'Notizen',
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade600,
                                   ),
                                 ),
                                 IconButton(
@@ -474,7 +480,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                       'Noch keine Notizen vorhanden',
                                       style: TextStyle(
                                         color: Colors.grey[600],
-                                        fontSize: 16,
+                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
@@ -604,7 +610,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                 child: Text(
                   widget.etappe.name,
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF5A7D7D),
                   ),
@@ -647,8 +653,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
           Text(
             'Statistiken',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
+              color: Colors.grey.shade600,
             ),
           ),
           SizedBox(height: 16),
@@ -678,7 +685,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: Color(0xFF5A7D7D),
           ),
@@ -729,8 +736,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
           Text(
             'Details',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
+              color: Colors.grey.shade600,
             ),
           ),
           SizedBox(height: 16),
@@ -800,8 +808,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
               Text(
                 'Bilder',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade600,
                 ),
               ),
               Row(
@@ -847,7 +856,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
           Text(
             'Keine Bilder vorhanden',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.grey.shade600,
             ),
           ),
@@ -979,8 +988,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
           Text(
             'Notizen',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
+              color: Colors.grey.shade600,
             ),
           ),
           SizedBox(height: 12),
@@ -1521,7 +1531,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                         Text(
                           wetter.formatierteTemperatur,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF00847E),
                           ),

@@ -193,7 +193,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           Text(
             'Keine Medien gefunden',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               color: Colors.grey.shade600,
             ),
           ),

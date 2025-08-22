@@ -96,7 +96,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
         Text(
           'Mediathek-Zugriff',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: Color(0xFF5A7D7D),
           ),
@@ -105,7 +105,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
         Text(
           'Bitte gib deinen PIN-Code ein',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             color: Colors.grey.shade600,
           ),
         ),
@@ -119,7 +119,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
         Text(
           'PIN-Code',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Colors.grey.shade700,
           ),
@@ -141,7 +141,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
                   LengthLimitingTextInputFormatter(1),
                 ],
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
                 decoration: InputDecoration(
@@ -219,7 +219,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
             : Text(
                 'Anmelden',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),

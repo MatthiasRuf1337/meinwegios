@@ -113,7 +113,7 @@ class BildDetailScreen extends StatelessWidget {
           Text(
             'Details',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -131,7 +131,7 @@ class BildDetailScreen extends StatelessWidget {
             Text(
               'Metadaten',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),

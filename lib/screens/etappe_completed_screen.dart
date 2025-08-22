@@ -56,76 +56,97 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
 
                   // Erfolgs-Icon
                   Container(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [Color(0xFF5A7D7D), Color(0xFF00A09A)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                      color: Color(0xFF5A7D7D).withOpacity(0.1),
+                      border: Border.all(
+                        color: Color(0xFF5A7D7D).withOpacity(0.3),
+                        width: 2,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          spreadRadius: 2,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
                     ),
                     child: Icon(
                       Icons.check,
-                      color: Colors.white,
-                      size: 80,
+                      color: Color(0xFF5A7D7D),
+                      size: 40,
                     ),
                   ),
                   SizedBox(height: 24),
 
-                  Text(
-                    'Etappe erfolgreich beendet!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF5A7D7D),
-                    ),
-                    textAlign: TextAlign.center,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.check,
+                        color: Color(0xFF5A7D7D),
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Etappe erfolgreich beendet!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF5A7D7D),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 16),
 
                   Text(
                     'Herzlichen Glückwunsch! Du hast deine Etappe erfolgreich abgeschlossen.',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.grey.shade700,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 32),
 
-                  // Statistiken
-                  _buildStatCard(
-                    'Distanz',
-                    widget.etappe.formatierteDistanz,
-                    Icons.straighten,
-                    Colors.blue.shade700,
+                  // Statistiken in 2x2 Grid
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          'Distanz',
+                          widget.etappe.formatierteDistanz,
+                          Icons.straighten,
+                          Colors.blue.shade700,
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Schritte',
+                          '${widget.etappe.schrittAnzahl} Schritte',
+                          Icons.directions_walk,
+                          Colors.green.shade700,
+                        ),
+                      ),
+                    ],
                   ),
-                  _buildStatCard(
-                    'Schritte',
-                    '${widget.etappe.schrittAnzahl} Schritte',
-                    Icons.directions_walk,
-                    Colors.green.shade700,
-                  ),
-                  _buildStatCard(
-                    'Dauer',
-                    widget.etappe.formatierteDauer,
-                    Icons.timer,
-                    Colors.orange.shade700,
-                  ),
-                  _buildStatCard(
-                    'Datum',
-                    '${widget.etappe.startzeit.day}.${widget.etappe.startzeit.month}.${widget.etappe.startzeit.year}',
-                    Icons.calendar_today,
-                    Colors.purple.shade700,
+                  SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          'Dauer',
+                          widget.etappe.formatierteDauer,
+                          Icons.timer,
+                          Colors.orange.shade700,
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Datum',
+                          '${widget.etappe.startzeit.day}.${widget.etappe.startzeit.month}.${widget.etappe.startzeit.year}',
+                          Icons.calendar_today,
+                          Colors.purple.shade700,
+                        ),
+                      ),
+                    ],
                   ),
 
                   // Route-Karte (nur wenn GPS-Daten vorhanden)
@@ -144,7 +165,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                             Row(
                               children: [
                                 Icon(Icons.map,
-                                    size: 30, color: Color(0xFF5A7D7D)),
+                                    size: 20, color: Colors.grey.shade600),
                                 SizedBox(width: 16),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,7 +173,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                                     Text(
                                       'Deine Route',
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.grey.shade600,
                                       ),
@@ -162,7 +183,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                                       'Deine aufgezeichnete Strecke',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Color(0xFF5A7D7D),
+                                        color: Colors.grey.shade600,
                                       ),
                                     ),
                                   ],
@@ -202,7 +223,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                       foregroundColor: Colors.white,
                       padding:
                           EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                      textStyle: TextStyle(fontSize: 18),
+                      textStyle: TextStyle(fontSize: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -282,7 +303,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
         padding: EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(icon, size: 30, color: color),
+            Icon(icon, size: 20, color: Colors.grey.shade600),
             SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,7 +311,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey.shade600,
                   ),
@@ -299,9 +320,9 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: color,
+                    color: Colors.grey.shade600,
                   ),
                 ),
               ],

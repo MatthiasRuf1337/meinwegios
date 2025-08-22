@@ -74,7 +74,7 @@ class _PDFViewerScreenAlternativeState
             Text(
               'Fehler beim Laden der PDF',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.grey.shade700,
               ),
@@ -117,7 +117,7 @@ class _PDFViewerScreenAlternativeState
             Text(
               'PDF wird geladen...',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 color: Colors.grey.shade600,
               ),
             ),

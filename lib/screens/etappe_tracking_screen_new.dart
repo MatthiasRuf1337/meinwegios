@@ -271,7 +271,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             Text(
               'Keine aktive Etappe',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 color: Colors.grey.shade600,
               ),
             ),
@@ -336,25 +336,20 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     final data = _currentTrackingData!;
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: data.isPaused
-              ? (data.isPausedBySpeed
-                  ? [Colors.red.shade50, Colors.red.shade100]
-                  : [Colors.orange.shade50, Colors.orange.shade100])
-              : [
-                  Color(0xFF00847E).withOpacity(0.1),
-                  Color(0xFF00847E).withOpacity(0.2)
-                ],
-        ),
-        borderRadius: BorderRadius.circular(12),
+        color: data.isPaused
+            ? (data.isPausedBySpeed
+                ? Colors.red.shade50
+                : Colors.orange.shade50)
+            : Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: data.isPaused
               ? (data.isPausedBySpeed
                   ? Colors.red.shade200
                   : Colors.orange.shade200)
-              : Color(0xFF00847E).withOpacity(0.3),
+              : Colors.grey.shade200,
         ),
       ),
       child: Column(
@@ -367,10 +362,10 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                 data.isPaused
                     ? (data.isPausedBySpeed ? Icons.speed : Icons.pause_circle)
                     : Icons.play_circle,
-                size: 32,
+                size: 20,
                 color: data.isPaused
                     ? (data.isPausedBySpeed ? Colors.red : Colors.orange)
-                    : Color(0xFF00847E),
+                    : Color(0xFF5A7D7D),
               ),
               SizedBox(width: 12),
               Text(
@@ -378,40 +373,30 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                     ? (data.isPausedBySpeed ? 'ZU SCHNELL' : 'PAUSIERT')
                     : 'TRACKING AKTIV',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: data.isPaused
                       ? (data.isPausedBySpeed
                           ? Colors.red.shade800
                           : Colors.orange.shade800)
-                      : Color(0xFF00847E),
+                      : Color(0xFF5A7D7D),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 8),
           Text(
             data.formattedElapsedTime,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: data.isPaused
                   ? (data.isPausedBySpeed
                       ? Colors.red.shade700
                       : Colors.orange.shade700)
-                  : Color(0xFF00847E),
+                  : Color(0xFF5A7D7D),
             ),
           ),
-
-          // Kompaktes Wetter-Widget
-          if (_aktuellesWetter != null) ...[
-            SizedBox(height: 12),
-            WetterWidget(
-              wetterDaten: _aktuellesWetter,
-              compact: true,
-              onRefresh: _updateWeather,
-            ),
-          ],
         ],
       ),
     );
@@ -440,8 +425,9 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
           Text(
             'Live-Statistiken',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
+              color: Colors.grey.shade600,
             ),
           ),
           SizedBox(height: 16),
@@ -455,10 +441,20 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                 child: _buildStatItem(
                     'Schritte', '${data.totalSteps}', Icons.directions_walk),
               ),
+            ],
+          ),
+          SizedBox(height: 12),
+          Row(
+            children: [
               Expanded(
                 child: _buildStatItem(
                     'Geschwindigkeit', data.formattedSpeed, Icons.speed),
               ),
+              if (_aktuellesWetter != null)
+                Expanded(
+                  child: _buildStatItem('Wetter',
+                      _aktuellesWetter!.formatierteTemperatur, Icons.wb_sunny),
+                ),
             ],
           ),
           SizedBox(height: 16),
@@ -467,9 +463,9 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
           Text(
             'Live-Karte',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF5A7D7D),
+              color: Colors.grey.shade600,
             ),
           ),
           SizedBox(height: 8),
@@ -490,7 +486,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         Text(
           value,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: Color(0xFF5A7D7D),
           ),
@@ -537,8 +533,9 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   Text(
                     'Medien',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade600,
                     ),
                   ),
                   GestureDetector(
@@ -776,7 +773,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             Text(
               'Inhalte zur Etappe hinzufügen',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),

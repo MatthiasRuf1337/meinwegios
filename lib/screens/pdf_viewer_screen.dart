@@ -75,7 +75,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
             Text(
               'Fehler beim Laden der PDF',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.grey.shade700,
               ),
@@ -118,7 +118,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
             Text(
               'PDF wird geladen...',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 color: Colors.grey.shade600,
               ),
             ),

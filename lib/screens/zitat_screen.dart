@@ -141,7 +141,7 @@ class _ZitatScreenState extends State<ZitatScreen>
               'Zitat konnte nicht geladen werden',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
             SizedBox(height: 24),
@@ -264,7 +264,7 @@ class _ZitatScreenState extends State<ZitatScreen>
         '— ${_zitat!.autor}',
         style: TextStyle(
           color: Colors.white.withOpacity(0.9),
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
         textAlign: TextAlign.center,
@@ -292,7 +292,7 @@ class _ZitatScreenState extends State<ZitatScreen>
           child: Text(
             'Weiter',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

@@ -114,7 +114,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: Color(0xFF5A7D7D),
           ),
@@ -198,7 +198,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
                         child: Text(
                           etappe.name,
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -213,7 +213,10 @@ class _ArchivScreenState extends State<ArchivScreen> {
                       SizedBox(width: 4),
                       Text(
                         DateFormat('dd.MM.yyyy HH:mm').format(etappe.startzeit),
-                        style: TextStyle(color: Colors.grey.shade600),
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -227,6 +230,11 @@ class _ArchivScreenState extends State<ArchivScreen> {
                           '${etappe.schrittAnzahl} Schritte'),
                       SizedBox(width: 16),
                       _buildInfoItem(Icons.timer, etappe.formatierteDauer),
+                      if (etappe.startWetter != null) ...[
+                        SizedBox(width: 16),
+                        _buildInfoItem(Icons.wb_sunny,
+                            '${etappe.startWetter!.formatierteTemperatur}'),
+                      ],
                     ],
                   ),
                   if (etappe.notizen != null && etappe.notizen!.isNotEmpty) ...[
@@ -236,20 +244,12 @@ class _ArchivScreenState extends State<ArchivScreen> {
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontStyle: FontStyle.italic,
+                        fontSize: 14,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                  // Wetter-Info anzeigen (kompakt)
-                  if (etappe.startWetter != null) ...[
-                    SizedBox(height: 8),
-                    WetterWidget(
-                      wetterDaten: etappe.startWetter,
-                      compact: true,
-                    ),
-                  ],
-
                   // Bild-Anzahl anzeigen
                   if (etappenBilder.isNotEmpty) ...[
                     SizedBox(height: 8),
@@ -344,7 +344,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
           Text(
             'Noch keine Etappen vorhanden',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               color: Colors.grey.shade600,
             ),
           ),
@@ -353,6 +353,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
             'Starte deine erste Etappe im Etappen-Tab',
             style: TextStyle(
               color: Colors.grey.shade500,
+              fontSize: 14,
             ),
           ),
         ],

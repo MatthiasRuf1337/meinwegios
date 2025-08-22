@@ -186,7 +186,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
             Text(
               'Keine aktive Etappe',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 color: Colors.grey.shade600,
               ),
             ),
@@ -257,7 +257,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
               Text(
                 _isPaused ? 'PAUSIERT' : 'TRACKING AKTIV',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: _isPaused ? Colors.orange.shade800 : Color(0xFF5A7D7D),
                 ),
@@ -268,7 +268,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
           Text(
             _formatDuration(_elapsedTime),
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: _isPaused ? Colors.orange.shade700 : Color(0xFF5A7D7D),
             ),
@@ -299,7 +299,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
           Text(
             'Live-Statistiken',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -330,7 +330,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         Text(
           value,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: Color(0xFF5A7D7D),
           ),
@@ -367,7 +367,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
           Text(
             'GPS-Informationen',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

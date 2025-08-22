@@ -180,8 +180,9 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                     Text(
                       'Audio-Aufnahmen',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
                       ),
                     ),
                     Icon(Icons.mic, color: Color(0xFF5A7D7D)),
@@ -226,7 +227,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                 Text(
                   'Aufnahme läuft: ${_formatDuration(_recordingDuration)}',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.red,
                   ),
@@ -290,7 +291,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
           Text(
             'Keine Audioaufnahmen vorhanden',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.grey.shade600,
             ),
           ),

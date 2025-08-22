@@ -130,7 +130,7 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
                 'Keine GPS-Daten verfügbar',
                 style: TextStyle(
                   color: Colors.grey.shade600,
-                  fontSize: 16,
+                  fontSize: 14,
                 ),
               ),
               const SizedBox(height: 4),

@@ -90,7 +90,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       appBar: AppBar(
         title: Text(
           widget.medienDatei.dateiname,
-          style: TextStyle(fontSize: 16),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -147,7 +146,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             Text(
               'Fehler beim Laden der Audio-Datei',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.grey.shade700,
               ),
@@ -190,7 +189,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             Text(
               'Audio wird geladen...',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 color: Colors.grey.shade600,
               ),
             ),

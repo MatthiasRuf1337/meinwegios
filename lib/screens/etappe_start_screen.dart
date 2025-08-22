@@ -89,19 +89,24 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.directions_walk,
-            size: 48,
-            color: Color(0xFF5A7D7D),
-          ),
-          SizedBox(height: 12),
-          Text(
-            'Neue Etappe starten',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF5A7D7D),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.directions_walk,
+                size: 24,
+                color: Color(0xFF5A7D7D),
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Neue Etappe starten',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF5A7D7D),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 8),
           Text(
@@ -123,8 +128,9 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         Text(
           'Etappen-Details',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
+            color: Color(0xFF5A7D7D),
           ),
         ),
         SizedBox(height: 16),
@@ -167,7 +173,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             icon: Icon(Icons.play_arrow),
             label: Text(
               'Live-Tracking starten',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 14),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFF5A7D7D),
@@ -189,7 +195,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             icon: Icon(Icons.add),
             label: Text(
               'Manuelle Etappe erstellen',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 14),
             ),
             style: OutlinedButton.styleFrom(
               padding: EdgeInsets.symmetric(vertical: 16),
@@ -366,7 +372,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         Text(
           'Aktuelle Wetterbedingungen',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: Color(0xFF5A7D7D),
           ),

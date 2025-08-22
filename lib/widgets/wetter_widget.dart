@@ -150,7 +150,7 @@ class WetterWidget extends StatelessWidget {
         children: [
           Text(
             wetterDaten!.wetterEmoji,
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 14),
           ),
           SizedBox(width: 6),
           Text(
@@ -203,7 +203,7 @@ class WetterWidget extends StatelessWidget {
                     Text(
                       wetterDaten!.formatierteTemperatur,
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF5A7D7D),
                       ),

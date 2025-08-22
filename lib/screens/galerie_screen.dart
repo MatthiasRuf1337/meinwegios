@@ -128,7 +128,7 @@ class _GalerieScreenState extends State<GalerieScreen> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Color(0xFF5A7D7D),
           ),
@@ -158,7 +158,7 @@ class _GalerieScreenState extends State<GalerieScreen> {
           Text(
             'Keine Bilder gefunden',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               color: Colors.grey.shade600,
             ),
           ),
