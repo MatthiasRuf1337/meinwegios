@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-import 'models/etappe.dart';
-import 'models/bild.dart';
-import 'models/medien_datei.dart';
-import 'models/app_settings.dart';
 import 'providers/etappen_provider.dart';
 import 'providers/bilder_provider.dart';
 import 'providers/medien_provider.dart';
@@ -18,7 +12,6 @@ import 'screens/onboarding_screen.dart';
 import 'screens/main_navigation.dart';
 import 'screens/zitat_screen.dart';
 import 'services/database_service.dart';
-import 'services/permission_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
