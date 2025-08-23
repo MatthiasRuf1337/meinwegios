@@ -572,33 +572,13 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
   }
 
   Widget _buildEmptyMediaState() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: Column(
-        children: [
-          Icon(
-            Icons.photo_library_outlined,
-            size: 48,
-            color: Colors.grey.shade400,
-          ),
-          SizedBox(height: 12),
-          Text(
-            'Noch keine Medien hinzugefügt',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Tippe auf + um Fotos, Audio oder Notizen hinzuzufügen',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+    return Center(
+      child: Text(
+        'Noch keine Medien hinzugefügt',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey.shade600,
+        ),
       ),
     );
   }

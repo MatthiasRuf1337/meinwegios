@@ -45,7 +45,7 @@ class Etappe {
       'gpsPunkte': jsonEncode(gpsPunkte.map((punkt) => punkt.toMap()).toList()),
       'notizen': notizen,
       'erstellungsDatum': erstellungsDatum.millisecondsSinceEpoch,
-      'bildIds': bildIds,
+      'bildIds': jsonEncode(bildIds),
       'startWetter': startWetter?.toJson(),
       'wetterVerlauf': jsonEncode(wetterVerlauf.map((w) => w.toMap()).toList()),
     };
@@ -81,7 +81,21 @@ class Etappe {
       notizen: map['notizen'],
       erstellungsDatum:
           DateTime.fromMillisecondsSinceEpoch(map['erstellungsDatum']),
-      bildIds: List<String>.from(map['bildIds'] ?? []),
+      bildIds: (() {
+        final raw = map['bildIds'];
+        if (raw == null) return <String>[];
+        try {
+          if (raw is String) {
+            final decoded = jsonDecode(raw);
+            if (decoded is List) {
+              return List<String>.from(decoded);
+            }
+          } else if (raw is List) {
+            return List<String>.from(raw);
+          }
+        } catch (_) {}
+        return <String>[];
+      })(),
       startWetter: map['startWetter'] != null
           ? WetterDaten.fromJson(map['startWetter'])
           : null,

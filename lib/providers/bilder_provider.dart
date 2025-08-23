@@ -3,7 +3,6 @@ import '../models/bild.dart';
 import '../services/database_service.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'etappen_provider.dart';
 
 class BilderProvider with ChangeNotifier {
   List<Bild> _bilder = [];
@@ -14,8 +13,6 @@ class BilderProvider with ChangeNotifier {
 
   BilderProvider() {
     _loadBilder();
-    // Callback für Reload registrieren
-    setBilderProviderReloadCallback(() => loadBilder());
   }
 
   Future<void> _loadBilder() async {

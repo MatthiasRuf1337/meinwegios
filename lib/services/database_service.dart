@@ -9,6 +9,7 @@ import '../models/bild.dart';
 import '../models/medien_datei.dart';
 import '../models/audio_aufnahme.dart';
 import '../models/notiz.dart';
+import '../models/wetter_daten.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
@@ -503,5 +504,179 @@ class DatabaseService {
       orderBy: 'erstellt_am DESC',
     );
     return List.generate(maps.length, (i) => Notiz.fromMap(maps[i]));
+  }
+
+  // Beispiel-Etappe erstellen (nur beim ersten App-Start)
+  Future<void> createExampleStageIfNeeded() async {
+    try {
+      // Prüfen ob bereits die Beispiel-Etappe vorhanden ist
+      final db = await database;
+      final existingExample = await db.query(
+        'etappen',
+        where: 'id = ?',
+        whereArgs: ['beispiel_etappe_2025'],
+      );
+
+      if (existingExample.isNotEmpty) {
+        print('Beispiel-Etappe bereits vorhanden, überspringe Erstellung');
+        return;
+      }
+
+      // Bereinige fehlerhafte Etappen (falls vorhanden)
+      await _cleanupCorruptedStages();
+
+      // Beispiel-Bild kopieren und Bild-Eintrag erstellen
+      final bildId = await _createExampleImage();
+
+      // Beispielwetter erstellen
+      final beispielWetter = WetterDaten(
+        temperatur: 18.5,
+        beschreibung: 'Leicht bewölkt',
+        hauptKategorie: 'Clouds',
+        icon: '02d',
+        luftfeuchtigkeit: 65.0,
+        windgeschwindigkeit: 12.3,
+        windrichtung: 225.0, // SW
+        luftdruck: 1013.2,
+        gefuehlteTemperatur: 19.2,
+        zeitstempel: DateTime(2025, 8, 1, 6, 0),
+        ort: 'Beispielort',
+      );
+
+      // Beispiel-Etappe erstellen
+      final beispielEtappe = Etappe(
+        id: 'beispiel_etappe_2025',
+        name: 'Beispiel-Etappe',
+        startzeit: DateTime(2025, 8, 1, 6, 0),
+        endzeit: DateTime(2025, 8, 1, 10, 30), // 4,5 Stunden Dauer
+        status: EtappenStatus.abgeschlossen,
+        gesamtDistanz: 30000.0, // 30 km in Metern
+        schrittAnzahl: 42000, // Realistische Schrittanzahl für 30km
+        gpsPunkte: _createExampleGPSPoints(),
+        notizen:
+            'Du kannst diese Beispiel-Etappe jederzeit löschen. Tipp: Nutze die App, um deine eigenen Wanderungen zu dokumentieren!',
+        erstellungsDatum: DateTime(2025, 8, 1, 6, 0),
+        bildIds: bildId != null ? [bildId] : [],
+        startWetter: beispielWetter,
+        wetterVerlauf: [beispielWetter],
+      );
+
+      // In Datenbank speichern
+      await insertEtappe(beispielEtappe);
+      print('Beispiel-Etappe erfolgreich erstellt');
+    } catch (e) {
+      print('Fehler beim Erstellen der Beispiel-Etappe: $e');
+    }
+  }
+
+  // Beispiel-Bild kopieren und Bild-Eintrag erstellen
+  Future<String?> _createExampleImage() async {
+    try {
+      // Versuche das Bild aus Assets zu laden
+      ByteData? imageData;
+      try {
+        imageData = await rootBundle.load('assets/images/beispiel.jpg');
+      } catch (e) {
+        print(
+            'beispiel.jpg nicht in Assets gefunden, versuche aus Projektroot');
+
+        // Fallback: Versuche aus Projektroot zu laden
+        final projectRoot = Directory.current;
+        final beispielFile = File('${projectRoot.path}/beispiel.jpg');
+
+        if (beispielFile.existsSync()) {
+          final bytes = await beispielFile.readAsBytes();
+          imageData = ByteData.view(Uint8List.fromList(bytes).buffer);
+        } else {
+          print(
+              'beispiel.jpg nicht gefunden - Beispiel-Etappe wird ohne Bild erstellt');
+          return null;
+        }
+      }
+
+      // App-Verzeichnis für Bilder erstellen
+      final appDir = await getApplicationDocumentsDirectory();
+      final bilderDir = Directory('${appDir.path}/bilder');
+      if (!await bilderDir.exists()) {
+        await bilderDir.create(recursive: true);
+      }
+
+      // Bild speichern
+      final zielPfad = '${bilderDir.path}/beispiel_etappe.jpg';
+      final file = File(zielPfad);
+      await file.writeAsBytes(imageData.buffer.asUint8List());
+
+      // Bild-Eintrag erstellen
+      final bildId = 'beispiel_bild_2025';
+      final beispielBild = Bild(
+        id: bildId,
+        dateiname: 'beispiel_etappe.jpg',
+        dateipfad: zielPfad,
+        latitude: 47.3769, // Beispiel-Koordinaten (Zürich)
+        longitude: 8.5417,
+        aufnahmeZeit: DateTime(2025, 8, 1, 8, 30),
+        etappenId: 'beispiel_etappe_2025',
+        metadaten: {
+          'isExample': true,
+          'beschreibung': 'Beispielbild für die Beispiel-Etappe',
+        },
+      );
+
+      await insertBild(beispielBild);
+      print('Beispiel-Bild erfolgreich erstellt: $zielPfad');
+      return bildId;
+    } catch (e) {
+      print('Fehler beim Erstellen des Beispiel-Bildes: $e');
+      return null;
+    }
+  }
+
+  // Beispiel-GPS-Punkte erstellen (simulierte Route)
+  List<GPSPunkt> _createExampleGPSPoints() {
+    final startLat = 47.3769;
+    final startLon = 8.5417;
+    final punkte = <GPSPunkt>[];
+
+    // Simuliere eine Route mit 30 GPS-Punkten über 4,5 Stunden
+    for (int i = 0; i < 30; i++) {
+      final zeitOffset = Duration(minutes: i * 9); // Alle 9 Minuten ein Punkt
+      final latOffset = (i * 0.002) - 0.03; // Leichte Bewegung nach Süden
+      final lonOffset = (i * 0.001) - 0.015; // Leichte Bewegung nach Westen
+
+      punkte.add(GPSPunkt(
+        latitude: startLat + latOffset,
+        longitude: startLon + lonOffset,
+        altitude: 400.0 + (i * 2.5), // Leichter Anstieg
+        timestamp: DateTime(2025, 8, 1, 6, 0).add(zeitOffset),
+        accuracy: 3.0 + (i % 3), // Wechselnde Genauigkeit
+      ));
+    }
+
+    return punkte;
+  }
+
+  // Bereinige fehlerhafte Etappen (die nicht korrekt geladen werden können)
+  Future<void> _cleanupCorruptedStages() async {
+    try {
+      final db = await database;
+      final allEtappenMaps = await db.query('etappen');
+
+      for (final etappenMap in allEtappenMaps) {
+        try {
+          // Versuche die Etappe zu laden
+          Etappe.fromMap(etappenMap);
+        } catch (e) {
+          // Wenn das Laden fehlschlägt, lösche die fehlerhafte Etappe
+          print('Lösche fehlerhafte Etappe mit ID: ${etappenMap['id']}');
+          await db.delete(
+            'etappen',
+            where: 'id = ?',
+            whereArgs: [etappenMap['id']],
+          );
+        }
+      }
+    } catch (e) {
+      print('Fehler beim Bereinigen fehlerhafter Etappen: $e');
+    }
   }
 }

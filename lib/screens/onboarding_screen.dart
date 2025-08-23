@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
 import '../services/permission_service.dart';
+import 'main_navigation.dart';
 
 class OnboardingScreen extends StatefulWidget {
   @override
@@ -529,6 +530,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     await settingsProvider.setFirstAppUsage(false);
     await settingsProvider.setOnboardingCompleted(true);
 
-    Navigator.of(context).pushReplacementNamed('/main');
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => MainNavigation()),
+    );
   }
 }

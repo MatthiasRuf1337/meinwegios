@@ -185,7 +185,13 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                         color: Colors.grey.shade600,
                       ),
                     ),
-                    Icon(Icons.mic, color: Color(0xFF5A7D7D)),
+                    IconButton(
+                      icon: Icon(Icons.mic, color: Color(0xFF5A7D7D)),
+                      onPressed: _startRecording,
+                      tooltip: 'Aufnahme starten',
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                    ),
                   ],
                 ),
                 SizedBox(height: 16),
@@ -211,6 +217,10 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
   Widget _buildRecordingControls() {
     final isRecording = _audioService.isRecording;
 
+    if (!isRecording) {
+      return SizedBox.shrink(); // Zeige nichts an, wenn nicht aufgenommen wird
+    }
+
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -218,93 +228,58 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       ),
       child: Column(
         children: [
-          if (isRecording) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.fiber_manual_record, color: Colors.red, size: 16),
-                SizedBox(width: 8),
-                Text(
-                  'Aufnahme läuft: ${_formatDuration(_recordingDuration)}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _cancelRecording,
-                  icon: Icon(Icons.cancel),
-                  label: Text('Abbrechen'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    foregroundColor: Colors.white,
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _stopRecording,
-                  icon: Icon(Icons.stop),
-                  label: Text('Stoppen'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ] else ...[
-            Center(
-              child: ElevatedButton.icon(
-                onPressed: _startRecording,
-                icon: Icon(Icons.mic),
-                label: Text('Aufnahme starten'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF5A7D7D),
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.fiber_manual_record, color: Colors.red, size: 16),
+              SizedBox(width: 8),
+              Text(
+                'Aufnahme läuft: ${_formatDuration(_recordingDuration)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton.icon(
+                onPressed: _cancelRecording,
+                icon: Icon(Icons.cancel),
+                label: Text('Abbrechen'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: _stopRecording,
+                icon: Icon(Icons.stop),
+                label: Text('Stoppen'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
   Widget _buildEmptyState() {
-    return Container(
-      padding: EdgeInsets.all(32),
-      child: Column(
-        children: [
-          Icon(
-            Icons.mic_none,
-            size: 48,
-            color: Colors.grey.shade400,
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Keine Audioaufnahmen vorhanden',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Starten Sie eine Aufnahme, um Audio-Notizen zu erstellen',
-            style: TextStyle(
-              color: Colors.grey.shade500,
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+    return Center(
+      child: Text(
+        'Keine Audioaufnahmen vorhanden',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey.shade600,
+        ),
       ),
     );
   }

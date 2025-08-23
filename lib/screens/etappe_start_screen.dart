@@ -137,7 +137,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
           controller: _nameController,
           style: TextStyle(fontSize: 14),
           decoration: InputDecoration(
-            labelText: 'Bezeichnung Etappe *',
+            labelText: 'Bezeichnung (von -- nach) *',
             hintText: 'z.B. Wanderung zum Gipfel',
             border: OutlineInputBorder(
               borderSide: BorderSide(color: Color(0xFF5A7D7D)),

@@ -139,13 +139,21 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Statistiken',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade600,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Statistiken',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            SizedBox(
+                                width:
+                                    24), // Platzhalter für konsistenten Abstand
+                          ],
                         ),
                         SizedBox(height: 16),
                         Row(
@@ -200,13 +208,21 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Wetterbedingungen',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade600,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Wetterbedingungen',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              SizedBox(
+                                  width:
+                                      24), // Platzhalter für konsistenten Abstand
+                            ],
                           ),
                           SizedBox(height: 16),
 
@@ -258,13 +274,21 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Gelaufene Route',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade600,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Gelaufene Route',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              SizedBox(
+                                  width:
+                                      24), // Platzhalter für konsistenten Abstand
+                            ],
                           ),
                           SizedBox(height: 8),
                           Text(
@@ -309,12 +333,17 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                       color: Color(0xFF5A7D7D)),
                                   onPressed: _showImageSourceDialog,
                                   tooltip: 'Foto aufnehmen',
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
                                 ),
+                                SizedBox(width: 8),
                                 IconButton(
                                   icon: Icon(Icons.photo_library,
                                       color: Color(0xFF5A7D7D)),
                                   onPressed: _pickImageFromGallery,
                                   tooltip: 'Aus Galerie auswählen',
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
                                 ),
                               ],
                             ),
@@ -323,32 +352,12 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                         SizedBox(height: 16),
                         if (bilder.isEmpty)
                           Center(
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.photo_library_outlined,
-                                  size: 64,
-                                  color: Colors.grey[400],
-                                ),
-                                SizedBox(height: 16),
-                                Text(
-                                  'Noch keine Bilder',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                ElevatedButton.icon(
-                                  onPressed: _showImageSourceDialog,
-                                  icon: Icon(Icons.add_a_photo),
-                                  label: Text('Bild hinzufügen'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFF5A7D7D),
-                                    foregroundColor: Colors.white,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              'Noch keine Bilder',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
                             ),
                           )
                         else
@@ -464,29 +473,20 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                       Icon(Icons.add, color: Color(0xFF5A7D7D)),
                                   onPressed: () => _showNotizDialog(),
                                   tooltip: 'Notiz hinzufügen',
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
                                 ),
                               ],
                             ),
                             SizedBox(height: 16),
                             if (notizen.isEmpty)
-                              Container(
-                                padding: EdgeInsets.all(20),
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.note_add,
-                                      size: 48,
-                                      color: Colors.grey[400],
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      'Noch keine Notizen vorhanden',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
+                              Center(
+                                child: Text(
+                                  'Noch keine Notizen vorhanden',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
                                 ),
                               )
                             else
@@ -1508,54 +1508,55 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
     if (wetterVerlauf.isEmpty) return SizedBox.shrink();
 
     return Container(
-      height: 120,
+      height: 80,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: wetterVerlauf.length,
         itemBuilder: (context, index) {
           final wetter = wetterVerlauf[index];
           return Container(
-            width: 200,
-            margin: EdgeInsets.only(right: 12),
+            width: 140,
+            margin: EdgeInsets.only(right: 8),
             child: Card(
-              elevation: 2,
+              elevation: 1,
               child: Padding(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.all(8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
                         Text(
                           wetter.wetterEmoji,
-                          style: TextStyle(fontSize: 20),
+                          style: TextStyle(fontSize: 16),
                         ),
-                        SizedBox(width: 8),
-                        Text(
-                          wetter.formatierteTemperatur,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF00847E),
+                        SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            wetter.formatierteTemperatur,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF00847E),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 4),
                     Text(
                       wetter.beschreibung,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 10,
                         color: Colors.grey[600],
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 4),
                     Text(
                       DateFormat('HH:mm').format(wetter.zeitstempel),
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 9,
                         color: Colors.grey[500],
                       ),
                     ),

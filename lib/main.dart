@@ -22,6 +22,9 @@ void main() async {
   // Vorab geladene Medien (PDFs und MP3s) importieren
   await DatabaseService.instance.importPreloadedMedia();
 
+  // Beispiel-Etappe erstellen (nur beim ersten App-Start)
+  await DatabaseService.instance.createExampleStageIfNeeded();
+
   // Berechtigungen werden später manuell angefordert
   print('App gestartet - Berechtigungen werden manuell angefordert');
 
