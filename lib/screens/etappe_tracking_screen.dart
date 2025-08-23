@@ -444,7 +444,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
                 icon: Icon(Icons.camera_alt),
                 label: Text('Foto'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Color(0xFF5A7D7D),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -457,7 +457,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
                 icon: Icon(Icons.note_add),
                 label: Text('Notiz'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Color(0xFF5A7D7D),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 12),
                 ),

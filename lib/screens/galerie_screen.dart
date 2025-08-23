@@ -29,6 +29,7 @@ class _GalerieScreenState extends State<GalerieScreen> {
         title: Text('Galerie'),
         backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
+        centerTitle: false,
         actions: [
           IconButton(
             icon: Icon(_isGridView ? Icons.list : Icons.grid_view),

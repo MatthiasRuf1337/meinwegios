@@ -305,12 +305,14 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                             Row(
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.camera_alt),
+                                  icon: Icon(Icons.camera_alt,
+                                      color: Color(0xFF5A7D7D)),
                                   onPressed: _showImageSourceDialog,
                                   tooltip: 'Foto aufnehmen',
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.photo_library),
+                                  icon: Icon(Icons.photo_library,
+                                      color: Color(0xFF5A7D7D)),
                                   onPressed: _pickImageFromGallery,
                                   tooltip: 'Aus Galerie auswählen',
                                 ),
@@ -458,7 +460,8 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.add),
+                                  icon:
+                                      Icon(Icons.add, color: Color(0xFF5A7D7D)),
                                   onPressed: () => _showNotizDialog(),
                                   tooltip: 'Notiz hinzufügen',
                                 ),

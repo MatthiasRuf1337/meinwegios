@@ -786,7 +786,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                 _buildActionMenuItem(
                   icon: Icons.camera_alt,
                   label: 'Foto',
-                  color: Colors.blue,
+                  color: Color(0xFF5A7D7D),
                   onTap: () {
                     Navigator.pop(context);
                     _takePhoto();
@@ -806,7 +806,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                 _buildActionMenuItem(
                   icon: Icons.note_add,
                   label: 'Notiz',
-                  color: Colors.orange,
+                  color: Color(0xFF5A7D7D),
                   onTap: () {
                     Navigator.pop(context);
                     _addNote();

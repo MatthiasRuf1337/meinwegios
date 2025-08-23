@@ -24,9 +24,10 @@ class _ArchivScreenState extends State<ArchivScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Etappen'),
+        title: Text('Übersicht Etappen'),
         backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
+        centerTitle: false,
         actions: [
           IconButton(
             icon: Icon(Icons.search),

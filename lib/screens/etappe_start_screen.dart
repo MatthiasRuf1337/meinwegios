@@ -36,9 +36,10 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Etappe starten'),
+        title: Text('Neue Etappe starten'),
         backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
+        centerTitle: false,
       ),
       body: Consumer<EtappenProvider>(
         builder: (context, etappenProvider, child) {
@@ -53,10 +54,6 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header
-                _buildHeader(),
-                SizedBox(height: 24),
-
                 // Wetter-Widget
                 _buildWetterSection(),
                 SizedBox(height: 24),
@@ -138,11 +135,18 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         // Name
         TextField(
           controller: _nameController,
+          style: TextStyle(fontSize: 14),
           decoration: InputDecoration(
-            labelText: 'Etappen-Name *',
+            labelText: 'Bezeichnung Etappe *',
             hintText: 'z.B. Wanderung zum Gipfel',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.edit),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF5A7D7D)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+            ),
+            labelStyle: TextStyle(color: Color(0xFF5A7D7D)),
+            prefixIcon: Icon(Icons.edit, color: Color(0xFF5A7D7D)),
           ),
         ),
         SizedBox(height: 16),
@@ -150,12 +154,19 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         // Beschreibung
         TextField(
           controller: _notizenController,
-          maxLines: 3,
+          maxLines: 1,
+          style: TextStyle(fontSize: 14),
           decoration: InputDecoration(
             labelText: 'Beschreibung (optional)',
             hintText: 'Zusätzliche Informationen zur Etappe...',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.description),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF5A7D7D)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+            ),
+            labelStyle: TextStyle(color: Color(0xFF5A7D7D)),
+            prefixIcon: Icon(Icons.description, color: Color(0xFF5A7D7D)),
           ),
         ),
       ],
@@ -194,7 +205,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             onPressed: _isLoading ? null : () => _createManualEtappe(provider),
             icon: Icon(Icons.add),
             label: Text(
-              'Manuelle Etappe erstellen',
+              'Manuell eine Etappe anlegen',
               style: TextStyle(fontSize: 14),
             ),
             style: OutlinedButton.styleFrom(

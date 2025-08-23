@@ -46,6 +46,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
             title: Text('Mediathek'),
             backgroundColor: Color(0xFF5A7D7D),
             foregroundColor: Colors.white,
+            centerTitle: false,
             actions: [
               IconButton(
                 icon: Icon(Icons.settings),
