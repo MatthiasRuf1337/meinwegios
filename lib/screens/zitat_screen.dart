@@ -71,31 +71,42 @@ class _ZitatScreenState extends State<ZitatScreen>
           Provider.of<SettingsProvider>(context, listen: false);
       final zitat = await settingsProvider.getHeutigesZitat();
 
-      setState(() {
-        _zitat = zitat;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _zitat = zitat;
+          _isLoading = false;
+        });
 
-      _animationController.forward();
+        _animationController.forward();
+      }
     } catch (e) {
       print('Fehler beim Laden des Zitats: $e');
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
-  void _navigateToMain() {
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            MainNavigation(),
-        transitionDuration: Duration(milliseconds: 500),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    );
+  void _navigateToMain() async {
+    // Markiere das Zitat als angezeigt, bevor wir navigieren
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
+    await settingsProvider.markZitatAsShown();
+
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              MainNavigation(),
+          transitionDuration: Duration(milliseconds: 500),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      );
+    }
   }
 
   @override
@@ -185,35 +196,35 @@ class _ZitatScreenState extends State<ZitatScreen>
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Padding(
-        padding: EdgeInsets.only(top: 16, bottom: 32),
+        padding: EdgeInsets.only(top: 24, bottom: 40),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 12,
+                    offset: Offset(0, 6),
                   ),
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(30),
                 child: Image.asset(
                   'icon.png',
-                  width: 40,
-                  height: 40,
+                  width: 120,
+                  height: 120,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(
                       Icons.directions_walk,
-                      size: 24,
+                      size: 60,
                       color: _selectedColor,
                     );
                   },
@@ -232,23 +243,31 @@ class _ZitatScreenState extends State<ZitatScreen>
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: Container(
-          padding: EdgeInsets.all(24),
+          padding: EdgeInsets.all(28),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
+            color: Colors.white.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-              width: 1,
+              color: Colors.white.withOpacity(0.25),
+              width: 1.5,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
           child: Text(
             '"${_zitat!.text}"',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.w300,
-              height: 1.4,
+              height: 1.5,
               fontStyle: FontStyle.italic,
+              letterSpacing: 0.3,
             ),
             textAlign: TextAlign.center,
           ),
@@ -263,9 +282,10 @@ class _ZitatScreenState extends State<ZitatScreen>
       child: Text(
         '— ${_zitat!.autor}',
         style: TextStyle(
-          color: Colors.white.withOpacity(0.9),
-          fontSize: 14,
+          color: Colors.white.withOpacity(0.95),
+          fontSize: 16,
           fontWeight: FontWeight.w500,
+          letterSpacing: 0.5,
         ),
         textAlign: TextAlign.center,
       ),
@@ -277,22 +297,23 @@ class _ZitatScreenState extends State<ZitatScreen>
       opacity: _fadeAnimation,
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.only(top: 32),
+        margin: EdgeInsets.only(top: 40),
         child: ElevatedButton(
           onPressed: _navigateToMain,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: _selectedColor,
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: EdgeInsets.symmetric(vertical: 18),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
             ),
-            elevation: 4,
+            elevation: 6,
+            shadowColor: Colors.black.withOpacity(0.3),
           ),
           child: Text(
             'Weiter',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),

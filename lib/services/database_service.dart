@@ -507,8 +507,16 @@ class DatabaseService {
   }
 
   // Beispiel-Etappe erstellen (nur beim ersten App-Start)
-  Future<void> createExampleStageIfNeeded() async {
+  Future<void> createExampleStageIfNeeded(
+      {bool isBeispielEtappeGeloescht = false}) async {
     try {
+      // Prüfen ob der User die Beispiel-Etappe bereits gelöscht hat
+      if (isBeispielEtappeGeloescht) {
+        print(
+            'Beispiel-Etappe wurde vom User gelöscht, überspringe Erstellung');
+        return;
+      }
+
       // Prüfen ob bereits die Beispiel-Etappe vorhanden ist
       final db = await database;
       final existingExample = await db.query(

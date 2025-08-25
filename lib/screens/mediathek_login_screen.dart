@@ -125,45 +125,31 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
           ),
         ),
         SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(4, (index) {
-            return Container(
-              width: 60,
-              height: 60,
-              child: TextField(
-                controller: _digitControllers[index],
-                focusNode: _focusNodes[index],
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(1),
-                ],
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
-                  ),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                onChanged: (value) {
-                  if (value.isNotEmpty && index < 3) {
-                    _focusNodes[index + 1].requestFocus();
-                  }
-                  _updatePIN();
-                },
+        Container(
+          width: double.infinity,
+          child: TextField(
+            controller: _pinController,
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.text,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2.0,
+            ),
+            decoration: InputDecoration(
+              hintText: 'PIN-Code eingeben',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
-            );
-          }),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+              ),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+          ),
         ),
       ],
     );
@@ -229,21 +215,17 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
 
   Widget _buildInfoText() {
     return Text(
-      'Standard PIN: 1234',
+      'Den Code findest du im Buch auf Seite 166',
       style: TextStyle(
         fontSize: 12,
-        color: Colors.grey.shade500,
-        fontStyle: FontStyle.italic,
+        color: Colors.grey.shade600,
       ),
+      textAlign: TextAlign.center,
     );
   }
 
   void _updatePIN() {
-    String pin = '';
-    for (var controller in _digitControllers) {
-      pin += controller.text;
-    }
-    _pinController.text = pin;
+    // Diese Methode ist nicht mehr nötig, da wir direkt den _pinController verwenden
   }
 
   Future<void> _validatePIN() async {
@@ -263,22 +245,16 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
       // Erfolgreiche Anmeldung
       await settingsProvider.setLastMediathekLogin(DateTime.now());
 
-      // PIN-Felder zurücksetzen
-      for (var controller in _digitControllers) {
-        controller.clear();
-      }
-      _focusNodes[0].requestFocus();
+      // PIN-Feld zurücksetzen
+      _pinController.clear();
     } else {
       // Fehlgeschlagene Anmeldung
       setState(() {
         _errorMessage = 'Falscher PIN-Code. Bitte versuche es erneut.';
       });
 
-      // PIN-Felder zurücksetzen
-      for (var controller in _digitControllers) {
-        controller.clear();
-      }
-      _focusNodes[0].requestFocus();
+      // PIN-Feld zurücksetzen
+      _pinController.clear();
     }
 
     setState(() {

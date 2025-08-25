@@ -26,7 +26,7 @@ class _GalerieScreenState extends State<GalerieScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Galerie'),
+        title: Text('Bilder-Galerie'),
         backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
         centerTitle: false,

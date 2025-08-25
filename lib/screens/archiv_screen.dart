@@ -213,12 +213,27 @@ class _ArchivScreenState extends State<ArchivScreen> {
                       Icon(Icons.calendar_today, size: 16, color: Colors.grey),
                       SizedBox(width: 4),
                       Text(
-                        DateFormat('dd.MM.yyyy HH:mm').format(etappe.startzeit),
+                        DateFormat('dd.MM.yyyy').format(etappe.startzeit),
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 14,
                         ),
                       ),
+                      SizedBox(width: 16),
+                      Icon(Icons.access_time, size: 16, color: Colors.grey),
+                      SizedBox(width: 4),
+                      Text(
+                        DateFormat('HH:mm').format(etappe.startzeit),
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      if (etappe.startWetter != null) ...[
+                        SizedBox(width: 16),
+                        _buildInfoItem(Icons.wb_sunny,
+                            '${etappe.startWetter!.formatierteTemperatur}'),
+                      ],
                     ],
                   ),
                   SizedBox(height: 8),
@@ -231,11 +246,6 @@ class _ArchivScreenState extends State<ArchivScreen> {
                           '${etappe.schrittAnzahl} Schritte'),
                       SizedBox(width: 16),
                       _buildInfoItem(Icons.timer, etappe.formatierteDauer),
-                      if (etappe.startWetter != null) ...[
-                        SizedBox(width: 16),
-                        _buildInfoItem(Icons.wb_sunny,
-                            '${etappe.startWetter!.formatierteTemperatur}'),
-                      ],
                     ],
                   ),
                   if (etappe.notizen != null && etappe.notizen!.isNotEmpty) ...[

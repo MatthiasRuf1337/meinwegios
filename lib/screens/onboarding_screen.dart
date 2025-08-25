@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
 import '../services/permission_service.dart';
-import 'main_navigation.dart';
 
 class OnboardingScreen extends StatefulWidget {
   @override
@@ -248,16 +247,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade700,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Dort findest du alle Texte, Reflexionsseiten, thematischen Impulse und Zitate.',
+            'Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.\n\nDort findest du alle Texte, Seiten für Reflexion, thematischen Impulse und Zitate.',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey.shade700,
@@ -530,8 +520,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     await settingsProvider.setFirstAppUsage(false);
     await settingsProvider.setOnboardingCompleted(true);
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => MainNavigation()),
-    );
+    // Die App wird automatisch neu aufgebaut und zeigt dann Zitat oder Main
+    // Kein expliziter Navigator-Aufruf nötig, da sich der Provider-State ändert
   }
 }

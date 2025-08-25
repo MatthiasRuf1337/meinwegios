@@ -5,6 +5,7 @@ import 'etappe_start_screen.dart';
 import 'galerie_screen.dart';
 import 'mediathek_screen.dart';
 import 'etappe_detail_screen.dart';
+import 'debug_zitat_screen.dart';
 import '../models/etappe.dart';
 
 // Globaler Controller für Tab-Navigation

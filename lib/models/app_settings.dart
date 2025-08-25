@@ -5,14 +5,16 @@ class AppSettings {
   final DateTime? letzteMediathekAnmeldung;
   final int aktuellerZitatIndex;
   final DateTime? letztesZitatDatum;
+  final bool beispielEtappeGeloescht;
 
   AppSettings({
     this.ersteAppNutzung = true,
-    this.mediathekPIN = '1234',
+    this.mediathekPIN = 'WEG.jetzt=42',
     this.onboardingAbgeschlossen = false,
     this.letzteMediathekAnmeldung,
     this.aktuellerZitatIndex = 0,
     this.letztesZitatDatum,
+    this.beispielEtappeGeloescht = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -24,13 +26,14 @@ class AppSettings {
           letzteMediathekAnmeldung?.millisecondsSinceEpoch,
       'aktuellerZitatIndex': aktuellerZitatIndex,
       'letztesZitatDatum': letztesZitatDatum?.millisecondsSinceEpoch,
+      'beispielEtappeGeloescht': beispielEtappeGeloescht,
     };
   }
 
   factory AppSettings.fromMap(Map<String, dynamic> map) {
     return AppSettings(
       ersteAppNutzung: map['ersteAppNutzung'] ?? true,
-      mediathekPIN: map['mediathekPIN'] ?? '1234',
+      mediathekPIN: map['mediathekPIN'] ?? 'WEG.jetzt=42',
       onboardingAbgeschlossen: map['onboardingAbgeschlossen'] ?? false,
       letzteMediathekAnmeldung: map['letzteMediathekAnmeldung'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['letzteMediathekAnmeldung'])
@@ -39,6 +42,7 @@ class AppSettings {
       letztesZitatDatum: map['letztesZitatDatum'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['letztesZitatDatum'])
           : null,
+      beispielEtappeGeloescht: map['beispielEtappeGeloescht'] ?? false,
     );
   }
 
@@ -49,6 +53,7 @@ class AppSettings {
     DateTime? letzteMediathekAnmeldung,
     int? aktuellerZitatIndex,
     DateTime? letztesZitatDatum,
+    bool? beispielEtappeGeloescht,
   }) {
     return AppSettings(
       ersteAppNutzung: ersteAppNutzung ?? this.ersteAppNutzung,
@@ -59,6 +64,8 @@ class AppSettings {
           letzteMediathekAnmeldung ?? this.letzteMediathekAnmeldung,
       aktuellerZitatIndex: aktuellerZitatIndex ?? this.aktuellerZitatIndex,
       letztesZitatDatum: letztesZitatDatum ?? this.letztesZitatDatum,
+      beispielEtappeGeloescht:
+          beispielEtappeGeloescht ?? this.beispielEtappeGeloescht,
     );
   }
 }

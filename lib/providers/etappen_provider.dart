@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import '../models/etappe.dart';
 import '../services/database_service.dart';
+import 'settings_provider.dart';
 
 class EtappenProvider with ChangeNotifier {
   List<Etappe> _etappen = [];
   Etappe? _aktuelleEtappe;
   bool _isLoading = false;
+  SettingsProvider? _settingsProvider;
 
   List<Etappe> get etappen => _etappen;
   Etappe? get aktuelleEtappe => _aktuelleEtappe;
@@ -14,6 +16,11 @@ class EtappenProvider with ChangeNotifier {
 
   EtappenProvider() {
     _loadEtappen();
+  }
+
+  // Setter für SettingsProvider
+  void setSettingsProvider(SettingsProvider settingsProvider) {
+    _settingsProvider = settingsProvider;
   }
 
   Future<void> _loadEtappen() async {
@@ -29,6 +36,12 @@ class EtappenProvider with ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  // Öffentliche Methode um Etappen neu zu laden
+  Future<void> reloadEtappen() async {
+    print('EtappenProvider: Lade Etappen neu...');
+    await _loadEtappen();
   }
 
   Future<void> addEtappe(Etappe etappe) async {
@@ -61,6 +74,13 @@ class EtappenProvider with ChangeNotifier {
     try {
       await DatabaseService.instance.deleteEtappe(etappenId);
       _etappen.removeWhere((e) => e.id == etappenId);
+
+      // Prüfen ob es sich um die Beispiel-Etappe handelt
+      if (etappenId == 'beispiel_etappe_2025' && _settingsProvider != null) {
+        await _settingsProvider!.setBeispielEtappeGeloescht(true);
+        print('Beispiel-Etappe gelöscht - Flag gesetzt');
+      }
+
       notifyListeners();
     } catch (e) {
       print('Fehler beim Löschen der Etappe: $e');

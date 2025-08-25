@@ -22,16 +22,18 @@ void main() async {
   // Vorab geladene Medien (PDFs und MP3s) importieren
   await DatabaseService.instance.importPreloadedMedia();
 
-  // Beispiel-Etappe erstellen (nur beim ersten App-Start)
-  await DatabaseService.instance.createExampleStageIfNeeded();
-
   // Berechtigungen werden später manuell angefordert
   print('App gestartet - Berechtigungen werden manuell angefordert');
 
   runApp(MeinWegApp());
 }
 
-class MeinWegApp extends StatelessWidget {
+class MeinWegApp extends StatefulWidget {
+  @override
+  _MeinWegAppState createState() => _MeinWegAppState();
+}
+
+class _MeinWegAppState extends State<MeinWegApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -43,8 +45,8 @@ class MeinWegApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AudioProvider()),
         ChangeNotifierProvider(create: (_) => NotizProvider()),
       ],
-      child: Consumer<SettingsProvider>(
-        builder: (context, settingsProvider, child) {
+      child: Consumer2<SettingsProvider, EtappenProvider>(
+        builder: (context, settingsProvider, etappenProvider, child) {
           if (settingsProvider.isLoading) {
             return MaterialApp(
               home: Scaffold(
@@ -54,6 +56,14 @@ class MeinWegApp extends StatelessWidget {
               ),
             );
           }
+
+          // SettingsProvider-Referenz an EtappenProvider übergeben
+          etappenProvider.setSettingsProvider(settingsProvider);
+
+          // Callback setzen damit EtappenProvider neu lädt wenn Beispiel-Etappe erstellt wurde
+          settingsProvider.setOnExampleStageCreatedCallback(() {
+            etappenProvider.reloadEtappen();
+          });
 
           Widget homeScreen;
 
