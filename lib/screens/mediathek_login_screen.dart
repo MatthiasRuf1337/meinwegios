@@ -186,7 +186,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : _validatePIN,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF5A7D7D),
+          backgroundColor: Color(0xFF8C0A28),
           foregroundColor: Colors.white,
           padding: EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(

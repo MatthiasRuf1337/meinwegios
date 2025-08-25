@@ -93,7 +93,7 @@ class _PDFViewerScreenAlternativeState
               icon: Icon(Icons.refresh),
               label: Text('Erneut versuchen'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF5A7D7D),
+                backgroundColor: Color(0xFF8C0A28),
                 foregroundColor: Colors.white,
               ),
             ),

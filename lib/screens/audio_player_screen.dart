@@ -165,7 +165,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               icon: Icon(Icons.refresh),
               label: Text('Erneut versuchen'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF5A7D7D),
+                backgroundColor: Color(0xFF8C0A28),
                 foregroundColor: Colors.white,
               ),
             ),
@@ -359,7 +359,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Vorheriger Track wird implementiert...'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }
@@ -368,7 +368,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Nächster Track wird implementiert...'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }
@@ -377,7 +377,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Shuffle wird implementiert...'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }
@@ -386,7 +386,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Repeat wird implementiert...'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }
@@ -395,7 +395,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Playlist wird implementiert...'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }

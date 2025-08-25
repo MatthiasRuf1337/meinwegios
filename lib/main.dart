@@ -93,14 +93,14 @@ class _MeinWegAppState extends State<MeinWegApp> {
             theme: ThemeData(
               fontFamily: 'MuseoSans',
               colorScheme: ColorScheme.light(
-                primary: Color(0xFF5A7D7D),
+                primary: Color(0xFF8C0A28),
               ),
               brightness: Brightness.light,
             ),
             darkTheme: ThemeData(
               fontFamily: 'MuseoSans',
               colorScheme: ColorScheme.dark(
-                primary: Color(0xFF5A7D7D),
+                primary: Color(0xFF8C0A28),
               ),
               brightness: Brightness.dark,
             ),

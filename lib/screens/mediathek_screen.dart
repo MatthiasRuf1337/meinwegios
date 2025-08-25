@@ -86,7 +86,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => _importMedia(context),
-            backgroundColor: Color(0xFF5A7D7D),
+            backgroundColor: Color(0xFF8C0A28),
             child: Icon(Icons.add, color: Colors.white),
             tooltip: 'Medien importieren',
           ),
@@ -347,7 +347,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Teilen-Funktion wird implementiert...'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }
@@ -514,7 +514,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           SnackBar(
             content: Text(
                 'Datei erfolgreich importiert: ${file.path.split('/').last}'),
-            backgroundColor: Color(0xFF5A7D7D),
+            backgroundColor: Color(0xFF8C0A28),
           ),
         );
       } else {
@@ -689,12 +689,12 @@ class _MediathekScreenState extends State<MediathekScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('PIN erfolgreich geändert'),
-                  backgroundColor: Color(0xFF5A7D7D),
+                  backgroundColor: Color(0xFF8C0A28),
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF5A7D7D),
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
             ),
             child: Text('Ändern'),
@@ -711,7 +711,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Erfolgreich abgemeldet'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }

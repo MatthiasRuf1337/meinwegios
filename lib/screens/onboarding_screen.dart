@@ -374,7 +374,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF5A7D7D),
+                  backgroundColor: Color(0xFF8C0A28),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -396,7 +396,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: ElevatedButton(
                 onPressed: () => _handleStart(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF5A7D7D),
+                  backgroundColor: Color(0xFF8C0A28),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(

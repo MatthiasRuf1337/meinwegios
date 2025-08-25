@@ -81,7 +81,7 @@ Sollte Zitat anzeigen: ${settingsProvider.shouldShowZitat()}
               },
               child: Text('Zitat-Datum zurücksetzen'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF5A7D7D),
+                backgroundColor: Color(0xFF8C0A28),
                 foregroundColor: Colors.white,
               ),
             ),

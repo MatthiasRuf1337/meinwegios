@@ -94,7 +94,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               icon: Icon(Icons.refresh),
               label: Text('Erneut versuchen'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF5A7D7D),
+                backgroundColor: Color(0xFF8C0A28),
                 foregroundColor: Colors.white,
               ),
             ),
@@ -257,7 +257,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Lesezeichen hinzugefügt!'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }
@@ -284,12 +284,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Suche wird implementiert...'),
-                  backgroundColor: Color(0xFF5A7D7D),
+                  backgroundColor: Color(0xFF8C0A28),
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF5A7D7D),
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
             ),
             child: Text('Suchen'),
@@ -303,7 +303,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('PDF wird geteilt...'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }

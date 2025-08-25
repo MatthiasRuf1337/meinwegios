@@ -858,7 +858,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
               _finishEtappe(provider);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF5A7D7D),
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
             ),
             child: Text('Beenden'),
@@ -947,7 +947,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Foto erfolgreich aufgenommen!'),
-            backgroundColor: Color(0xFF5A7D7D),
+            backgroundColor: Color(0xFF8C0A28),
           ),
         );
       }
@@ -977,7 +977,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Audio-Aufnahme gespeichert!'),
-              backgroundColor: Color(0xFF5A7D7D),
+              backgroundColor: Color(0xFF8C0A28),
             ),
           );
         }
@@ -996,7 +996,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Audio-Aufnahme gestartet'),
-            backgroundColor: Color(0xFF5A7D7D),
+            backgroundColor: Color(0xFF8C0A28),
           ),
         );
       } else {
@@ -1134,7 +1134,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Notiz aktualisiert!'),
-                      backgroundColor: Color(0xFF5A7D7D),
+                      backgroundColor: Color(0xFF8C0A28),
                     ),
                   );
                 } else {
@@ -1153,7 +1153,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Notiz hinzugefügt!'),
-                      backgroundColor: Color(0xFF5A7D7D),
+                      backgroundColor: Color(0xFF8C0A28),
                     ),
                   );
                 }
@@ -1167,7 +1167,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF5A7D7D),
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
             ),
             child: Text(existingNotiz != null ? 'Aktualisieren' : 'Speichern'),

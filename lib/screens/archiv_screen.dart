@@ -421,7 +421,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Aktive Etappe! Wechsle zum Live-Tracking...'),
-          backgroundColor: Color(0xFF5A7D7D),
+          backgroundColor: Color(0xFF8C0A28),
           duration: Duration(seconds: 1),
         ),
       );

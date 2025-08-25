@@ -82,7 +82,7 @@ class _PDFViewerSimpleState extends State<PDFViewerSimple> {
               icon: Icon(Icons.refresh),
               label: Text('Erneut versuchen'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF5A7D7D),
+                backgroundColor: Color(0xFF8C0A28),
                 foregroundColor: Colors.white,
               ),
             ),
@@ -174,7 +174,7 @@ class _PDFViewerSimpleState extends State<PDFViewerSimple> {
               icon: Icon(Icons.open_in_new),
               label: Text('PDF in Standard-App öffnen'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF5A7D7D),
+                backgroundColor: Color(0xFF8C0A28),
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),

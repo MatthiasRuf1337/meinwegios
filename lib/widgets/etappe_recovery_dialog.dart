@@ -97,7 +97,7 @@ class EtappeRecoveryDialog extends StatelessWidget {
                                   icon: Icon(Icons.play_arrow, size: 18),
                                   label: Text('Fortsetzen'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFF5A7D7D),
+                                    backgroundColor: Color(0xFF8C0A28),
                                     foregroundColor: Colors.white,
                                     padding: EdgeInsets.symmetric(vertical: 8),
                                   ),
@@ -164,7 +164,7 @@ class EtappeRecoveryDialog extends StatelessWidget {
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF5A7D7D),
+            backgroundColor: Color(0xFF8C0A28),
             foregroundColor: Colors.white,
           ),
           child: Text('Später entscheiden'),
@@ -184,7 +184,7 @@ class EtappeRecoveryDialog extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Etappe "${etappe.name}" wurde wiederhergestellt'),
-          backgroundColor: Color(0xFF5A7D7D),
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     } catch (e) {

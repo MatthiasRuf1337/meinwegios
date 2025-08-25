@@ -146,7 +146,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
           return Scaffold(
             appBar: AppBar(
               title: Text(currentEtappe.name),
-              backgroundColor: Color(0xFF5A7D7D),
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
               actions: [
                 IconButton(
@@ -170,7 +170,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text('Tracking'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF8C0A28),
         foregroundColor: Colors.white,
       ),
       body: Center(
@@ -444,7 +444,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
                 icon: Icon(Icons.camera_alt),
                 label: Text('Foto'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF5A7D7D),
+                  backgroundColor: Color(0xFF8C0A28),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -457,7 +457,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
                 icon: Icon(Icons.note_add),
                 label: Text('Notiz'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF5A7D7D),
+                  backgroundColor: Color(0xFF8C0A28),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -906,7 +906,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
               _finishEtappe(provider);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF5A7D7D),
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
             ),
             child: Text('Beenden'),
@@ -1004,7 +1004,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Foto erfolgreich aufgenommen!'),
-            backgroundColor: Color(0xFF5A7D7D),
+            backgroundColor: Color(0xFF8C0A28),
           ),
         );
       }

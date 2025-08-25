@@ -219,7 +219,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     icon: Icon(Icons.photo_library),
                     label: Text('Bilder & Audio hinzufügen'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF5A7D7D),
+                      backgroundColor: Color(0xFF8C0A28),
                       foregroundColor: Colors.white,
                       padding:
                           EdgeInsets.symmetric(horizontal: 30, vertical: 15),

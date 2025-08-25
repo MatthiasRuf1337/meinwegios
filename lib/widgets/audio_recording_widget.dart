@@ -69,7 +69,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Aufnahme gespeichert!'),
-          backgroundColor: Color(0xFF5A7D7D),
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     } else {

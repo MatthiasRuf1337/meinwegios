@@ -830,7 +830,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Bild erfolgreich hinzugefügt!'),
-          backgroundColor: Color(0xFF5A7D7D),
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     } catch (e) {
@@ -1109,7 +1109,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Etappe erfolgreich aktualisiert!'),
-                    backgroundColor: Color(0xFF5A7D7D),
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
               } catch (e) {
@@ -1122,7 +1122,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF5A7D7D),
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
             ),
             child: Text('Speichern'),
@@ -1288,7 +1288,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Notiz gelöscht!'),
-                        backgroundColor: Color(0xFF5A7D7D),
+                        backgroundColor: Color(0xFF8C0A28),
                       ),
                     );
                   } catch (e) {
@@ -1333,7 +1333,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Notiz aktualisiert!'),
-                      backgroundColor: Color(0xFF5A7D7D),
+                      backgroundColor: Color(0xFF8C0A28),
                     ),
                   );
                 } else {
@@ -1352,7 +1352,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Notiz hinzugefügt!'),
-                      backgroundColor: Color(0xFF5A7D7D),
+                      backgroundColor: Color(0xFF8C0A28),
                     ),
                   );
                 }
@@ -1366,7 +1366,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF5A7D7D),
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
             ),
             child: Text(existingNotiz != null ? 'Aktualisieren' : 'Speichern'),
@@ -1398,7 +1398,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Notiz gelöscht!'),
-                    backgroundColor: Color(0xFF5A7D7D),
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
               } catch (e) {
