@@ -76,10 +76,12 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
             icon: Icon(Icons.edit),
             onPressed: () => _editEtappe(context),
           ),
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () => _deleteEtappe(context),
-          ),
+          // Löschen-Button nur anzeigen wenn nicht von completed screen
+          if (!widget.fromCompletedScreen)
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () => _deleteEtappe(context),
+            ),
         ],
       ),
       body: Consumer3<EtappenProvider, BilderProvider, NotizProvider>(
@@ -1283,11 +1285,46 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
             child: Text('Abbrechen'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Provider.of<EtappenProvider>(context, listen: false)
-                  .deleteEtappe(widget.etappe.id);
-              Navigator.pop(context);
+            onPressed: () async {
+              Navigator.pop(context); // Dialog schließen
+
+              try {
+                // Etappe löschen
+                await Provider.of<EtappenProvider>(context, listen: false)
+                    .deleteEtappe(widget.etappe.id);
+
+                // Erfolgreiche Löschung - zur Hauptnavigation zurückkehren
+                if (widget.fromCompletedScreen) {
+                  // Wenn von completed screen: Zur Hauptnavigation mit Archiv-Tab
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MainNavigation(initialTab: 0),
+                    ),
+                    (route) => false, // Alle vorherigen Routen entfernen
+                  );
+                } else {
+                  // Normale Navigation zurück
+                  Navigator.pop(context);
+                }
+
+                // Erfolgsmeldung anzeigen
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content:
+                        Text('Etappe "${widget.etappe.name}" wurde gelöscht'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              } catch (e) {
+                // Fehlermeldung anzeigen
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Fehler beim Löschen der Etappe: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text('Löschen'),

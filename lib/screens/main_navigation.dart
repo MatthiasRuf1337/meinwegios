@@ -5,8 +5,8 @@ import 'etappe_start_screen.dart';
 import 'galerie_screen.dart';
 import 'mediathek_screen.dart';
 import 'etappe_detail_screen.dart';
-import 'debug_zitat_screen.dart';
 import '../models/etappe.dart';
+import '../widgets/etappe_recovery_dialog.dart';
 
 // Globaler Controller für Tab-Navigation
 class MainNavigationController {
@@ -40,6 +40,20 @@ class _MainNavigationState extends State<MainNavigation> {
     super.initState();
     MainNavigationController._setInstance(this);
     _currentIndex = widget.initialTab ?? 0;
+
+    // Nach dem ersten Frame prüfen ob verwaiste Etappen vorhanden sind
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForOrphanedEtappen();
+    });
+  }
+
+  void _checkForOrphanedEtappen() async {
+    // Kurz warten damit der EtappenProvider vollständig geladen ist
+    await Future.delayed(Duration(milliseconds: 500));
+
+    if (mounted) {
+      await EtappeRecoveryDialog.showIfNeeded(context);
+    }
   }
 
   void switchToTab(int index) {
@@ -55,7 +69,7 @@ class _MainNavigationState extends State<MainNavigation> {
     if (widget.etappeToShow != null) {
       return [
         EtappeDetailScreen(
-            etappe: widget.etappeToShow!, fromCompletedScreen: false),
+            etappe: widget.etappeToShow!, fromCompletedScreen: true),
         EtappeStartScreen(),
         GalerieScreen(),
         MediathekScreen(),
