@@ -14,9 +14,7 @@ import '../providers/notiz_provider.dart';
 import '../services/database_service.dart';
 import '../services/permission_service.dart';
 import 'bild_detail_screen.dart';
-import 'galerie_screen.dart';
-import 'mediathek_screen.dart';
-import 'etappe_start_screen.dart';
+
 import '../widgets/audio_recording_widget.dart';
 import '../widgets/static_route_map_widget.dart';
 import '../widgets/wetter_widget.dart';
@@ -87,8 +85,10 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       body: Consumer3<EtappenProvider, BilderProvider, NotizProvider>(
         builder:
             (context, etappenProvider, bilderProvider, notizProvider, child) {
-          // Verwende die aktuelle Etappe aus dem Widget
-          final etappe = widget.etappe;
+          // Verwende die aktualisierte Etappe aus dem Provider, falls verfügbar
+          final etappe = etappenProvider.etappen.firstWhere(
+              (e) => e.id == widget.etappe.id,
+              orElse: () => widget.etappe);
           final bilder = bilderProvider.getBilderByEtappe(widget.etappe.id);
 
           return SingleChildScrollView(
@@ -592,96 +592,6 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF5A7D7D).withOpacity(0.1),
-            Color(0xFF5A7D7D).withOpacity(0.2)
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.directions_walk, color: Color(0xFF5A7D7D)),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  widget.etappe.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF5A7D7D),
-                  ),
-                ),
-              ),
-              _buildStatusChip(widget.etappe.status),
-            ],
-          ),
-          SizedBox(height: 12),
-          Text(
-            'Erstellt am ${DateFormat('dd.MM.yyyy HH:mm').format(widget.etappe.erstellungsDatum)}',
-            style: TextStyle(
-              color: Color(0xFF5A7D7D).withOpacity(0.8),
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatistics() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Statistiken',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                  child: _buildStatItem('Distanz',
-                      widget.etappe.formatierteDistanz, Icons.straighten)),
-              Expanded(
-                  child: _buildStatItem('Schritte',
-                      '${widget.etappe.schrittAnzahl}', Icons.directions_walk)),
-              Expanded(
-                  child: _buildStatItem(
-                      'Dauer', widget.etappe.formatierteDauer, Icons.timer)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
@@ -718,298 +628,6 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
     } else {
       return '${seconds}s';
     }
-  }
-
-  Widget _buildDetails() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Details',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          SizedBox(height: 16),
-          _buildDetailRow('Startzeit',
-              DateFormat('dd.MM.yyyy HH:mm').format(widget.etappe.startzeit)),
-          if (widget.etappe.endzeit != null)
-            _buildDetailRow('Endzeit',
-                DateFormat('dd.MM.yyyy HH:mm').format(widget.etappe.endzeit!)),
-          _buildDetailRow('GPS-Punkte', '${widget.etappe.gpsPunkte.length}'),
-          _buildDetailRow('Bilder', '${widget.etappe.bildIds.length}'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBilderSection() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Bilder',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () => _showImageSourceDialog(),
-                    icon: Icon(Icons.add_a_photo, color: Color(0xFF5A7D7D)),
-                    tooltip: 'Bild hinzufügen',
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          Consumer<BilderProvider>(
-            builder: (context, bilderProvider, child) {
-              final etappenBilder =
-                  bilderProvider.getBilderByEtappe(widget.etappe.id);
-
-              if (etappenBilder.isEmpty) {
-                return _buildEmptyBilderState();
-              }
-
-              return _buildBilderGrid(etappenBilder);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyBilderState() {
-    return Container(
-      padding: EdgeInsets.all(32),
-      child: Column(
-        children: [
-          Icon(
-            Icons.photo_library_outlined,
-            size: 48,
-            color: Colors.grey.shade400,
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Keine Bilder vorhanden',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Fügen Sie Bilder zu dieser Etappe hinzu',
-            style: TextStyle(
-              color: Colors.grey.shade500,
-              fontSize: 14,
-            ),
-          ),
-          SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: () => _showImageSourceDialog(),
-            icon: Icon(Icons.add_a_photo),
-            label: Text('Bild hinzufügen'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF5A7D7D),
-              foregroundColor: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBilderGrid(List<Bild> bilder) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: bilder.length,
-      itemBuilder: (context, index) {
-        final bild = bilder[index];
-        return _buildBildTile(bild);
-      },
-    );
-  }
-
-  Widget _buildBildTile(Bild bild) {
-    return GestureDetector(
-      onTap: () => _openBildDetail(bild),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Stack(
-            children: [
-              _buildImageWidget(bild),
-              if (bild.hatGPS)
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: Container(
-                    padding: EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Icon(
-                      Icons.location_on,
-                      color: Colors.white,
-                      size: 12,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImageWidget(Bild bild) {
-    try {
-      final file = File(bild.dateipfad);
-      if (file.existsSync()) {
-        return Image.file(
-          file,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildPlaceholderImage();
-          },
-        );
-      } else {
-        return _buildPlaceholderImage();
-      }
-    } catch (e) {
-      return _buildPlaceholderImage();
-    }
-  }
-
-  Widget _buildPlaceholderImage() {
-    return Container(
-      color: Colors.grey.shade200,
-      child: Icon(
-        Icons.image,
-        color: Colors.grey.shade400,
-        size: 32,
-      ),
-    );
-  }
-
-  Widget _buildNotizen() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Notizen',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          SizedBox(height: 12),
-          Text(
-            widget.etappe.notizen!,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade700,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildStatusChip(EtappenStatus status) {
@@ -1267,9 +885,250 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
   }
 
   void _editEtappe(BuildContext context) {
-    // Implementierung für das Bearbeiten der Etappe
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Bearbeiten-Funktion wird implementiert...')),
+    _showEditEtappeDialog();
+  }
+
+  void _showEditEtappeDialog() {
+    final nameController = TextEditingController(text: widget.etappe.name);
+    final notizenController =
+        TextEditingController(text: widget.etappe.notizen ?? '');
+    final distanzController = TextEditingController(
+        text: widget.etappe.gesamtDistanz.toStringAsFixed(0));
+    final schritteController =
+        TextEditingController(text: widget.etappe.schrittAnzahl.toString());
+
+    // Dauer in Minuten für einfachere Bearbeitung
+    final dauerInMinuten = widget.etappe.dauer.inMinutes;
+    final dauerController =
+        TextEditingController(text: dauerInMinuten.toString());
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Etappe bearbeiten'),
+        contentPadding: EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Name/Bezeichnung
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Bezeichnung *',
+                    hintText: 'z.B. Morgenspaziergang',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    prefixIcon: Icon(Icons.label),
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // Beschreibung/Notizen
+                TextField(
+                  controller: notizenController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Beschreibung',
+                    hintText: 'Zusätzliche Notizen zur Etappe...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    prefixIcon: Icon(Icons.description),
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // Statistiken-Sektion
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.analytics, color: Color(0xFF5A7D7D)),
+                          SizedBox(width: 8),
+                          Text(
+                            'Statistiken bearbeiten',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF5A7D7D),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+
+                      // Distanz
+                      TextField(
+                        controller: distanzController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Distanz (Meter)',
+                          hintText: 'z.B. 1500',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide:
+                                BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
+                          prefixIcon: Icon(Icons.straighten, size: 20),
+                          suffixText: 'm',
+                        ),
+                      ),
+                      SizedBox(height: 12),
+
+                      // Schritte
+                      TextField(
+                        controller: schritteController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Schritte',
+                          hintText: 'z.B. 2000',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide:
+                                BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
+                          prefixIcon: Icon(Icons.trending_up, size: 20),
+                        ),
+                      ),
+                      SizedBox(height: 12),
+
+                      // Dauer
+                      TextField(
+                        controller: dauerController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Dauer (Minuten)',
+                          hintText: 'z.B. 30',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide:
+                                BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
+                          prefixIcon: Icon(Icons.timer, size: 20),
+                          suffixText: 'min',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (nameController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text('Bitte geben Sie eine Bezeichnung ein')),
+                );
+                return;
+              }
+
+              try {
+                // Eingaben validieren und parsen
+                final newName = nameController.text.trim();
+                final newNotizen = notizenController.text.trim().isEmpty
+                    ? null
+                    : notizenController.text.trim();
+
+                final newDistanz = double.tryParse(distanzController.text) ??
+                    widget.etappe.gesamtDistanz;
+                final newSchritte = int.tryParse(schritteController.text) ??
+                    widget.etappe.schrittAnzahl;
+                final newDauerMinuten = int.tryParse(dauerController.text) ??
+                    widget.etappe.dauer.inMinutes;
+
+                // Neue Endzeit basierend auf der bearbeiteten Dauer berechnen
+                final newEndzeit = widget.etappe.startzeit
+                    .add(Duration(minutes: newDauerMinuten));
+
+                // Aktualisierte Etappe erstellen
+                final updatedEtappe = widget.etappe.copyWith(
+                  name: newName,
+                  notizen: newNotizen,
+                  gesamtDistanz: newDistanz,
+                  schrittAnzahl: newSchritte,
+                  endzeit: newEndzeit,
+                );
+
+                // Etappe in der Datenbank aktualisieren
+                final etappenProvider =
+                    Provider.of<EtappenProvider>(context, listen: false);
+                await etappenProvider.updateEtappe(updatedEtappe);
+
+                Navigator.pop(context);
+
+                // Erfolgreiche Aktualisierung
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Etappe erfolgreich aktualisiert!'),
+                    backgroundColor: Color(0xFF5A7D7D),
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Fehler beim Speichern: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Speichern'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1344,31 +1203,53 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(existingNotiz != null ? 'Notiz bearbeiten' : 'Neue Notiz'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titelController,
-                decoration: InputDecoration(
-                  labelText: 'Titel (optional)',
-                  hintText: 'z.B. Wichtige Beobachtung',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.title),
+        contentPadding: EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.85,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titelController,
+                  decoration: InputDecoration(
+                    labelText: 'Titel (optional)',
+                    hintText: 'z.B. Wichtige Beobachtung',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    prefixIcon: Icon(Icons.title),
+                  ),
                 ),
-              ),
-              SizedBox(height: 16),
-              TextField(
-                controller: inhaltController,
-                maxLines: 5,
-                decoration: InputDecoration(
-                  labelText: 'Notiz *',
-                  hintText: 'Ihre Notiz hier eingeben...',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.note),
+                SizedBox(height: 16),
+                TextField(
+                  controller: inhaltController,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    labelText: 'Notiz *',
+                    hintText: 'Ihre Notiz hier eingeben...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    prefixIcon: Icon(Icons.note),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         actions: [

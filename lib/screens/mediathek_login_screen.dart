@@ -130,7 +130,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
           child: TextField(
             controller: _pinController,
             textAlign: TextAlign.center,
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.visiblePassword,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,

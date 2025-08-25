@@ -1035,28 +1035,48 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       builder: (context) => AlertDialog(
         title: Text(
             existingNotiz != null ? 'Notiz bearbeiten' : 'Notiz hinzufügen'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titelController,
-              decoration: InputDecoration(
-                labelText: 'Titel',
-                border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.85,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titelController,
+                decoration: InputDecoration(
+                  labelText: 'Titel',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: inhaltController,
-              decoration: InputDecoration(
-                labelText: 'Notiz',
-                border: OutlineInputBorder(),
-                hintText: 'Hier können Sie Ihre Notizen eingeben...',
+              SizedBox(height: 16),
+              TextField(
+                controller: inhaltController,
+                decoration: InputDecoration(
+                  labelText: 'Notiz',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  hintText: 'Hier können Sie Ihre Notizen eingeben...',
+                ),
+                maxLines: 5,
+                minLines: 3,
               ),
-              maxLines: 5,
-              minLines: 3,
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           if (existingNotiz != null)

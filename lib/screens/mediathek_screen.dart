@@ -579,39 +579,67 @@ class _MediathekScreenState extends State<MediathekScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('PIN ändern'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: oldPinController,
-              decoration: InputDecoration(
-                labelText: 'Aktuelle PIN',
-                border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: oldPinController,
+                decoration: InputDecoration(
+                  labelText: 'Aktuelle PIN',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: true,
               ),
-              keyboardType: TextInputType.number,
-              obscureText: true,
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: newPinController,
-              decoration: InputDecoration(
-                labelText: 'Neue PIN',
-                border: OutlineInputBorder(),
+              SizedBox(height: 20),
+              TextField(
+                controller: newPinController,
+                decoration: InputDecoration(
+                  labelText: 'Neue PIN',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: true,
               ),
-              keyboardType: TextInputType.number,
-              obscureText: true,
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: confirmPinController,
-              decoration: InputDecoration(
-                labelText: 'Neue PIN bestätigen',
-                border: OutlineInputBorder(),
+              SizedBox(height: 20),
+              TextField(
+                controller: confirmPinController,
+                decoration: InputDecoration(
+                  labelText: 'Neue PIN bestätigen',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: true,
               ),
-              keyboardType: TextInputType.number,
-              obscureText: true,
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -649,7 +677,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
               if (newPin.length != 4) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('PIN muss 4 Ziffern haben'),
+                    content: Text('PIN muss 4 Zeichen haben'),
                     backgroundColor: Colors.red,
                   ),
                 );
