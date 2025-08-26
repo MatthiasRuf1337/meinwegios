@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import '../providers/etappen_provider.dart';
 import '../providers/bilder_provider.dart';
 import '../providers/audio_provider.dart';
@@ -952,6 +953,14 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
 
         await DatabaseService.instance.insertBild(bild);
 
+        // Bild auch in die Galerie speichern
+        try {
+          await ImageGallerySaver.saveFile(savedFile.path);
+        } catch (e) {
+          print('Fehler beim Speichern in die Galerie: $e');
+          // Galerie-Fehler nicht als kritisch behandeln
+        }
+
         // Provider aktualisieren
         final bilderProvider =
             Provider.of<BilderProvider>(context, listen: false);
@@ -959,7 +968,8 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Foto erfolgreich aufgenommen!'),
+            content: Text(
+                'Foto erfolgreich aufgenommen und in Galerie gespeichert!'),
             backgroundColor: Color(0xFF8C0A28),
           ),
         );

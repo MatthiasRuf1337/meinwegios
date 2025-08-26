@@ -66,6 +66,8 @@
 	<string>Die App benötigt Zugriff auf Aktivitätserkennung, um Ihre Schritte zu zählen.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Die App benötigt Zugriff auf Fotos, um Bilder aus Ihrer Galerie zu importieren.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Die App möchte Ihre aufgenommenen Bilder in der Foto-Galerie speichern.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Die App benötigt Zugriff auf das Mikrofon für Audio-Aufnahmen.</string>
 	
