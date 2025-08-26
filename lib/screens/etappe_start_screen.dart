@@ -38,7 +38,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Neue Etappe starten'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF45A173),
         foregroundColor: Colors.white,
         centerTitle: false,
       ),
@@ -82,7 +82,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF5A7D7D),
+            color: Color(0xFF45A173),
           ),
         ),
         SizedBox(height: 16),
@@ -95,13 +95,13 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             labelText: 'Bezeichnung (von -- nach) *',
             hintText: 'z.B. Wanderung zum Gipfel',
             border: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF5A7D7D)),
+              borderSide: BorderSide(color: Color(0xFF45A173)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+              borderSide: BorderSide(color: Color(0xFF45A173), width: 2),
             ),
-            labelStyle: TextStyle(color: Color(0xFF5A7D7D)),
-            prefixIcon: Icon(Icons.edit, color: Color(0xFF5A7D7D)),
+            labelStyle: TextStyle(color: Color(0xFF45A173)),
+            prefixIcon: Icon(Icons.edit, color: Color(0xFF45A173)),
           ),
         ),
         SizedBox(height: 16),
@@ -115,13 +115,13 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             labelText: 'Beschreibung (optional)',
             hintText: 'Zusätzliche Informationen zur Etappe...',
             border: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF5A7D7D)),
+              borderSide: BorderSide(color: Color(0xFF45A173)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
+              borderSide: BorderSide(color: Color(0xFF45A173), width: 2),
             ),
-            labelStyle: TextStyle(color: Color(0xFF5A7D7D)),
-            prefixIcon: Icon(Icons.description, color: Color(0xFF5A7D7D)),
+            labelStyle: TextStyle(color: Color(0xFF45A173)),
+            prefixIcon: Icon(Icons.description, color: Color(0xFF45A173)),
           ),
         ),
       ],
@@ -324,7 +324,7 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF5A7D7D),
+            color: Color(0xFF45A173),
           ),
         ),
         SizedBox(height: 12),

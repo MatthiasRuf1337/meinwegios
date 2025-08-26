@@ -25,7 +25,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.medienDatei.dateiname),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF45A173),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -112,7 +112,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5A7D7D)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF45A173)),
             ),
             SizedBox(height: 16),
             Text(
@@ -212,7 +212,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           IconButton(
             icon: Icon(Icons.arrow_back_ios, size: 20),
             onPressed: _currentPage > 1 ? _previousPage : null,
-            color: _currentPage > 1 ? Color(0xFF5A7D7D) : Colors.grey,
+            color: _currentPage > 1 ? Color(0xFF45A173) : Colors.grey,
           ),
           Expanded(
             child: Text(
@@ -220,14 +220,14 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF5A7D7D),
+                color: Color(0xFF45A173),
               ),
             ),
           ),
           IconButton(
             icon: Icon(Icons.arrow_forward_ios, size: 20),
             onPressed: _currentPage < _totalPages ? _nextPage : null,
-            color: _currentPage < _totalPages ? Color(0xFF5A7D7D) : Colors.grey,
+            color: _currentPage < _totalPages ? Color(0xFF45A173) : Colors.grey,
           ),
         ],
       ),

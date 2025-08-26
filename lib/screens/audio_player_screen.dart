@@ -93,7 +93,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF45A173),
         foregroundColor: Colors.white,
         toolbarHeight: 56,
         actions: [
@@ -183,7 +183,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5A7D7D)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF45A173)),
             ),
             SizedBox(height: 16),
             Text(
@@ -273,7 +273,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
           value: _position.inMilliseconds.toDouble(),
           min: 0,
           max: _duration.inMilliseconds.toDouble(),
-          activeColor: Color(0xFF5A7D7D),
+          activeColor: Color(0xFF45A173),
           inactiveColor: Colors.grey.shade300,
           onChanged: (value) {
             _audioPlayer.seek(Duration(milliseconds: value.toInt()));
@@ -312,12 +312,12 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
         IconButton(
           icon: Icon(Icons.skip_previous, size: 28),
           onPressed: _previousTrack,
-          color: Color(0xFF5A7D7D),
+          color: Color(0xFF45A173),
           padding: EdgeInsets.all(8),
         ),
         Container(
           decoration: BoxDecoration(
-            color: Color(0xFF5A7D7D),
+            color: Color(0xFF45A173),
             shape: BoxShape.circle,
           ),
           child: IconButton(
@@ -333,7 +333,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
         IconButton(
           icon: Icon(Icons.skip_next, size: 28),
           onPressed: _nextTrack,
-          color: Color(0xFF5A7D7D),
+          color: Color(0xFF45A173),
           padding: EdgeInsets.all(8),
         ),
       ],

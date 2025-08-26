@@ -54,7 +54,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0xFF5A7D7D).withOpacity(0.1),
+                Color(0xFF45A173).withOpacity(0.1),
                 Colors.white,
               ],
             ),
@@ -96,7 +96,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
       decoration: BoxDecoration(
-        color: Color(0xFF5A7D7D),
+        color: Color(0xFF45A173),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -134,7 +134,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   return Icon(
                     Icons.directions_walk,
                     size: 24,
-                    color: Color(0xFF5A7D7D),
+                    color: Color(0xFF45A173),
                   );
                 },
               ),
@@ -174,7 +174,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: Text(
           '${step + 1}',
           style: TextStyle(
-            color: isActive ? Color(0xFF5A7D7D) : Colors.white,
+            color: isActive ? Color(0xFF45A173) : Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -232,7 +232,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF5A7D7D),
+              color: Color(0xFF45A173),
             ),
           ),
           const SizedBox(height: 16),
@@ -291,7 +291,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF5A7D7D),
+              color: Color(0xFF45A173),
             ),
           ),
           const SizedBox(height: 24),
@@ -307,15 +307,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Color(0xFF5A7D7D).withOpacity(0.1),
+              color: Color(0xFF45A173).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Color(0xFF5A7D7D).withOpacity(0.3)),
+              border: Border.all(color: Color(0xFF45A173).withOpacity(0.3)),
             ),
             child: Column(
               children: [
                 Icon(
                   Icons.lock,
-                  color: Color(0xFF5A7D7D),
+                  color: Color(0xFF45A173),
                   size: 32,
                 ),
                 SizedBox(height: 8),
@@ -324,7 +324,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF5A7D7D),
+                    color: Color(0xFF45A173),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -423,7 +423,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Text(
                 'Zurück',
                 style: TextStyle(
-                  color: Color(0xFF5A7D7D),
+                  color: Color(0xFF45A173),
                   fontSize: 16,
                 ),
               ),
@@ -462,7 +462,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Icon(
             Icons.check_circle,
-            color: Color(0xFF5A7D7D),
+            color: Color(0xFF45A173),
             size: 16,
           ),
           SizedBox(width: 8),

@@ -186,7 +186,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.mic, color: Color(0xFF5A7D7D)),
+                      icon: Icon(Icons.mic, color: Color(0xFF45A173)),
                       onPressed: _startRecording,
                       tooltip: 'Aufnahme starten',
                       padding: EdgeInsets.zero,
@@ -297,10 +297,10 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       margin: EdgeInsets.only(bottom: 8),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isPlaying ? Color(0xFF5A7D7D).withOpacity(0.1) : Colors.white,
+        color: isPlaying ? Color(0xFF45A173).withOpacity(0.1) : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isPlaying ? Color(0xFF5A7D7D) : Colors.grey.shade300,
+          color: isPlaying ? Color(0xFF45A173) : Colors.grey.shade300,
         ),
       ),
       child: Row(
@@ -310,7 +310,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
             onPressed: () => _playAudio(audio),
             icon: Icon(
               isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Color(0xFF5A7D7D),
+              color: Color(0xFF45A173),
             ),
           ),
 

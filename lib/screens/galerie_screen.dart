@@ -27,7 +27,7 @@ class _GalerieScreenState extends State<GalerieScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Bilder-Galerie'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF45A173),
         foregroundColor: Colors.white,
         centerTitle: false,
         actions: [
@@ -104,9 +104,9 @@ class _GalerieScreenState extends State<GalerieScreen> {
           padding: EdgeInsets.all(16.0),
           margin: EdgeInsets.symmetric(horizontal: 16.0),
           decoration: BoxDecoration(
-            color: Color(0xFF5A7D7D).withOpacity(0.1),
+            color: Color(0xFF45A173).withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Color(0xFF5A7D7D).withOpacity(0.3)),
+            border: Border.all(color: Color(0xFF45A173).withOpacity(0.3)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -124,14 +124,14 @@ class _GalerieScreenState extends State<GalerieScreen> {
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Color(0xFF5A7D7D), size: 20),
+        Icon(icon, color: Color(0xFF45A173), size: 20),
         SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF5A7D7D),
+            color: Color(0xFF45A173),
           ),
         ),
         Text(
@@ -239,7 +239,7 @@ class _GalerieScreenState extends State<GalerieScreen> {
           style: TextStyle(color: Colors.grey.shade600),
         ),
         trailing: bild.hatGPS
-            ? Icon(Icons.location_on, color: Color(0xFF5A7D7D))
+            ? Icon(Icons.location_on, color: Color(0xFF45A173))
             : null,
         onTap: () => _openImageDetail(bild),
       ),

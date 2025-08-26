@@ -231,15 +231,15 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
           colors: _isPaused
               ? [Colors.orange.shade50, Colors.orange.shade100]
               : [
-                  Color(0xFF5A7D7D).withOpacity(0.1),
-                  Color(0xFF5A7D7D).withOpacity(0.2)
+                  Color(0xFF45A173).withOpacity(0.1),
+                  Color(0xFF45A173).withOpacity(0.2)
                 ],
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _isPaused
               ? Colors.orange.shade200
-              : Color(0xFF5A7D7D).withOpacity(0.3),
+              : Color(0xFF45A173).withOpacity(0.3),
         ),
       ),
       child: Column(
@@ -251,7 +251,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
               Icon(
                 _isPaused ? Icons.pause_circle : Icons.play_circle,
                 size: 32,
-                color: _isPaused ? Colors.orange : Color(0xFF5A7D7D),
+                color: _isPaused ? Colors.orange : Color(0xFF45A173),
               ),
               SizedBox(width: 12),
               Text(
@@ -259,7 +259,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: _isPaused ? Colors.orange.shade800 : Color(0xFF5A7D7D),
+                  color: _isPaused ? Colors.orange.shade800 : Color(0xFF45A173),
                 ),
               ),
             ],
@@ -270,7 +270,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: _isPaused ? Colors.orange.shade700 : Color(0xFF5A7D7D),
+              color: _isPaused ? Colors.orange.shade700 : Color(0xFF45A173),
             ),
           ),
         ],
@@ -325,14 +325,14 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Color(0xFF5A7D7D), size: 24),
+        Icon(icon, color: Color(0xFF45A173), size: 24),
         SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF5A7D7D),
+            color: Color(0xFF45A173),
           ),
         ),
         Text(

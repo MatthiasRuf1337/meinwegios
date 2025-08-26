@@ -137,7 +137,7 @@ class _MainNavigationState extends State<MainNavigation> {
               });
             }
           },
-          selectedItemColor: Color(0xFF5A7D7D),
+          selectedItemColor: Color(0xFF45A173),
           unselectedItemColor: Colors.grey,
           items: _navigationItems,
         ),

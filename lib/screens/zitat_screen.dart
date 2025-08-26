@@ -20,7 +20,7 @@ class _ZitatScreenState extends State<ZitatScreen>
 
   // Drei verschiedene Farben aus dem Buch-Design
   final List<Color> _backgroundColors = [
-    Color(0xFF5A7D7D), // Hauptfarbe
+    Color(0xFF45A173), // Hauptfarbe
     Color(0xFF7B9B9B), // Hellere Variante
     Color(0xFF4A6D6D), // Dunklere Variante
   ];

@@ -39,7 +39,7 @@ Sollte Zitat anzeigen: ${settingsProvider.shouldShowZitat()}
     return Scaffold(
       appBar: AppBar(
         title: Text('Zitat Debug'),
-        backgroundColor: Color(0xFF5A7D7D),
+        backgroundColor: Color(0xFF45A173),
         foregroundColor: Colors.white,
       ),
       body: Padding(

@@ -67,15 +67,15 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Color(0xFF5A7D7D).withOpacity(0.1),
+                      color: Color(0xFF45A173).withOpacity(0.1),
                       border: Border.all(
-                        color: Color(0xFF5A7D7D).withOpacity(0.3),
+                        color: Color(0xFF45A173).withOpacity(0.3),
                         width: 2,
                       ),
                     ),
                     child: Icon(
                       Icons.check,
-                      color: Color(0xFF5A7D7D),
+                      color: Color(0xFF45A173),
                       size: 40,
                     ),
                   ),
@@ -86,7 +86,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     children: [
                       Icon(
                         Icons.check,
-                        color: Color(0xFF5A7D7D),
+                        color: Color(0xFF45A173),
                         size: 20,
                       ),
                       SizedBox(width: 8),
@@ -95,7 +95,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF5A7D7D),
+                          color: Color(0xFF45A173),
                         ),
                       ),
                     ],
@@ -249,7 +249,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     icon: Icon(Icons.celebration),
                     label: Text('Nochmal feiern!'),
                     style: TextButton.styleFrom(
-                      foregroundColor: Color(0xFF5A7D7D),
+                      foregroundColor: Color(0xFF45A173),
                     ),
                   ),
                   SizedBox(height: 16),
@@ -293,7 +293,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                   Colors.pink,
                   Colors.orange,
                   Colors.purple,
-                  Color(0xFF5A7D7D),
+                  Color(0xFF45A173),
                   Colors.red,
                   Colors.yellow,
                 ],
