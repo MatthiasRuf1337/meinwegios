@@ -106,13 +106,38 @@ class _ImpulsfrageWidgetState extends State<ImpulsfrageWidget> {
             ),
             SizedBox(width: 12),
             Expanded(
-              child: Text(
-                _aktuelleImpulsfrage!.text,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF2C2C2C),
-                  height: 1.4,
+              child: RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF2C2C2C),
+                    height: 1.4,
+                  ),
+                  children: [
+                    // Öffnendes Anführungszeichen (unten)
+                    TextSpan(
+                      text: '"',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF8F116E),
+                      ),
+                    ),
+                    // Haupttext
+                    TextSpan(
+                      text: _cleanQuoteText(_aktuelleImpulsfrage!.text),
+                    ),
+                    // Schließendes Anführungszeichen (oben)
+                    TextSpan(
+                      text: '"',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF8F116E),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -168,5 +193,13 @@ class _ImpulsfrageWidgetState extends State<ImpulsfrageWidget> {
         ),
       ),
     );
+  }
+
+  String _cleanQuoteText(String text) {
+    // Remove leading and trailing double quotes if they exist
+    if (text.startsWith('"') && text.endsWith('"')) {
+      return text.substring(1, text.length - 1);
+    }
+    return text;
   }
 }
