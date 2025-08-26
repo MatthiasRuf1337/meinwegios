@@ -85,6 +85,68 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
         .toList();
   }
 
+  List<Polyline> _buildRoutePolylines() {
+    final allPoints = widget.etappe.gpsPunkte;
+    if (allPoints.isEmpty) return [];
+
+    List<Polyline> polylines = [];
+    List<LatLng> currentSegment = [];
+    bool inInterpolatedSection = false;
+
+    for (int i = 0; i < allPoints.length; i++) {
+      final point = allPoints[i];
+      final latLng = LatLng(point.latitude, point.longitude);
+
+      // Prüfe ob Punkt interpoliert ist (accuracy = 999.0)
+      final isInterpolated = point.accuracy != null && point.accuracy! > 900;
+
+      if (isInterpolated && !inInterpolatedSection) {
+        // Start einer interpolierten Sektion
+        if (currentSegment.isNotEmpty) {
+          // Beende aktuelles Segment (echte GPS-Punkte)
+          polylines.add(Polyline(
+            points: List.from(currentSegment),
+            strokeWidth: 4.0,
+            color: const Color(0xFF5A7D7D),
+          ));
+          currentSegment.clear();
+        }
+        inInterpolatedSection = true;
+        currentSegment.add(latLng);
+      } else if (!isInterpolated && inInterpolatedSection) {
+        // Ende einer interpolierten Sektion
+        currentSegment.add(latLng);
+        // Erstelle gestrichelte Linie für interpolierte Sektion
+        polylines.add(Polyline(
+          points: List.from(currentSegment),
+          strokeWidth: 3.0,
+          color: const Color(0xFF5A7D7D).withOpacity(0.6),
+          isDotted: true,
+        ));
+        currentSegment.clear();
+        currentSegment.add(latLng);
+        inInterpolatedSection = false;
+      } else {
+        // Normaler Punkt
+        currentSegment.add(latLng);
+      }
+    }
+
+    // Letztes Segment hinzufügen
+    if (currentSegment.isNotEmpty) {
+      polylines.add(Polyline(
+        points: currentSegment,
+        strokeWidth: inInterpolatedSection ? 3.0 : 4.0,
+        color: inInterpolatedSection
+            ? const Color(0xFF5A7D7D).withOpacity(0.6)
+            : const Color(0xFF5A7D7D),
+        isDotted: inInterpolatedSection,
+      ));
+    }
+
+    return polylines;
+  }
+
   LatLng? _getStartPosition() {
     if (widget.etappe.gpsPunkte.isEmpty) return null;
     final firstPoint = widget.etappe.gpsPunkte.first;
@@ -177,15 +239,9 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
                   maxZoom: 18,
                 ),
 
-                // Route als Polyline
+                // Route als Polyline mit GPS-Lücken-Visualisierung
                 PolylineLayer(
-                  polylines: [
-                    Polyline(
-                      points: routePoints,
-                      strokeWidth: 4.0,
-                      color: const Color(0xFF5A7D7D),
-                    ),
-                  ],
+                  polylines: _buildRoutePolylines(),
                 ),
 
                 // Marker für Start und Ende
@@ -335,34 +391,104 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
               ),
             ),
 
-            // Etappen-Status unten rechts
+            // GPS-Legende unten rechts
             Positioned(
               bottom: 8,
               right: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: widget.etappe.status == EtappenStatus.abgeschlossen
-                      ? Colors.green
-                      : Colors.orange,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  widget.etappe.status == EtappenStatus.abgeschlossen
-                      ? 'ABGESCHLOSSEN'
-                      : widget.etappe.status.name.toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // GPS-Legende (nur wenn interpolierte Punkte vorhanden)
+                  if (_hasInterpolatedPoints())
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 3),
+                      margin: const EdgeInsets.only(bottom: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 2,
+                                color: const Color(0xFF5A7D7D),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                'GPS',
+                                style:
+                                    TextStyle(color: Colors.white, fontSize: 8),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 2,
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xFF5A7D7D).withOpacity(0.6),
+                                ),
+                                child: CustomPaint(
+                                  painter: DottedLinePainter(),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                'Geschätzt',
+                                style:
+                                    TextStyle(color: Colors.white, fontSize: 8),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  // Etappen-Status
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: widget.etappe.status == EtappenStatus.abgeschlossen
+                          ? Colors.green
+                          : Colors.orange,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      widget.etappe.status == EtappenStatus.abgeschlossen
+                          ? 'ABGESCHLOSSEN'
+                          : widget.etappe.status.name.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  bool _hasInterpolatedPoints() {
+    return widget.etappe.gpsPunkte
+        .any((point) => point.accuracy != null && point.accuracy! > 900);
   }
 
   void _showFullscreenMap(BuildContext context) {
@@ -383,4 +509,30 @@ class _StaticRouteMapWidgetState extends State<StaticRouteMapWidget> {
       ),
     );
   }
+}
+
+// Custom Painter für gestrichelte Linie in der Legende
+class DottedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF5A7D7D).withOpacity(0.6)
+      ..strokeWidth = 1;
+
+    const dashWidth = 2.0;
+    const dashSpace = 1.0;
+    double startX = 0;
+
+    while (startX < size.width) {
+      canvas.drawLine(
+        Offset(startX, size.height / 2),
+        Offset(startX + dashWidth, size.height / 2),
+        paint,
+      );
+      startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

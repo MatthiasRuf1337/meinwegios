@@ -221,14 +221,8 @@ class TrackingServiceV2 {
 
       // Filter für realistische Bewegung
       if (_isRealisticMovement(gpsDistance, position)) {
-        // GPS-Punkt hinzufügen
-        _gpsPoints.add(GPSPunkt(
-          latitude: position.latitude,
-          longitude: position.longitude,
-          altitude: position.altitude,
-          timestamp: DateTime.now(),
-          accuracy: position.accuracy,
-        ));
+        // Prüfe auf GPS-Lücke und interpoliere falls nötig
+        _handleGPSGapAndInterpolation(position, gpsDistance);
 
         // Hybrid-Distanzberechnung: GPS zur Schrittlängen-Kalibrierung nutzen
         _validateAndCalibrateWithGPS(gpsDistance);
@@ -239,6 +233,9 @@ class TrackingServiceV2 {
         if (_useGPSStepEstimation) {
           _estimateStepsFromGPS(gpsDistance);
         }
+      } else {
+        // GPS-Punkt verworfen - prüfe auf längere Lücke
+        _handlePoorGPSSignal(position);
       }
     } else {
       // Erste Position
@@ -423,6 +420,107 @@ class TrackingServiceV2 {
     final additionalDistance = newSteps * _averageStepLength;
     _stepBasedDistance += additionalDistance;
     _lastStepCountForDistance = _totalSteps;
+  }
+
+  // GPS-Lücken-Behandlung und Interpolation
+  DateTime? _lastGPSTime;
+  int _poorGPSCount = 0;
+
+  void _handleGPSGapAndInterpolation(Position position, double gpsDistance) {
+    final now = DateTime.now();
+
+    // Prüfe auf zeitliche Lücke seit letztem GPS-Punkt
+    if (_lastGPSTime != null) {
+      final timeSinceLastGPS = now.difference(_lastGPSTime!);
+
+      // Wenn mehr als 30 Sekunden ohne GPS-Punkt und Distanz > 20m
+      if (timeSinceLastGPS.inSeconds > 30 && gpsDistance > 20) {
+        print(
+            'TrackingServiceV2: GPS-Lücke erkannt (${timeSinceLastGPS.inSeconds}s, ${gpsDistance.toStringAsFixed(1)}m)');
+        _interpolateGPSGap(position, gpsDistance, timeSinceLastGPS);
+      }
+    }
+
+    // GPS-Punkt hinzufügen
+    _gpsPoints.add(GPSPunkt(
+      latitude: position.latitude,
+      longitude: position.longitude,
+      altitude: position.altitude,
+      timestamp: now,
+      accuracy: position.accuracy,
+    ));
+
+    _lastGPSTime = now;
+    _poorGPSCount = 0; // Reset bei erfolgreichem GPS-Punkt
+  }
+
+  void _handlePoorGPSSignal(Position position) {
+    _poorGPSCount++;
+
+    // Nach 10 verworfenen GPS-Punkten: lockere Filter für Wald-Bedingungen
+    if (_poorGPSCount >= 10) {
+      print(
+          'TrackingServiceV2: Schlechtes GPS-Signal - verwende lockere Filter');
+
+      // Lockere Genauigkeitsfilter für Wald
+      if (position.accuracy <= 50.0) {
+        // Statt 20m nun 50m
+        final distance = _lastValidPosition != null
+            ? Geolocator.distanceBetween(
+                _lastValidPosition!.latitude,
+                _lastValidPosition!.longitude,
+                position.latitude,
+                position.longitude,
+              )
+            : 0.0;
+
+        // Lockere Distanzfilter
+        if (distance <= 100.0) {
+          // Statt 50m nun 100m
+          print('TrackingServiceV2: GPS-Punkt mit lockeren Filtern akzeptiert');
+          _handleGPSGapAndInterpolation(position, distance);
+          _lastValidPosition = position;
+          _poorGPSCount = 0;
+        }
+      }
+    }
+  }
+
+  void _interpolateGPSGap(
+      Position currentPosition, double totalDistance, Duration timeDiff) {
+    if (_lastValidPosition == null) return;
+
+    // Berechne Anzahl Interpolationspunkte basierend auf Distanz
+    final interpolationPoints =
+        (totalDistance / 25).ceil().clamp(1, 5); // Alle 25m ein Punkt, max 5
+
+    print(
+        'TrackingServiceV2: Interpoliere ${interpolationPoints} Punkte über ${totalDistance.toStringAsFixed(1)}m');
+
+    for (int i = 1; i < interpolationPoints; i++) {
+      final ratio = i / interpolationPoints;
+
+      // Lineare Interpolation zwischen letzter und aktueller Position
+      final interpolatedLat = _lastValidPosition!.latitude +
+          (currentPosition.latitude - _lastValidPosition!.latitude) * ratio;
+      final interpolatedLng = _lastValidPosition!.longitude +
+          (currentPosition.longitude - _lastValidPosition!.longitude) * ratio;
+      final interpolatedAlt = (_lastValidPosition!.altitude +
+          (currentPosition.altitude - _lastValidPosition!.altitude) * ratio);
+
+      // Zeitstempel interpolieren
+      final interpolatedTime = _lastGPSTime!.add(
+          Duration(milliseconds: (timeDiff.inMilliseconds * ratio).round()));
+
+      // Interpolierten Punkt hinzufügen (markiert als interpoliert)
+      _gpsPoints.add(GPSPunkt(
+        latitude: interpolatedLat,
+        longitude: interpolatedLng,
+        altitude: interpolatedAlt,
+        timestamp: interpolatedTime,
+        accuracy: 999.0, // Spezielle Markierung für interpolierte Punkte
+      ));
+    }
   }
 
   // GPS-Validierung und Schrittlängen-Kalibrierung
