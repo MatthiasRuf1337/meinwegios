@@ -3,7 +3,9 @@ import 'package:confetti/confetti.dart';
 import 'dart:math';
 import '../models/etappe.dart';
 import '../widgets/static_route_map_widget.dart';
-import 'etappe_detail_screen.dart';
+import '../widgets/impulsfrage_widget.dart';
+import '../widgets/impulsfrage_audio_widget.dart';
+import '../services/impulsfragen_service.dart';
 import 'main_navigation.dart'; // For navigating back to main tabs
 
 class EtappeCompletedScreen extends StatefulWidget {
@@ -18,12 +20,14 @@ class EtappeCompletedScreen extends StatefulWidget {
 
 class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
   late ConfettiController _confettiController;
+  final ImpulsfrageService _impulsfrageService = ImpulsfrageService();
 
   @override
   void initState() {
     super.initState();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
+    _initializeImpulsfragen();
     // Verzögerung vor dem Konfetti-Start, um Flackern zu vermeiden
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration(milliseconds: 800), () {
@@ -32,6 +36,10 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
         }
       });
     });
+  }
+
+  Future<void> _initializeImpulsfragen() async {
+    await _impulsfrageService.loadImpulsfragen();
   }
 
   @override
@@ -203,6 +211,10 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
 
                   SizedBox(height: 32),
 
+                  // Impulsfragen-Sektion
+                  _buildImpulsfrageSection(),
+                  SizedBox(height: 32),
+
                   // Aktionen
                   ElevatedButton.icon(
                     onPressed: () {
@@ -289,6 +301,48 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildImpulsfrageSection() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header für die gesamte Sektion - nur Text, kein Icon
+          Text(
+            'Impulsfrage & Audio-Notiz',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF8F116E),
+            ),
+          ),
+
+          SizedBox(height: 16),
+
+          // Impulsfrage Widget (ohne eigene Box)
+          ImpulsfrageWidget(etappenId: widget.etappe.id),
+
+          SizedBox(height: 16),
+
+          // Audio-Aufnahme Widget (ohne eigene Box)
+          ImpulsfrageAudioWidget(etappenId: widget.etappe.id),
+        ],
       ),
     );
   }

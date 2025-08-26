@@ -17,8 +17,11 @@ import '../services/tracking_service_v2.dart';
 import '../services/audio_recording_service.dart';
 import '../services/wetter_service.dart';
 import '../models/wetter_daten.dart';
-import '../widgets/wetter_widget.dart';
+
 import '../widgets/live_map_widget.dart';
+import '../widgets/impulsfrage_widget.dart';
+import '../widgets/impulsfrage_audio_widget.dart';
+import '../services/impulsfragen_service.dart';
 import 'etappe_completed_screen.dart';
 import 'dart:io';
 import 'dart:async';
@@ -48,6 +51,9 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
   WetterDaten? _aktuellesWetter;
   Timer? _wetterUpdateTimer;
 
+  // Impulsfragen-Service
+  final ImpulsfrageService _impulsfrageService = ImpulsfrageService();
+
   @override
   void initState() {
     super.initState();
@@ -70,6 +76,9 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
 
     // Wetter initialisieren
     _initializeWeather();
+
+    // Impulsfragen initialisieren
+    _initializeImpulsfragen();
   }
 
   @override
@@ -322,6 +331,10 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
 
           // Live Statistics
           _buildLiveStatistics(),
+          SizedBox(height: 24),
+
+          // Impulsfrage-Sektion
+          _buildImpulsfrageSection(),
           SizedBox(height: 24),
 
           // Medien-Sektion
@@ -1222,6 +1235,52 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     } catch (e) {
       print('Fehler beim Aktualisieren der Wetterdaten: $e');
     }
+  }
+
+  Future<void> _initializeImpulsfragen() async {
+    await _impulsfrageService.loadImpulsfragen();
+  }
+
+  Widget _buildImpulsfrageSection() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header für die gesamte Sektion - nur Text, kein Icon
+          Text(
+            'Impulsfrage & Audio-Notiz',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF8F116E),
+            ),
+          ),
+
+          SizedBox(height: 16),
+
+          // Impulsfrage Widget (ohne eigene Box)
+          ImpulsfrageWidget(etappenId: widget.etappe.id),
+
+          SizedBox(height: 16),
+
+          // Audio-Aufnahme Widget (ohne eigene Box)
+          ImpulsfrageAudioWidget(etappenId: widget.etappe.id),
+        ],
+      ),
+    );
   }
 
   void _addWeatherToEtappe(WetterDaten wetter) {

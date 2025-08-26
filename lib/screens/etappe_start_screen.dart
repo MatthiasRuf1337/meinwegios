@@ -8,6 +8,7 @@ import '../models/wetter_daten.dart';
 import '../services/permission_service.dart';
 import '../services/wetter_service.dart';
 import '../widgets/wetter_widget.dart';
+
 import 'etappe_tracking_screen_new.dart';
 import 'etappe_detail_screen.dart';
 
@@ -68,52 +69,6 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF5A7D7D).withOpacity(0.1),
-            Color(0xFF5A7D7D).withOpacity(0.2)
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.directions_walk,
-                size: 24,
-                color: Color(0xFF5A7D7D),
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Neue Etappe starten',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF5A7D7D),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Erstelle eine neue Etappe und beginne mit dem Tracking',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Color(0xFF5A7D7D).withOpacity(0.8),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -349,22 +304,6 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Fehler'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showSuccessDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Erfolg'),
         content: Text(message),
         actions: [
           TextButton(

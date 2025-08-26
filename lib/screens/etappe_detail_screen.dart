@@ -18,6 +18,9 @@ import 'bild_detail_screen.dart';
 import '../widgets/audio_recording_widget.dart';
 import '../widgets/static_route_map_widget.dart';
 import '../widgets/wetter_widget.dart';
+import '../widgets/impulsfrage_widget.dart';
+import '../widgets/impulsfrage_audio_widget.dart';
+import '../services/impulsfragen_service.dart';
 import 'main_navigation.dart';
 import 'dart:io';
 
@@ -37,6 +40,17 @@ class EtappeDetailScreen extends StatefulWidget {
 
 class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
   final ImagePicker _picker = ImagePicker();
+  final ImpulsfrageService _impulsfrageService = ImpulsfrageService();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeImpulsfragen();
+  }
+
+  Future<void> _initializeImpulsfragen() async {
+    await _impulsfrageService.loadImpulsfragen();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,16 +176,16 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                           children: [
                             Expanded(
                               child: _buildStatItem(
-                                'Dauer',
-                                _formatDuration(etappe.dauer),
-                                Icons.timer,
+                                'Distanz',
+                                etappe.formatierteDistanz,
+                                Icons.straighten,
                               ),
                             ),
                             Expanded(
                               child: _buildStatItem(
-                                'Distanz',
-                                etappe.formatierteDistanz,
-                                Icons.straighten,
+                                'Schritte',
+                                '${etappe.schrittAnzahl}',
+                                Icons.directions_walk,
                               ),
                             ),
                           ],
@@ -181,9 +195,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                           children: [
                             Expanded(
                               child: _buildStatItem(
-                                'Schritte',
-                                '${etappe.schrittAnzahl}',
-                                Icons.trending_up,
+                                'Dauer',
+                                _formatDuration(etappe.dauer),
+                                Icons.timer,
                               ),
                             ),
                             Expanded(
@@ -310,6 +324,10 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                   ),
                 if (etappe.gpsPunkte.isNotEmpty) SizedBox(height: 16),
 
+                // Impulsfragen-Sektion
+                _buildImpulsfrageSection(),
+                SizedBox(height: 16),
+
                 // Bilder-Sektion
                 Card(
                   child: Padding(
@@ -355,7 +373,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                         if (bilder.isEmpty)
                           Center(
                             child: Text(
-                              'Noch keine Bilder',
+                              'Noch keine Bilder vorhanden',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -588,6 +606,48 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildImpulsfrageSection() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header für die gesamte Sektion - nur Text, kein Icon
+          Text(
+            'Impulsfrage & Audio-Notiz',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF8F116E),
+            ),
+          ),
+
+          SizedBox(height: 16),
+
+          // Impulsfrage Widget (ohne eigene Box)
+          ImpulsfrageWidget(etappenId: widget.etappe.id),
+
+          SizedBox(height: 16),
+
+          // Audio-Aufnahme Widget (ohne eigene Box)
+          ImpulsfrageAudioWidget(etappenId: widget.etappe.id),
+        ],
       ),
     );
   }

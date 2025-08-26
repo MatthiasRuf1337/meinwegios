@@ -275,7 +275,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
   Widget _buildEmptyState() {
     return Center(
       child: Text(
-        'Keine Audioaufnahmen vorhanden',
+        'Noch keine Audios vorhanden',
         style: TextStyle(
           fontSize: 14,
           color: Colors.grey.shade600,

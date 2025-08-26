@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import '../models/audio_aufnahme.dart';
 import '../services/permission_service.dart';
+import '../services/global_audio_manager.dart';
 
 class AudioRecordingService {
   static final AudioRecordingService _instance =
@@ -12,24 +13,24 @@ class AudioRecordingService {
   factory AudioRecordingService() => _instance;
   AudioRecordingService._internal();
 
-  final AudioRecorder _recorder = AudioRecorder();
-  final AudioPlayer _player = AudioPlayer();
+  final GlobalAudioManager _audioManager = GlobalAudioManager();
 
-  bool _isRecording = false;
-  bool _isPlaying = false;
   String? _currentRecordingPath;
   DateTime? _recordingStartTime;
 
-  bool get isRecording => _isRecording;
-  bool get isPlaying => _isPlaying;
+  bool get isRecording => _audioManager.isRecording;
+  bool get isPlaying => _audioManager.isPlaying;
 
   // Aufnahme starten
   Future<bool> startRecording() async {
     try {
       // Prüfen ob bereits aufgenommen wird
-      if (_isRecording) {
+      if (_audioManager.isRecording) {
         throw Exception('Aufnahme läuft bereits');
       }
+
+      // Alle Audio-Aktivitäten stoppen
+      await _audioManager.stopAllAudio();
 
       // Mikrofon-Berechtigung prüfen
       final hasPermission =
@@ -39,7 +40,8 @@ class AudioRecordingService {
       }
 
       // Prüfen ob der Recorder die Berechtigung hat
-      final hasRecordPermission = await _recorder.hasPermission();
+      final recorder = _audioManager.getRecorder();
+      final hasRecordPermission = await recorder.hasPermission();
       if (!hasRecordPermission) {
         throw Exception('Record-Package hat keine Mikrofon-Berechtigung');
       }
@@ -57,15 +59,14 @@ class AudioRecordingService {
       // Kurze Verzögerung vor dem Start
       await Future.delayed(Duration(milliseconds: 200));
 
-      // Aufnahme mit minimaler Konfiguration starten
-      await _recorder.start(
+      // Aufnahme mit Standard-Konfiguration starten
+      await recorder.start(
         const RecordConfig(),
         path: filePath,
       );
 
       _currentRecordingPath = filePath;
-
-      _isRecording = true;
+      _audioManager.setRecordingStatus(true);
       _recordingStartTime = DateTime.now();
 
       return true;
@@ -75,6 +76,19 @@ class AudioRecordingService {
       if (e is Exception) {
         print('Exception Details: ${e.toString()}');
       }
+
+      // Cleanup bei Fehler
+      _audioManager.setRecordingStatus(false);
+      _currentRecordingPath = null;
+      _recordingStartTime = null;
+
+      // Zusätzliche Informationen bei Session-Fehlern
+      if (e.toString().contains('setActive') ||
+          e.toString().contains('Session activation failed')) {
+        print(
+            'Audio-Session-Konflikt erkannt. Versuche es in ein paar Sekunden erneut.');
+      }
+
       return false;
     }
   }
@@ -82,15 +96,16 @@ class AudioRecordingService {
   // Aufnahme stoppen
   Future<AudioAufnahme?> stopRecording(String etappenId) async {
     try {
-      if (!_isRecording ||
+      if (!_audioManager.isRecording ||
           _currentRecordingPath == null ||
           _recordingStartTime == null) {
         throw Exception('Keine aktive Aufnahme');
       }
 
       // Aufnahme stoppen
-      await _recorder.stop();
-      _isRecording = false;
+      final recorder = _audioManager.getRecorder();
+      await recorder.stop();
+      _audioManager.setRecordingStatus(false);
 
       // Audio Session wird automatisch verwaltet
 
@@ -125,7 +140,7 @@ class AudioRecordingService {
       return audioAufnahme;
     } catch (e) {
       print('Fehler beim Stoppen der Aufnahme: $e');
-      _isRecording = false;
+      _audioManager.setRecordingStatus(false);
       _currentRecordingPath = null;
       _recordingStartTime = null;
       return null;
@@ -135,9 +150,9 @@ class AudioRecordingService {
   // Aufnahme abbrechen
   Future<void> cancelRecording() async {
     try {
-      if (_isRecording) {
-        await _recorder.stop();
-        _isRecording = false;
+      if (_audioManager.isRecording) {
+        await _audioManager.getRecorder().stop();
+        _audioManager.setRecordingStatus(false);
       }
 
       // Audio Session wird automatisch verwaltet
@@ -160,20 +175,24 @@ class AudioRecordingService {
   // Audio abspielen
   Future<bool> playAudio(String filePath) async {
     try {
-      if (_isPlaying) {
+      if (_audioManager.isPlaying) {
         await stopPlayback();
       }
 
-      // Audio Session wird automatisch von just_audio verwaltet
+      // Aufnahme stoppen falls aktiv
+      if (_audioManager.isRecording) {
+        await cancelRecording();
+      }
 
-      await _player.setFilePath(filePath);
-      await _player.play();
-      _isPlaying = true;
+      final player = _audioManager.getPlayer();
+      await player.setFilePath(filePath);
+      await player.play();
+      _audioManager.setPlayingStatus(true);
 
       // Listener für Ende der Wiedergabe
-      _player.playerStateStream.listen((state) {
+      player.playerStateStream.listen((state) {
         if (state.processingState == ProcessingState.completed) {
-          _isPlaying = false;
+          _audioManager.setPlayingStatus(false);
         }
       });
 
@@ -187,8 +206,8 @@ class AudioRecordingService {
   // Wiedergabe stoppen
   Future<void> stopPlayback() async {
     try {
-      await _player.stop();
-      _isPlaying = false;
+      await _audioManager.getPlayer().stop();
+      _audioManager.setPlayingStatus(false);
     } catch (e) {
       print('Fehler beim Stoppen der Wiedergabe: $e');
     }
@@ -197,44 +216,61 @@ class AudioRecordingService {
   // Wiedergabe pausieren
   Future<void> pausePlayback() async {
     try {
-      await _player.pause();
-      _isPlaying = false;
+      await _audioManager.getPlayer().pause();
+      _audioManager.setPlayingStatus(false);
     } catch (e) {
       print('Fehler beim Pausieren der Wiedergabe: $e');
     }
   }
 
   // Aktuelle Wiedergabe-Position
-  Duration get currentPosition => _player.position;
+  Duration get currentPosition => _audioManager.getPlayer().position;
 
   // Gesamtdauer der aktuellen Audio-Datei
-  Duration? get duration => _player.duration;
+  Duration? get duration => _audioManager.getPlayer().duration;
 
   // Stream für Wiedergabe-Position
-  Stream<Duration> get positionStream => _player.positionStream;
+  Stream<Duration> get positionStream =>
+      _audioManager.getPlayer().positionStream;
 
   // Stream für Player-Status
-  Stream<PlayerState> get playerStateStream => _player.playerStateStream;
+  Stream<PlayerState> get playerStateStream =>
+      _audioManager.getPlayer().playerStateStream;
 
   // Aufnahme-Dauer (während der Aufnahme)
   Duration get recordingDuration {
-    if (_recordingStartTime != null && _isRecording) {
+    if (_recordingStartTime != null && _audioManager.isRecording) {
       return DateTime.now().difference(_recordingStartTime!);
     }
     return Duration.zero;
   }
 
+  // Audio-Service komplett zurücksetzen
+  Future<void> resetAudioService() async {
+    try {
+      print('Audio-Service wird zurückgesetzt...');
+
+      await _audioManager.stopAllAudio();
+
+      // Kurze Pause
+      await Future.delayed(Duration(milliseconds: 500));
+
+      print('Audio-Service erfolgreich zurückgesetzt');
+    } catch (e) {
+      print('Fehler beim Zurücksetzen des Audio-Services: $e');
+    }
+  }
+
   // Ressourcen freigeben
   Future<void> dispose() async {
     try {
-      if (_isRecording) {
+      if (_audioManager.isRecording) {
         await cancelRecording();
       }
-      if (_isPlaying) {
+      if (_audioManager.isPlaying) {
         await stopPlayback();
       }
-      await _recorder.dispose();
-      await _player.dispose();
+      await _audioManager.dispose();
     } catch (e) {
       print('Fehler beim Freigeben der Audio-Ressourcen: $e');
     }

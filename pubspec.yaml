@@ -56,6 +56,9 @@ dependencies:
   # HTTP Requests für Wetter-API
   http: ^1.1.0
 
+  # CSV Parser für Impulsfragen
+  csv: ^6.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -76,6 +79,7 @@ flutter:
     - assets/pdf/
     - icon.png
     - Zitate.csv
+    - Impulsfragen.csv
 
   fonts:
     - family: MuseoSans

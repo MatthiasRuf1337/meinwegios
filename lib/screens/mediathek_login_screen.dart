@@ -250,7 +250,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
     } else {
       // Fehlgeschlagene Anmeldung
       setState(() {
-        _errorMessage = 'Falscher PIN-Code. Bitte versuche es erneut.';
+        _errorMessage = 'Falscher Code. Bitte versuche es erneut.';
       });
 
       // PIN-Feld zurücksetzen
