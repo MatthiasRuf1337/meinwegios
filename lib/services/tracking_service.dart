@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../models/etappe.dart';
+import 'background_location_service.dart';
 
 class TrackingService {
   static final TrackingService _instance = TrackingService._internal();
@@ -33,6 +34,11 @@ class TrackingService {
   int _totalSteps = 0;
   int? _initialStepCount;
 
+  // Background Service
+  final BackgroundLocationService _backgroundService =
+      BackgroundLocationService();
+  bool _backgroundTrackingEnabled = false;
+
   // Callbacks
   Function(TrackingData)? _onTrackingUpdate;
   Function(String)? _onError;
@@ -40,6 +46,9 @@ class TrackingService {
   // Getter
   bool get isTracking => _isTracking;
   bool get isPaused => _isPaused;
+  bool get backgroundTrackingEnabled => _backgroundTrackingEnabled;
+  bool get hasBackgroundPermission =>
+      _backgroundService.hasBackgroundPermission;
   TrackingData get currentData => TrackingData(
         isTracking: _isTracking,
         isPaused: _isPaused,
@@ -70,6 +79,7 @@ class TrackingService {
   Future<bool> startTracking({
     Function(TrackingData)? onUpdate,
     Function(String)? onError,
+    bool enableBackgroundTracking = true,
   }) async {
     if (_isTracking) return false;
 
@@ -93,6 +103,11 @@ class TrackingService {
 
     // GPS-Tracking starten
     await _startGPSTracking();
+
+    // Background-Tracking starten falls aktiviert
+    if (enableBackgroundTracking) {
+      await _startBackgroundTracking();
+    }
 
     // Schritt-Tracking starten
     await _startStepTracking();
@@ -140,6 +155,9 @@ class TrackingService {
     await _positionSubscription?.cancel();
     await _stepCountSubscription?.cancel();
     _trackingTimer?.cancel();
+
+    // Background-Tracking stoppen
+    await _stopBackgroundTracking();
 
     _positionSubscription = null;
     _stepCountSubscription = null;
@@ -357,6 +375,104 @@ class TrackingService {
         speedAccuracy: 0.0,
       );
     }
+  }
+
+  // Background-Tracking starten
+  Future<void> _startBackgroundTracking() async {
+    print('TrackingService: Starte Background-Tracking...');
+
+    final success = await _backgroundService.startBackgroundTracking(
+      onUpdate: _onBackgroundUpdate,
+      onError: _onError,
+    );
+
+    _backgroundTrackingEnabled = success;
+
+    if (success) {
+      print('TrackingService: Background-Tracking erfolgreich gestartet');
+    } else {
+      print(
+          'TrackingService: Background-Tracking konnte nicht gestartet werden');
+    }
+  }
+
+  // Background-Tracking stoppen
+  Future<void> _stopBackgroundTracking() async {
+    if (!_backgroundTrackingEnabled) return;
+
+    print('TrackingService: Stoppe Background-Tracking...');
+
+    // Sammle noch offene Background-Punkte
+    final backgroundPoints = _backgroundService.getAndClearBackgroundPoints();
+    if (backgroundPoints.isNotEmpty) {
+      _gpsPoints.addAll(backgroundPoints);
+      print(
+          'TrackingService: ${backgroundPoints.length} Background-Punkte hinzugefügt');
+    }
+
+    await _backgroundService.stopBackgroundTracking();
+    _backgroundTrackingEnabled = false;
+
+    print('TrackingService: Background-Tracking gestoppt');
+  }
+
+  // Background GPS-Update Callback
+  void _onBackgroundUpdate(List<GPSPunkt> backgroundPoints) {
+    if (!_isTracking || backgroundPoints.isEmpty) return;
+
+    print(
+        'TrackingService: Background-Update mit ${backgroundPoints.length} Punkten');
+
+    // Neue Background-Punkte zur Hauptliste hinzufügen
+    final newPoints = backgroundPoints
+        .where((point) => !_gpsPoints.any(
+            (existing) => existing.timestamp.isAtSameMomentAs(point.timestamp)))
+        .toList();
+
+    if (newPoints.isNotEmpty) {
+      _gpsPoints.addAll(newPoints);
+
+      // Distanz neu berechnen
+      _recalculateDistance();
+
+      print(
+          'TrackingService: ${newPoints.length} neue Background-Punkte hinzugefügt');
+      _notifyUpdate();
+    }
+  }
+
+  // Distanz neu berechnen
+  void _recalculateDistance() {
+    if (_gpsPoints.length < 2) return;
+
+    double totalDistance = 0.0;
+    for (int i = 1; i < _gpsPoints.length; i++) {
+      final prev = _gpsPoints[i - 1];
+      final current = _gpsPoints[i];
+
+      final distance = Geolocator.distanceBetween(
+        prev.latitude,
+        prev.longitude,
+        current.latitude,
+        current.longitude,
+      );
+
+      totalDistance += distance;
+    }
+
+    _totalDistance = totalDistance;
+  }
+
+  // Background-Berechtigung prüfen
+  Future<bool> checkBackgroundPermission() async {
+    final permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.always;
+  }
+
+  // Background-Berechtigung anfordern
+  Future<bool> requestBackgroundPermission() async {
+    final permission = await Geolocator.requestPermission();
+    return permission == LocationPermission.always;
   }
 }
 

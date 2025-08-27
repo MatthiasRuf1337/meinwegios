@@ -61,7 +61,9 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Die App benötigt Zugriff auf den Standort, um Ihre Etappen mit GPS zu verfolgen.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Die App benötigt Zugriff auf den Standort, um Ihre Etappen mit GPS zu verfolgen.</string>
+	<string>Die App benötigt dauerhaften Zugriff auf den Standort, um Ihre Etappen auch im Hintergrund zu verfolgen und aufzuzeichnen.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Die App benötigt dauerhaften Zugriff auf den Standort, um Ihre Etappen auch im Hintergrund zu verfolgen und aufzuzeichnen.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Die App benötigt Zugriff auf Aktivitätserkennung, um Ihre Schritte zu zählen.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -76,6 +78,12 @@
 	<array>
 		<string>location</string>
 		<string>audio</string>
+		<string>background-fetch</string>
+		<string>background-processing</string>
 	</array>
+	
+	<!-- Background App Refresh -->
+	<key>UIBackgroundRefreshStatusDidChangeNotification</key>
+	<true/>
 </dict>
 </plist> 

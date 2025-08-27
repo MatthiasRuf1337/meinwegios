@@ -53,6 +53,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _loadExistingData();
+    _requestBackgroundPermissions();
     _startTracking();
   }
 
@@ -570,14 +571,99 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     }
   }
 
+  // Background-Berechtigungen anfordern
+  Future<void> _requestBackgroundPermissions() async {
+    try {
+      // Prüfe aktuelle Berechtigung
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission != LocationPermission.always) {
+        // Zeige Dialog für Background-Berechtigung
+        if (mounted) {
+          final shouldRequest = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Hintergrund-GPS'),
+              content: const Text(
+                  'Für kontinuierliches GPS-Tracking auch im Standby-Modus benötigt die App Zugriff auf Ihren Standort "Immer". '
+                  'Dies ermöglicht es, Ihre Route auch dann aufzuzeichnen, wenn die App im Hintergrund läuft.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Später'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Berechtigung erteilen'),
+                ),
+              ],
+            ),
+          );
+
+          if (shouldRequest == true) {
+            // Berechtigung anfordern
+            permission = await Geolocator.requestPermission();
+
+            if (permission == LocationPermission.always) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                        'Hintergrund-GPS aktiviert! Ihre Route wird auch im Standby aufgezeichnet.'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            } else {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                        'Hintergrund-GPS nicht verfügbar. GPS funktioniert nur bei aktiver App.'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Fehler beim Anfordern der Background-Berechtigung: $e');
+    }
+  }
+
   void _startGPSTracking() {
     print('Starte GPS-Tracking...');
-    // Kontinuierliches GPS-Tracking mit Hintergrund-Unterstützung
-    _positionSubscription = Geolocator.getPositionStream(
-      locationSettings: LocationSettings(
+
+    // Spezielle Einstellungen für Background-Tracking
+    LocationSettings locationSettings;
+
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
+      locationSettings = AppleSettings(
+        accuracy: LocationAccuracy.best,
+        activityType: ActivityType.fitness,
+        distanceFilter: 3,
+        pauseLocationUpdatesAutomatically: false,
+        showBackgroundLocationIndicator: true,
+      );
+    } else {
+      locationSettings = AndroidSettings(
         accuracy: LocationAccuracy.best,
         distanceFilter: 3,
-      ),
+        forceLocationManager: false,
+        intervalDuration: const Duration(seconds: 5),
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationText: "Mein Weg verfolgt Ihre Etappe",
+          notificationTitle: "GPS-Tracking aktiv",
+          enableWakeLock: true,
+        ),
+      );
+    }
+
+    // Kontinuierliches GPS-Tracking mit Hintergrund-Unterstützung
+    _positionSubscription = Geolocator.getPositionStream(
+      locationSettings: locationSettings,
     ).listen((Position position) {
       if (_isPaused || !mounted) return;
 
