@@ -78,12 +78,6 @@
 	<array>
 		<string>location</string>
 		<string>audio</string>
-		<string>background-fetch</string>
-		<string>background-processing</string>
 	</array>
-	
-	<!-- Background App Refresh -->
-	<key>UIBackgroundRefreshStatusDidChangeNotification</key>
-	<true/>
 </dict>
 </plist> 

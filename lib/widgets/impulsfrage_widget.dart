@@ -107,39 +107,38 @@ class _ImpulsfrageWidgetState extends State<ImpulsfrageWidget> {
             SizedBox(width: 12),
             Expanded(
               child: RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF2C2C2C),
-                    height: 1.4,
-                  ),
-                  children: [
-                    // Öffnendes Anführungszeichen (unten)
-                    TextSpan(
-                      text: '"',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8F116E),
-                      ),
-                    ),
-                    // Haupttext
-                    TextSpan(
-                      text: _cleanQuoteText(_aktuelleImpulsfrage!.text),
-                    ),
-                    // Schließendes Anführungszeichen (oben)
-                    TextSpan(
-                      text: '"',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8F116E),
-                      ),
-                    ),
-                  ],
+                  text: TextSpan(
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF2C2C2C),
+                  height: 1.4,
                 ),
-              ),
+                children: [
+                  // Öffnendes Anführungszeichen (unten)
+                  TextSpan(
+                    text: '"',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF8F116E),
+                    ),
+                  ),
+                  // Haupttext
+                  TextSpan(
+                    text: _cleanQuoteText(_aktuelleImpulsfrage!.text),
+                  ),
+                  // Schließendes Anführungszeichen (oben)
+                  TextSpan(
+                    text: '"',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF8F116E),
+                    ),
+                  ),
+                ],
+              )),
             ),
           ],
         ),
