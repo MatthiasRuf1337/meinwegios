@@ -260,7 +260,7 @@ class _ZitatScreenState extends State<ZitatScreen>
             ],
           ),
           child: Text(
-            '"${_zitat!.text}"',
+            '„${_zitat!.text}"',
             style: TextStyle(
               color: Colors.white,
               fontSize: 22,

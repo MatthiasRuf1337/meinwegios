@@ -246,7 +246,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   icon: Icon(Icons.stop, size: 18),
                   label: Text('Stop', style: TextStyle(fontSize: 12)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     minimumSize: Size(0, 36),
@@ -978,7 +978,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Fehler beim Aufnehmen des Fotos: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }
@@ -1008,7 +1008,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Stoppen der Aufnahme: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Color(0xFF8C0A28),
           ),
         );
       }
@@ -1026,7 +1026,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Starten der Aufnahme'),
-            backgroundColor: Colors.red,
+            backgroundColor: Color(0xFF8C0A28),
           ),
         );
       }
@@ -1113,14 +1113,14 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Notiz gelöscht!'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: Color(0xFF8C0A28),
                     ),
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Fehler beim Löschen: $e'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: Color(0xFF8C0A28),
                     ),
                   );
                 }
@@ -1184,7 +1184,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Fehler beim Speichern: $e'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
               }
@@ -1275,7 +1275,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF8F116E),
+              color: Color(0xFF8C0A28),
             ),
           ),
 

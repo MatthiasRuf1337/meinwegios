@@ -329,7 +329,7 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF8F116E),
+              color: Color(0xFF8C0A28),
             ),
           ),
 

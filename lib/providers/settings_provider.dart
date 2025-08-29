@@ -192,7 +192,7 @@ class SettingsProvider with ChangeNotifier {
     final zitat =
         await ZitatService.getZitatByIndex(_settings.aktuellerZitatIndex);
 
-    print('Zitat geladen: "${zitat.text}" - ${zitat.autor}');
+    print('Zitat geladen: „${zitat.text}" - ${zitat.autor}');
     print('Aktueller Zitat-Index: ${_settings.aktuellerZitatIndex}');
 
     return zitat;

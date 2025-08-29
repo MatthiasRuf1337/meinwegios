@@ -52,7 +52,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Fehler beim Starten der Aufnahme'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }
@@ -76,7 +76,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Fehler beim Speichern der Aufnahme'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }
@@ -134,7 +134,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
             child: Text('Abbrechen'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF8C0A28)),
             onPressed: () => Navigator.of(context).pop(true),
             child: Text('Löschen'),
           ),
@@ -149,7 +149,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Audioaufnahme gelöscht'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }
@@ -261,7 +261,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                 icon: Icon(Icons.stop),
                 label: Text('Stoppen'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Color(0xFF8C0A28),
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -357,7 +357,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
           // Delete Button
           IconButton(
             onPressed: () => _deleteAudio(audio),
-            icon: Icon(Icons.delete, color: Colors.red),
+            icon: Icon(Icons.delete, color: Color(0xFF8C0A28)),
             tooltip: 'Löschen',
           ),
         ],

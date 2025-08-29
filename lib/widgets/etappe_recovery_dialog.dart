@@ -111,8 +111,8 @@ class EtappeRecoveryDialog extends StatelessWidget {
                                   icon: Icon(Icons.stop, size: 18),
                                   label: Text('Beenden'),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: Colors.red,
-                                    side: BorderSide(color: Colors.red),
+                                    foregroundColor: Color(0xFF8C0A28),
+                                    side: BorderSide(color: Color(0xFF8C0A28)),
                                     padding: EdgeInsets.symmetric(vertical: 8),
                                   ),
                                 ),
@@ -158,7 +158,7 @@ class EtappeRecoveryDialog extends StatelessWidget {
           onPressed: () => _completeAllEtappen(context),
           child: Text(
             'Alle beenden',
-            style: TextStyle(color: Colors.red),
+            style: TextStyle(color: Color(0xFF8C0A28)),
           ),
         ),
         ElevatedButton(
@@ -191,7 +191,7 @@ class EtappeRecoveryDialog extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Fehler beim Wiederherstellen: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }
@@ -219,7 +219,7 @@ class EtappeRecoveryDialog extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Fehler beim Beenden: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }
@@ -247,7 +247,7 @@ class EtappeRecoveryDialog extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Fehler beim Beenden aller Etappen: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }

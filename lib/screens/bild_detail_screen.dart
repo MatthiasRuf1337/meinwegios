@@ -193,7 +193,7 @@ class BildDetailScreen extends StatelessWidget {
             child: Text('Abbrechen'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF8C0A28)),
             onPressed: () async {
               Navigator.pop(context);
               // delete via provider
@@ -210,7 +210,7 @@ class BildDetailScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                     content: Text('Bild gelöscht'),
-                    backgroundColor: Colors.red),
+                    backgroundColor: Color(0xFF8C0A28)),
               );
             },
             child: Text('Löschen'),

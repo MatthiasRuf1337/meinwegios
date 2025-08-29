@@ -1108,7 +1108,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Fehler beim Aufnehmen des Fotos: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }

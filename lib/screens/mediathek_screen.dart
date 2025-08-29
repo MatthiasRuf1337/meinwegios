@@ -276,9 +276,9 @@ class _MediathekScreenState extends State<MediathekScreen> {
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete, color: Colors.red),
+                  Icon(Icons.delete, color: Color(0xFF8C0A28)),
                   SizedBox(width: 8),
-                  Text('Löschen', style: TextStyle(color: Colors.red)),
+                  Text('Löschen', style: TextStyle(color: Color(0xFF8C0A28))),
                 ],
               ),
             ),
@@ -299,7 +299,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Fehler beim Öffnen der PDF: ${result.message}'),
-                backgroundColor: Colors.red,
+                backgroundColor: Color(0xFF8C0A28),
               ),
             );
           }
@@ -307,7 +307,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('PDF-Datei nicht gefunden'),
-              backgroundColor: Colors.red,
+              backgroundColor: Color(0xFF8C0A28),
             ),
           );
         }
@@ -315,7 +315,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Öffnen der PDF: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Color(0xFF8C0A28),
           ),
         );
       }
@@ -371,7 +371,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
                   .deleteMedienDatei(medienDatei.id);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
             ),
             child: Text('Löschen'),
@@ -529,7 +529,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }
@@ -658,7 +658,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Aktuelle PIN ist falsch'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
                 return;
@@ -668,7 +668,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('PINs stimmen nicht überein'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
                 return;
@@ -678,7 +678,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('PIN muss 4 Zeichen haben'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
                 return;

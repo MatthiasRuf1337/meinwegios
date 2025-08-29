@@ -159,19 +159,19 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.red.shade50,
+        color: Color(0xFF8C0A28).withOpacity(0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.red.shade200),
+        border: Border.all(color: Color(0xFF8C0A28).withOpacity(0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error, color: Colors.red, size: 16),
+          Icon(Icons.error, color: Color(0xFF8C0A28), size: 16),
           SizedBox(width: 8),
           Text(
             _errorMessage,
             style: TextStyle(
-              color: Colors.red.shade700,
+              color: Color(0xFF8C0A28),
               fontSize: 14,
             ),
           ),

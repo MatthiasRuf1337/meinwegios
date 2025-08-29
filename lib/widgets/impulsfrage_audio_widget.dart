@@ -49,7 +49,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
         SnackBar(
           content: Text(
               'Fehler beim Starten der Aufnahme. Audio-Service wurde zurückgesetzt.'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
           action: SnackBarAction(
             label: 'Erneut versuchen',
             onPressed: () => _startRecording(),
@@ -70,14 +70,14 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Aufnahme zur Impulsfrage gespeichert!'),
-          backgroundColor: Color(0xFF8F116E),
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Fehler beim Speichern der Aufnahme'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }
@@ -166,7 +166,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
           style: TextStyle(fontSize: 14),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF8F116E),
+          backgroundColor: Color(0xFF8C0A28),
           foregroundColor: Colors.white,
           padding: EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
@@ -235,7 +235,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
                 icon: Icon(Icons.stop, size: 16),
                 label: Text('Speichern'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF8F116E),
+                  backgroundColor: Color(0xFF8C0A28),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 10),
                 ),
@@ -253,10 +253,10 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isPlaying ? Color(0xFF8F116E).withOpacity(0.1) : Colors.white,
+        color: isPlaying ? Color(0xFF8C0A28).withOpacity(0.1) : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Color(0xFF8F116E).withOpacity(0.3),
+          color: Color(0xFF8C0A28).withOpacity(0.3),
         ),
       ),
       child: Row(
@@ -266,7 +266,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
             onPressed: () => _playAudio(audio),
             icon: Icon(
               isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Color(0xFF8F116E),
+              color: Color(0xFF8C0A28),
             ),
             constraints: BoxConstraints(),
             padding: EdgeInsets.zero,
@@ -284,7 +284,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
-                    color: Color(0xFF8F116E),
+                    color: Color(0xFF8C0A28),
                   ),
                 ),
                 SizedBox(height: 2),
@@ -305,7 +305,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
             icon: Icon(Icons.add, size: 16),
             label: Text('Neu', style: TextStyle(fontSize: 12)),
             style: TextButton.styleFrom(
-              foregroundColor: Color(0xFF8F116E),
+              foregroundColor: Color(0xFF8C0A28),
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             ),
           ),

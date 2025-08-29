@@ -71,14 +71,14 @@ class _ImpulsfrageWidgetState extends State<ImpulsfrageWidget> {
               height: 16,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8F116E)),
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8C0A28)),
               ),
             ),
             SizedBox(width: 12),
             Text(
               'Impulsfrage wird geladen...',
               style: TextStyle(
-                color: Color(0xFF8F116E),
+                color: Color(0xFF8C0A28),
                 fontSize: 14,
               ),
             ),
@@ -92,55 +92,15 @@ class _ImpulsfrageWidgetState extends State<ImpulsfrageWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Frage-Icon und Text
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.only(top: 2),
-              child: Icon(
-                Icons.psychology,
-                color: Color(0xFF8F116E),
-                size: 20,
-              ),
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: RichText(
-                  text: TextSpan(
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF2C2C2C),
-                  height: 1.4,
-                ),
-                children: [
-                  // Öffnendes Anführungszeichen (unten)
-                  TextSpan(
-                    text: '"',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8F116E),
-                    ),
-                  ),
-                  // Haupttext
-                  TextSpan(
-                    text: _cleanQuoteText(_aktuelleImpulsfrage!.text),
-                  ),
-                  // Schließendes Anführungszeichen (oben)
-                  TextSpan(
-                    text: '"',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8F116E),
-                    ),
-                  ),
-                ],
-              )),
-            ),
-          ],
+        // Frage-Text ohne Icon und ohne Anführungszeichen
+        Text(
+          _cleanQuoteText(_aktuelleImpulsfrage!.text),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF2C2C2C),
+            height: 1.4,
+          ),
         ),
 
         SizedBox(height: 16),
@@ -149,17 +109,17 @@ class _ImpulsfrageWidgetState extends State<ImpulsfrageWidget> {
         Container(
           padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Color(0xFF8F116E).withOpacity(0.05),
+            color: Color(0xFF8C0A28).withOpacity(0.05),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: Color(0xFF8F116E).withOpacity(0.1),
+              color: Color(0xFF8C0A28).withOpacity(0.1),
             ),
           ),
           child: Text(
             'Nimm dir einen Moment Zeit für diese Frage während deiner Etappe.',
             style: TextStyle(
               fontSize: 12,
-              color: Color(0xFF8F116E).withOpacity(0.8),
+              color: Color(0xFF8C0A28).withOpacity(0.8),
               fontStyle: FontStyle.italic,
             ),
           ),

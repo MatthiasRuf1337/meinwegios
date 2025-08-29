@@ -580,11 +580,13 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                           child: Row(
                                             children: [
                                               Icon(Icons.delete,
-                                                  size: 18, color: Colors.red),
+                                                  size: 18,
+                                                  color: Color(0xFF8C0A28)),
                                               SizedBox(width: 8),
                                               Text('Löschen',
                                                   style: TextStyle(
-                                                      color: Colors.red)),
+                                                      color:
+                                                          Color(0xFF8C0A28))),
                                             ],
                                           ),
                                         ),
@@ -635,7 +637,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF8F116E),
+              color: Color(0xFF8C0A28),
             ),
           ),
 
@@ -793,7 +795,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(errorMessage),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
           duration: Duration(seconds: 4),
           action: SnackBarAction(
             label: 'Einstellungen',
@@ -832,7 +834,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(errorMessage),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
           duration: Duration(seconds: 4),
           action: SnackBarAction(
             label: 'Einstellungen',
@@ -907,7 +909,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Fehler beim Speichern des Bildes: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Color(0xFF8C0A28),
         ),
       );
     }
@@ -934,7 +936,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
             child: Text('Abbrechen'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF8C0A28)),
             onPressed: () async {
               Navigator.pop(context);
               final bilderProvider =
@@ -943,7 +945,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Bild gelöscht'),
-                  backgroundColor: Colors.red,
+                  backgroundColor: Color(0xFF8C0A28),
                 ),
               );
             },
@@ -1186,7 +1188,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Fehler beim Speichern: $e'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
               }
@@ -1242,7 +1244,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                   SnackBar(
                     content:
                         Text('Etappe "${widget.etappe.name}" wurde gelöscht'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
               } catch (e) {
@@ -1250,12 +1252,12 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Fehler beim Löschen der Etappe: $e'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF8C0A28)),
             child: Text('Löschen'),
           ),
         ],
@@ -1339,7 +1341,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                       ElevatedButton(
                         onPressed: () => Navigator.pop(context, true),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
+                          backgroundColor: Color(0xFF8C0A28),
                           foregroundColor: Colors.white,
                         ),
                         child: Text('Löschen'),
@@ -1365,13 +1367,14 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Fehler beim Löschen: $e'),
-                        backgroundColor: Colors.red,
+                        backgroundColor: Color(0xFF8C0A28),
                       ),
                     );
                   }
                 }
               },
-              child: Text('Löschen', style: TextStyle(color: Colors.red)),
+              child:
+                  Text('Löschen', style: TextStyle(color: Color(0xFF8C0A28))),
             ),
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -1430,7 +1433,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Fehler beim Speichern: $e'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
               }
@@ -1476,13 +1479,13 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Fehler beim Löschen: $e'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xFF8C0A28),
                   ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: Color(0xFF8C0A28),
               foregroundColor: Colors.white,
             ),
             child: Text('Löschen'),
