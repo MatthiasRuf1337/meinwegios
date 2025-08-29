@@ -60,6 +60,9 @@ dependencies:
   # CSV Parser für Impulsfragen
   csv: ^6.0.0
 
+  # URL Launcher für externe Links
+  url_launcher: ^6.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

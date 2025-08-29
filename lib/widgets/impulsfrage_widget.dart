@@ -116,7 +116,7 @@ class _ImpulsfrageWidgetState extends State<ImpulsfrageWidget> {
             ),
           ),
           child: Text(
-            'Tipp: Sprich deine Gedanken frei heraus, als würdest du Tagebuch führen. Halte fest, was dir gerade wichtig erscheint. Mehrere Aufnahmen sind jederzeit möglich, wann immer du möchtest.,
+            'Tipp: Sprich deine Gedanken frei heraus, als würdest du Tagebuch führen. Halte fest, was dir gerade wichtig erscheint. Mehrere Aufnahmen sind jederzeit möglich, wann immer du möchtest.',
             style: TextStyle(
               fontSize: 12,
               color: Color(0xFF8C0A28).withOpacity(0.8),

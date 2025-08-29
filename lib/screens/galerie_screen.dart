@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/bilder_provider.dart';
 import '../models/bild.dart';
 import 'bild_detail_screen.dart';
+import '../widgets/legal_menu_widget.dart';
 import 'dart:io';
 
 class GalerieScreen extends StatefulWidget {
@@ -39,6 +40,7 @@ class _GalerieScreenState extends State<GalerieScreen> {
               });
             },
           ),
+          LegalMenuWidget(),
         ],
       ),
       body: Column(

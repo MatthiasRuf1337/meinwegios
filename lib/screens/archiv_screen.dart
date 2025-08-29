@@ -8,7 +8,7 @@ import '../models/etappe.dart';
 import '../models/bild.dart';
 import 'etappe_detail_screen.dart';
 import 'main_navigation.dart';
-import '../widgets/wetter_widget.dart';
+import '../widgets/legal_menu_widget.dart';
 
 class ArchivScreen extends StatefulWidget {
   @override
@@ -37,6 +37,7 @@ class _ArchivScreenState extends State<ArchivScreen> {
             icon: Icon(Icons.filter_list),
             onPressed: () => _showFilterDialog(),
           ),
+          LegalMenuWidget(),
         ],
       ),
       body: Consumer2<EtappenProvider, BilderProvider>(

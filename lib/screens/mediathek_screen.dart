@@ -9,10 +9,8 @@ import '../providers/settings_provider.dart';
 import '../models/medien_datei.dart';
 import '../services/thumbnail_service.dart';
 import 'mediathek_login_screen.dart';
-import 'pdf_viewer_screen.dart';
-import 'pdf_viewer_screen_alternative.dart';
-import 'pdf_viewer_simple.dart';
 import 'audio_player_screen.dart';
+import '../widgets/legal_menu_widget.dart';
 
 class MediathekScreen extends StatefulWidget {
   @override
@@ -52,6 +50,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 icon: Icon(Icons.settings),
                 onPressed: () => _showSettings(context),
               ),
+              LegalMenuWidget(),
             ],
           ),
           body: Column(

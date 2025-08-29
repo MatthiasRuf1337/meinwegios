@@ -8,6 +8,7 @@ import '../models/wetter_daten.dart';
 import '../services/permission_service.dart';
 import '../services/wetter_service.dart';
 import '../widgets/wetter_widget.dart';
+import '../widgets/legal_menu_widget.dart';
 
 import 'etappe_tracking_screen_new.dart';
 import 'etappe_detail_screen.dart';
@@ -41,6 +42,9 @@ class _EtappeStartScreenState extends State<EtappeStartScreen> {
         backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
         centerTitle: false,
+        actions: [
+          LegalMenuWidget(),
+        ],
       ),
       body: Consumer<EtappenProvider>(
         builder: (context, etappenProvider, child) {
