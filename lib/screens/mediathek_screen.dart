@@ -44,7 +44,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
         return Scaffold(
           appBar: AppBar(
             title: Text('Mediathek'),
-            backgroundColor: Color(0xFF45A173),
+            backgroundColor: Color(0xFF5A7D7D),
             foregroundColor: Colors.white,
             centerTitle: false,
             actions: [
@@ -86,7 +86,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => _importMedia(context),
-            backgroundColor: Color(0xFF8C0A28),
+            backgroundColor: Color(0xFF5A7D7D),
             child: Icon(Icons.add, color: Colors.white),
             tooltip: 'Medien importieren',
           ),
@@ -132,8 +132,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 _selectedType = null;
               });
             },
-            selectedColor: Color(0xFF45A173).withOpacity(0.2),
-            checkmarkColor: Color(0xFF45A173),
+            selectedColor: Color(0xFF5A7D7D).withOpacity(0.2),
+            checkmarkColor: Color(0xFF5A7D7D),
           ),
           SizedBox(width: 8),
           FilterChip(
@@ -144,8 +144,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 _selectedType = selected ? MedienTyp.pdf : null;
               });
             },
-            selectedColor: Color(0xFF45A173).withOpacity(0.2),
-            checkmarkColor: Color(0xFF45A173),
+            selectedColor: Color(0xFF5A7D7D).withOpacity(0.2),
+            checkmarkColor: Color(0xFF5A7D7D),
           ),
           SizedBox(width: 8),
           FilterChip(
@@ -156,8 +156,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 _selectedType = selected ? MedienTyp.mp3 : null;
               });
             },
-            selectedColor: Color(0xFF45A173).withOpacity(0.2),
-            checkmarkColor: Color(0xFF45A173),
+            selectedColor: Color(0xFF5A7D7D).withOpacity(0.2),
+            checkmarkColor: Color(0xFF5A7D7D),
           ),
           SizedBox(width: 8),
           FilterChip(
@@ -172,8 +172,8 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 }
               });
             },
-            selectedColor: Color(0xFF45A173).withOpacity(0.2),
-            checkmarkColor: Color(0xFF45A173),
+            selectedColor: Color(0xFF5A7D7D).withOpacity(0.2),
+            checkmarkColor: Color(0xFF5A7D7D),
           ),
         ],
       ),
@@ -398,7 +398,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
             ),
             SizedBox(height: 20),
             ListTile(
-              leading: Icon(Icons.photo_camera, color: Color(0xFF45A173)),
+              leading: Icon(Icons.photo_camera, color: Color(0xFF5A7D7D)),
               title: Text('Kamera'),
               subtitle: Text('Foto aufnehmen'),
               onTap: () {
@@ -407,7 +407,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library, color: Color(0xFF45A173)),
+              leading: Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
               title: Text('Galerie'),
               subtitle: Text('Foto aus Galerie wählen'),
               onTap: () {
@@ -416,7 +416,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.folder_open, color: Color(0xFF45A173)),
+              leading: Icon(Icons.folder_open, color: Color(0xFF5A7D7D)),
               title: Text('Datei auswählen'),
               subtitle: Text('PDF, MP3, Bilder oder andere Dateien'),
               onTap: () {
@@ -594,7 +594,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF45A173), width: 2),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -612,7 +612,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF45A173), width: 2),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -630,7 +630,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF45A173), width: 2),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 16),

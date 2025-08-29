@@ -81,7 +81,7 @@ class EtappeRecoveryDialog extends StatelessWidget {
                             Text(
                               '${etappe.schrittAnzahl} Schritte • ${_formatDistance(etappe.gesamtDistanz)}',
                               style: TextStyle(
-                                color: Color(0xFF45A173),
+                                color: Color(0xFF5A7D7D),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),

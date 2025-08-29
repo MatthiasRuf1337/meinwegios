@@ -37,7 +37,33 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
   }
 
   void _startRecording() async {
+    // Zeige Loading-Indikator
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+            SizedBox(width: 12),
+            Text('Aufnahme wird vorbereitet...'),
+          ],
+        ),
+        backgroundColor: Color(0xFF5A7D7D),
+        duration: Duration(seconds: 5),
+      ),
+    );
+
     final success = await _audioService.startRecording();
+
+    // Verstecke Loading-Indikator
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
     if (success) {
       setState(() {
         _recordingDuration = Duration.zero;
@@ -48,11 +74,26 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
           _recordingDuration = _audioService.recordingDuration;
         });
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Audio-Aufnahme gestartet'),
+          backgroundColor: Color(0xFF8C0A28),
+          duration: Duration(seconds: 2),
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Fehler beim Starten der Aufnahme'),
+          content: Text(
+              'Fehler beim Starten der Aufnahme. Bitte versuchen Sie es erneut.'),
           backgroundColor: Color(0xFF8C0A28),
+          action: SnackBarAction(
+            label: 'Erneut versuchen',
+            textColor: Colors.white,
+            onPressed: () => _startRecording(),
+          ),
+          duration: Duration(seconds: 5),
         ),
       );
     }
@@ -186,7 +227,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.mic, color: Color(0xFF45A173)),
+                      icon: Icon(Icons.mic, color: Color(0xFF5A7D7D)),
                       onPressed: _startRecording,
                       tooltip: 'Aufnahme starten',
                       padding: EdgeInsets.zero,
@@ -297,10 +338,10 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       margin: EdgeInsets.only(bottom: 8),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isPlaying ? Color(0xFF45A173).withOpacity(0.1) : Colors.white,
+        color: isPlaying ? Color(0xFF5A7D7D).withOpacity(0.1) : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isPlaying ? Color(0xFF45A173) : Colors.grey.shade300,
+          color: isPlaying ? Color(0xFF5A7D7D) : Colors.grey.shade300,
         ),
       ),
       child: Row(
@@ -310,7 +351,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
             onPressed: () => _playAudio(audio),
             icon: Icon(
               isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Color(0xFF45A173),
+              color: Color(0xFF5A7D7D),
             ),
           ),
 

@@ -30,7 +30,52 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
   }
 
   void _startRecording() async {
+    // Prüfe zuerst ob Aufnahme möglich ist
+    final canRecord = await _audioService.canStartRecording();
+    if (!canRecord) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Audio-Aufnahme momentan nicht möglich. Bitte schließen Sie andere Audio-Apps und versuchen Sie es erneut.'),
+          backgroundColor: Color(0xFF8C0A28),
+          action: SnackBarAction(
+            label: 'Erneut versuchen',
+            textColor: Colors.white,
+            onPressed: () => _startRecording(),
+          ),
+          duration: Duration(seconds: 6),
+        ),
+      );
+      return;
+    }
+
+    // Zeige Loading-Indikator
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+            SizedBox(width: 12),
+            Text('Audio-Aufnahme wird vorbereitet...'),
+          ],
+        ),
+        backgroundColor: Color(0xFF5A7D7D),
+        duration: Duration(seconds: 12), // Länger wegen mehr Retry-Versuchen
+      ),
+    );
+
     final success = await _audioService.startRecording();
+
+    // Verstecke Loading-Indikator
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
     if (success) {
       setState(() {
         _recordingDuration = Duration.zero;
@@ -41,19 +86,26 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
           _recordingDuration = _audioService.recordingDuration;
         });
       });
-    } else {
-      // Bei Fehlern Audio-Service zurücksetzen
-      await _audioService.resetAudioService();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          content: Text('Audio-Aufnahme zur Impulsfrage gestartet'),
+          backgroundColor: Color(0xFF8C0A28),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
           content: Text(
-              'Fehler beim Starten der Aufnahme. Audio-Service wurde zurückgesetzt.'),
+              'Fehler beim Starten der Aufnahme. Bitte versuchen Sie es erneut.'),
           backgroundColor: Color(0xFF8C0A28),
           action: SnackBarAction(
             label: 'Erneut versuchen',
+            textColor: Colors.white,
             onPressed: () => _startRecording(),
           ),
+          duration: Duration(seconds: 5),
         ),
       );
     }
@@ -133,22 +185,24 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
   Widget build(BuildContext context) {
     return Consumer<AudioProvider>(
       builder: (context, audioProvider, child) {
-        // Nur die neueste Audio-Aufnahme für diese Etappe anzeigen
+        // Alle Audio-Aufnahmen für diese Etappe anzeigen
         final audioAufnahmen =
             audioProvider.getAudioAufnahmenByEtappe(widget.etappenId);
-        final neuesteAufnahme =
-            audioAufnahmen.isNotEmpty ? audioAufnahmen.last : null;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Aufnahme-Steuerung oder vorhandene Aufnahme
+            // Aufnahme-Steuerung
             if (_audioService.isRecording)
               _buildRecordingControls()
-            else if (neuesteAufnahme != null)
-              _buildExistingAudio(neuesteAufnahme)
             else
               _buildStartRecordingButton(),
+
+            // Vorhandene Aufnahmen anzeigen
+            if (audioAufnahmen.isNotEmpty) ...[
+              SizedBox(height: 16),
+              _buildAudioList(audioAufnahmen),
+            ],
           ],
         );
       },
@@ -247,10 +301,31 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
     );
   }
 
-  Widget _buildExistingAudio(AudioAufnahme audio) {
+  Widget _buildAudioList(List<AudioAufnahme> audioAufnahmen) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Audio-Notizen zur Impulsfrage (${audioAufnahmen.length})',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF8C0A28),
+          ),
+        ),
+        SizedBox(height: 8),
+        ...audioAufnahmen.reversed
+            .map((audio) => _buildAudioTile(audio))
+            .toList(),
+      ],
+    );
+  }
+
+  Widget _buildAudioTile(AudioAufnahme audio) {
     final isPlaying = _playingAudioId == audio.id;
 
     return Container(
+      margin: EdgeInsets.only(bottom: 8),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isPlaying ? Color(0xFF8C0A28).withOpacity(0.1) : Colors.white,
@@ -280,7 +355,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Audio-Notiz zur Impulsfrage',
+                  'Aufnahme vom ${audio.aufnahmeZeit.day}.${audio.aufnahmeZeit.month}.${audio.aufnahmeZeit.year}',
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
@@ -288,29 +363,78 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
                   ),
                 ),
                 SizedBox(height: 2),
-                Text(
-                  'Dauer: ${audio.formatierteDauer}',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 12,
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.access_time, size: 14, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      audio.formatierteDauer,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Icon(Icons.schedule, size: 14, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      '${audio.aufnahmeZeit.hour.toString().padLeft(2, '0')}:${audio.aufnahmeZeit.minute.toString().padLeft(2, '0')}',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          // Neue Aufnahme Button
-          TextButton.icon(
-            onPressed: _startRecording,
-            icon: Icon(Icons.add, size: 16),
-            label: Text('Neu', style: TextStyle(fontSize: 12)),
-            style: TextButton.styleFrom(
-              foregroundColor: Color(0xFF8C0A28),
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            ),
+          // Delete Button
+          IconButton(
+            onPressed: () => _deleteAudio(audio),
+            icon: Icon(Icons.delete_outline,
+                color: Colors.grey.shade600, size: 18),
+            constraints: BoxConstraints(),
+            padding: EdgeInsets.zero,
+            tooltip: 'Löschen',
           ),
         ],
       ),
     );
+  }
+
+  void _deleteAudio(AudioAufnahme audio) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Audio-Notiz löschen'),
+        content: Text(
+            'Möchten Sie diese Audio-Notiz zur Impulsfrage wirklich löschen?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF8C0A28)),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+      await audioProvider.deleteAudioAufnahme(audio.id);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Audio-Notiz gelöscht'),
+          backgroundColor: Color(0xFF8C0A28),
+        ),
+      );
+    }
   }
 }

@@ -49,7 +49,7 @@ class WetterWidget extends StatelessWidget {
             height: 20,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF45A173)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5A7D7D)),
             ),
           ),
           SizedBox(width: 12),
@@ -141,9 +141,9 @@ class WetterWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Color(0xFF45A173).withOpacity(0.1),
+        color: Color(0xFF5A7D7D).withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Color(0xFF45A173).withOpacity(0.3)),
+        border: Border.all(color: Color(0xFF5A7D7D).withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -158,7 +158,7 @@ class WetterWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF45A173),
+              color: Color(0xFF5A7D7D),
             ),
           ),
           if (onRefresh != null) ...[
@@ -168,7 +168,7 @@ class WetterWidget extends StatelessWidget {
               child: Icon(
                 Icons.refresh,
                 size: 16,
-                color: Color(0xFF45A173).withOpacity(0.7),
+                color: Color(0xFF5A7D7D).withOpacity(0.7),
               ),
             ),
           ],
@@ -181,9 +181,9 @@ class WetterWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF45A173).withOpacity(0.05),
+        color: Color(0xFF5A7D7D).withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Color(0xFF45A173).withOpacity(0.2)),
+        border: Border.all(color: Color(0xFF5A7D7D).withOpacity(0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +205,7 @@ class WetterWidget extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF45A173),
+                        color: Color(0xFF5A7D7D),
                       ),
                     ),
                     Text(
@@ -230,7 +230,7 @@ class WetterWidget extends StatelessWidget {
                 IconButton(
                   icon: Icon(Icons.refresh),
                   onPressed: onRefresh,
-                  color: Color(0xFF45A173),
+                  color: Color(0xFF5A7D7D),
                 ),
             ],
           ),

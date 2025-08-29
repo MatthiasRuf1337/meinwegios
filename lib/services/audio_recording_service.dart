@@ -23,74 +23,114 @@ class AudioRecordingService {
 
   // Aufnahme starten
   Future<bool> startRecording() async {
-    try {
-      // Prüfen ob bereits aufgenommen wird
-      if (_audioManager.isRecording) {
-        throw Exception('Aufnahme läuft bereits');
+    return await _startRecordingWithRetry();
+  }
+
+  // Aufnahme starten mit Retry-Logik
+  Future<bool> _startRecordingWithRetry({int maxRetries = 3}) async {
+    for (int attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        print('Starte Aufnahme-Versuch ${attempt + 1} von ${maxRetries + 1}');
+
+        // Prüfen ob bereits aufgenommen wird
+        if (_audioManager.isRecording) {
+          throw Exception('Aufnahme läuft bereits');
+        }
+
+        // Bei Wiederholungsversuchen: Audio-Session-Verfügbarkeit prüfen
+        if (attempt > 0) {
+          print('Prüfe Audio-Session-Verfügbarkeit...');
+          final sessionAvailable =
+              await _audioManager.isAudioSessionAvailable();
+          if (!sessionAvailable) {
+            print('Audio-Session nicht verfügbar, warte länger...');
+            await Future.delayed(Duration(milliseconds: 3000));
+          }
+        }
+
+        // Alle Audio-Aktivitäten stoppen
+        await _audioManager.stopAllAudio();
+
+        // Mikrofon-Berechtigung prüfen
+        final hasPermission =
+            await PermissionService.requestMicrophonePermission();
+        if (!hasPermission) {
+          throw Exception('Mikrofon-Berechtigung verweigert');
+        }
+
+        // Prüfen ob der Recorder die Berechtigung hat
+        final recorder = _audioManager.getRecorder();
+        final hasRecordPermission = await recorder.hasPermission();
+        if (!hasRecordPermission) {
+          throw Exception('Record-Package hat keine Mikrofon-Berechtigung');
+        }
+
+        // Aufnahme-Pfad erstellen
+        final directory = await getApplicationDocumentsDirectory();
+        final audioDir = Directory(p.join(directory.path, 'audio'));
+        if (!audioDir.existsSync()) {
+          await audioDir.create(recursive: true);
+        }
+
+        final fileName = 'audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
+        final filePath = p.join(audioDir.path, fileName);
+
+        // Progressive Verzögerung vor dem Start
+        final delay = 500 + (attempt * 1000); // 500ms, 1.5s, 2.5s, 3.5s
+        print('Warte ${delay}ms vor Aufnahme-Start...');
+        await Future.delayed(Duration(milliseconds: delay));
+
+        // Aufnahme mit Standard-Konfiguration starten
+        print('Starte Recorder...');
+        await recorder.start(
+          const RecordConfig(),
+          path: filePath,
+        );
+
+        _currentRecordingPath = filePath;
+        _audioManager.setRecordingStatus(true);
+        _recordingStartTime = DateTime.now();
+
+        print('Audio-Aufnahme erfolgreich gestartet (Versuch ${attempt + 1})');
+        return true;
+      } catch (e) {
+        print('Fehler beim Starten der Aufnahme (Versuch ${attempt + 1}): $e');
+        print('Fehler-Typ: ${e.runtimeType}');
+        if (e is Exception) {
+          print('Exception Details: ${e.toString()}');
+        }
+
+        // Cleanup bei Fehler
+        _audioManager.setRecordingStatus(false);
+        _currentRecordingPath = null;
+        _recordingStartTime = null;
+
+        // Bei Session-Fehlern und noch Versuche übrig
+        if ((e.toString().contains('setActive') ||
+                e.toString().contains('Session activation failed')) &&
+            attempt < maxRetries) {
+          print(
+              'Audio-Session-Konflikt erkannt. Führe kompletten Reset durch...');
+
+          // Kompletter Audio-Service Reset
+          await resetAudioService();
+
+          // Exponentiell längere Pause vor dem nächsten Versuch
+          final waitTime = 2000 + (attempt * 2000); // 2s, 4s, 6s
+          print('Warte ${waitTime}ms vor nächstem Versuch...');
+          await Future.delayed(Duration(milliseconds: waitTime));
+          continue;
+        }
+
+        // Bei letztem Versuch oder anderen Fehlern
+        if (attempt == maxRetries) {
+          print(
+              'Alle ${maxRetries + 1} Versuche fehlgeschlagen. Aufnahme konnte nicht gestartet werden.');
+          return false;
+        }
       }
-
-      // Alle Audio-Aktivitäten stoppen
-      await _audioManager.stopAllAudio();
-
-      // Mikrofon-Berechtigung prüfen
-      final hasPermission =
-          await PermissionService.requestMicrophonePermission();
-      if (!hasPermission) {
-        throw Exception('Mikrofon-Berechtigung verweigert');
-      }
-
-      // Prüfen ob der Recorder die Berechtigung hat
-      final recorder = _audioManager.getRecorder();
-      final hasRecordPermission = await recorder.hasPermission();
-      if (!hasRecordPermission) {
-        throw Exception('Record-Package hat keine Mikrofon-Berechtigung');
-      }
-
-      // Aufnahme-Pfad erstellen
-      final directory = await getApplicationDocumentsDirectory();
-      final audioDir = Directory(p.join(directory.path, 'audio'));
-      if (!audioDir.existsSync()) {
-        await audioDir.create(recursive: true);
-      }
-
-      final fileName = 'audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
-      final filePath = p.join(audioDir.path, fileName);
-
-      // Kurze Verzögerung vor dem Start
-      await Future.delayed(Duration(milliseconds: 200));
-
-      // Aufnahme mit Standard-Konfiguration starten
-      await recorder.start(
-        const RecordConfig(),
-        path: filePath,
-      );
-
-      _currentRecordingPath = filePath;
-      _audioManager.setRecordingStatus(true);
-      _recordingStartTime = DateTime.now();
-
-      return true;
-    } catch (e) {
-      print('Fehler beim Starten der Aufnahme: $e');
-      print('Fehler-Typ: ${e.runtimeType}');
-      if (e is Exception) {
-        print('Exception Details: ${e.toString()}');
-      }
-
-      // Cleanup bei Fehler
-      _audioManager.setRecordingStatus(false);
-      _currentRecordingPath = null;
-      _recordingStartTime = null;
-
-      // Zusätzliche Informationen bei Session-Fehlern
-      if (e.toString().contains('setActive') ||
-          e.toString().contains('Session activation failed')) {
-        print(
-            'Audio-Session-Konflikt erkannt. Versuche es in ein paar Sekunden erneut.');
-      }
-
-      return false;
     }
+    return false;
   }
 
   // Aufnahme stoppen
@@ -250,14 +290,47 @@ class AudioRecordingService {
     try {
       print('Audio-Service wird zurückgesetzt...');
 
-      await _audioManager.stopAllAudio();
+      // Cleanup lokaler Variablen
+      _currentRecordingPath = null;
+      _recordingStartTime = null;
 
-      // Kurze Pause
-      await Future.delayed(Duration(milliseconds: 500));
+      // Audio-Session komplett zurücksetzen
+      await _audioManager.resetAudioSession();
 
       print('Audio-Service erfolgreich zurückgesetzt');
     } catch (e) {
       print('Fehler beim Zurücksetzen des Audio-Services: $e');
+    }
+  }
+
+  // Prüft ob Audio-Aufnahme möglich ist (ohne tatsächlich aufzunehmen)
+  Future<bool> canStartRecording() async {
+    try {
+      // Prüfe Berechtigung
+      final hasPermission =
+          await PermissionService.requestMicrophonePermission();
+      if (!hasPermission) {
+        print('Keine Mikrofon-Berechtigung');
+        return false;
+      }
+
+      // Prüfe Audio-Session
+      final sessionAvailable = await _audioManager.isAudioSessionAvailable();
+      if (!sessionAvailable) {
+        print('Audio-Session nicht verfügbar');
+        return false;
+      }
+
+      // Prüfe ob bereits aufgenommen wird
+      if (_audioManager.isRecording) {
+        print('Aufnahme läuft bereits');
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      print('Fehler beim Prüfen der Aufnahme-Bereitschaft: $e');
+      return false;
     }
   }
 

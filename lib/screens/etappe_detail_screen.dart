@@ -12,6 +12,7 @@ import '../models/notiz.dart';
 import '../providers/etappen_provider.dart';
 import '../providers/bilder_provider.dart';
 import '../providers/notiz_provider.dart';
+import '../providers/audio_provider.dart';
 import '../services/database_service.dart';
 import '../services/permission_service.dart';
 import 'bild_detail_screen.dart';
@@ -39,14 +40,49 @@ class EtappeDetailScreen extends StatefulWidget {
   _EtappeDetailScreenState createState() => _EtappeDetailScreenState();
 }
 
-class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
+class _EtappeDetailScreenState extends State<EtappeDetailScreen>
+    with WidgetsBindingObserver {
   final ImagePicker _picker = ImagePicker();
   final ImpulsfrageService _impulsfrageService = ImpulsfrageService();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initializeImpulsfragen();
+
+    // Provider laden
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<BilderProvider>(context, listen: false).loadBilder();
+      Provider.of<AudioProvider>(context, listen: false).loadAudioAufnahmen();
+      Provider.of<NotizProvider>(context, listen: false).loadNotizen();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print('App wieder aufgenommen - lade Provider neu');
+        // Provider neu laden um sicherzustellen, dass alle Daten aktuell sind
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Provider.of<BilderProvider>(context, listen: false).loadBilder();
+          Provider.of<AudioProvider>(context, listen: false)
+              .loadAudioAufnahmen();
+          Provider.of<NotizProvider>(context, listen: false).loadNotizen();
+        });
+        break;
+      default:
+        break;
+    }
   }
 
   Future<void> _initializeImpulsfragen() async {
@@ -62,7 +98,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Etappen-Details'),
-        backgroundColor: Color(0xFF45A173),
+        backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
         leading: widget.fromCompletedScreen
             ? IconButton(
@@ -97,9 +133,10 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
             ),
         ],
       ),
-      body: Consumer3<EtappenProvider, BilderProvider, NotizProvider>(
-        builder:
-            (context, etappenProvider, bilderProvider, notizProvider, child) {
+      body: Consumer4<EtappenProvider, BilderProvider, NotizProvider,
+          AudioProvider>(
+        builder: (context, etappenProvider, bilderProvider, notizProvider,
+            audioProvider, child) {
           // Verwende die aktualisierte Etappe aus dem Provider, falls verfügbar
           final etappe = etappenProvider.etappen.firstWhere(
               (e) => e.id == widget.etappe.id,
@@ -351,7 +388,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                               children: [
                                 IconButton(
                                   icon: Icon(Icons.camera_alt,
-                                      color: Color(0xFF45A173)),
+                                      color: Color(0xFF5A7D7D)),
                                   onPressed: _showImageSourceDialog,
                                   tooltip: 'Foto aufnehmen',
                                   padding: EdgeInsets.zero,
@@ -360,7 +397,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                 SizedBox(width: 8),
                                 IconButton(
                                   icon: Icon(Icons.photo_library,
-                                      color: Color(0xFF45A173)),
+                                      color: Color(0xFF5A7D7D)),
                                   onPressed: _pickImageFromGallery,
                                   tooltip: 'Aus Galerie auswählen',
                                   padding: EdgeInsets.zero,
@@ -491,7 +528,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                                 ),
                                 IconButton(
                                   icon:
-                                      Icon(Icons.add, color: Color(0xFF45A173)),
+                                      Icon(Icons.add, color: Color(0xFF5A7D7D)),
                                   onPressed: () => _showNotizDialog(),
                                   tooltip: 'Notiz hinzufügen',
                                   padding: EdgeInsets.zero,
@@ -658,14 +695,14 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Color(0xFF45A173), size: 24),
+        Icon(icon, color: Color(0xFF5A7D7D), size: 24),
         SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF45A173),
+            color: Color(0xFF5A7D7D),
           ),
         ),
         Text(
@@ -707,7 +744,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
         text = 'Pausiert';
         break;
       case EtappenStatus.abgeschlossen:
-        color = Color(0xFF45A173);
+        color = Color(0xFF5A7D7D);
         text = 'Abgeschlossen';
         break;
     }
@@ -739,7 +776,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.camera_alt, color: Color(0xFF45A173)),
+              leading: Icon(Icons.camera_alt, color: Color(0xFF5A7D7D)),
               title: Text('Kamera'),
               subtitle: Text('Neues Foto aufnehmen'),
               onTap: () {
@@ -748,7 +785,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library, color: Color(0xFF45A173)),
+              leading: Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
               title: Text('Galerie'),
               subtitle: Text('Bild aus Galerie auswählen'),
               onTap: () {
@@ -997,7 +1034,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide:
-                          BorderSide(color: Color(0xFF45A173), width: 2),
+                          BorderSide(color: Color(0xFF5A7D7D), width: 2),
                     ),
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -1019,7 +1056,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide:
-                          BorderSide(color: Color(0xFF45A173), width: 2),
+                          BorderSide(color: Color(0xFF5A7D7D), width: 2),
                     ),
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -1041,14 +1078,14 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.analytics, color: Color(0xFF45A173)),
+                          Icon(Icons.analytics, color: Color(0xFF5A7D7D)),
                           SizedBox(width: 8),
                           Text(
                             'Statistiken bearbeiten',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF45A173),
+                              color: Color(0xFF5A7D7D),
                             ),
                           ),
                         ],
@@ -1068,7 +1105,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide:
-                                BorderSide(color: Color(0xFF45A173), width: 2),
+                                BorderSide(color: Color(0xFF5A7D7D), width: 2),
                           ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
@@ -1091,7 +1128,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide:
-                                BorderSide(color: Color(0xFF45A173), width: 2),
+                                BorderSide(color: Color(0xFF5A7D7D), width: 2),
                           ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
@@ -1113,7 +1150,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide:
-                                BorderSide(color: Color(0xFF45A173), width: 2),
+                                BorderSide(color: Color(0xFF5A7D7D), width: 2),
                           ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
@@ -1293,7 +1330,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide:
-                          BorderSide(color: Color(0xFF45A173), width: 2),
+                          BorderSide(color: Color(0xFF5A7D7D), width: 2),
                     ),
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -1313,7 +1350,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide:
-                          BorderSide(color: Color(0xFF45A173), width: 2),
+                          BorderSide(color: Color(0xFF5A7D7D), width: 2),
                     ),
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 16),

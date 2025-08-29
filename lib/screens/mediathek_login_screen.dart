@@ -38,7 +38,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF45A173).withOpacity(0.1),
+              Color(0xFF5A7D7D).withOpacity(0.1),
               Colors.white,
             ],
           ),
@@ -83,7 +83,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: Color(0xFF45A173),
+            color: Color(0xFF5A7D7D),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Icon(
@@ -98,7 +98,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF45A173),
+            color: Color(0xFF5A7D7D),
           ),
         ),
         SizedBox(height: 8),
@@ -144,7 +144,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Color(0xFF45A173), width: 2),
+                borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
               ),
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -186,7 +186,7 @@ class _MediathekLoginScreenState extends State<MediathekLoginScreen> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : _validatePIN,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF8C0A28),
+          backgroundColor: Color(0xFF5A7D7D),
           foregroundColor: Colors.white,
           padding: EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(

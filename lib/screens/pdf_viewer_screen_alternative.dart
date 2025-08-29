@@ -25,7 +25,7 @@ class _PDFViewerScreenAlternativeState
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.medienDatei.dateiname),
-        backgroundColor: Color(0xFF45A173),
+        backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -111,7 +111,7 @@ class _PDFViewerScreenAlternativeState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF45A173)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5A7D7D)),
             ),
             SizedBox(height: 16),
             Text(

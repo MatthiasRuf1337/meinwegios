@@ -12,9 +12,11 @@ class GlobalAudioManager {
 
   bool _isRecording = false;
   bool _isPlaying = false;
+  bool _isResetting = false;
 
   bool get isRecording => _isRecording;
   bool get isPlaying => _isPlaying;
+  bool get isResetting => _isResetting;
 
   /// Globalen AudioPlayer abrufen (Singleton)
   AudioPlayer getPlayer() {
@@ -24,7 +26,9 @@ class GlobalAudioManager {
 
   /// Globalen AudioRecorder abrufen (Singleton)
   AudioRecorder getRecorder() {
-    _globalRecorder ??= AudioRecorder();
+    if (_globalRecorder == null || _isResetting) {
+      _globalRecorder = AudioRecorder();
+    }
     return _globalRecorder!;
   }
 
@@ -42,6 +46,72 @@ class GlobalAudioManager {
       }
     } catch (e) {
       print('Fehler beim Stoppen aller Audio-Aktivitäten: $e');
+    }
+  }
+
+  /// Audio-Session komplett zurücksetzen
+  Future<void> resetAudioSession() async {
+    try {
+      _isResetting = true;
+      print('Audio-Session wird zurückgesetzt...');
+
+      // Alle Aktivitäten stoppen
+      await stopAllAudio();
+
+      // Recorder komplett neu erstellen
+      if (_globalRecorder != null) {
+        try {
+          await _globalRecorder!.dispose();
+        } catch (e) {
+          print('Fehler beim Dispose des Recorders: $e');
+        }
+        _globalRecorder = null;
+      }
+
+      // Player komplett neu erstellen
+      if (_globalPlayer != null) {
+        try {
+          await _globalPlayer!.dispose();
+        } catch (e) {
+          print('Fehler beim Dispose des Players: $e');
+        }
+        _globalPlayer = null;
+      }
+
+      // Längere Pause für iOS Audio-Session (iOS braucht mehr Zeit)
+      await Future.delayed(Duration(milliseconds: 2000));
+
+      _isResetting = false;
+      print('Audio-Session erfolgreich zurückgesetzt');
+    } catch (e) {
+      _isResetting = false;
+      print('Fehler beim Zurücksetzen der Audio-Session: $e');
+    }
+  }
+
+  /// Prüft ob Audio-Session verfügbar ist
+  Future<bool> isAudioSessionAvailable() async {
+    try {
+      // Teste mit einem temporären Recorder
+      final testRecorder = AudioRecorder();
+      final hasPermission = await testRecorder.hasPermission();
+
+      if (!hasPermission) {
+        await testRecorder.dispose();
+        return false;
+      }
+
+      // Teste ob Session aktiviert werden kann
+      try {
+        await testRecorder.dispose();
+        return true;
+      } catch (e) {
+        print('Audio-Session nicht verfügbar: $e');
+        return false;
+      }
+    } catch (e) {
+      print('Fehler beim Prüfen der Audio-Session: $e');
+      return false;
     }
   }
 
@@ -74,4 +144,3 @@ class GlobalAudioManager {
     }
   }
 }
-

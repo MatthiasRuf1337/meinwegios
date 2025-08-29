@@ -16,7 +16,7 @@ class BildDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Bild Details'),
-        backgroundColor: Color(0xFF45A173),
+        backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
         actions: [
           IconButton(

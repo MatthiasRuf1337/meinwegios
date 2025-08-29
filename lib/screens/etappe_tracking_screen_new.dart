@@ -101,6 +101,13 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         break;
       case AppLifecycleState.resumed:
         print('App wieder aufgenommen');
+        // Provider neu laden um sicherzustellen, dass alle Daten aktuell sind
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Provider.of<BilderProvider>(context, listen: false).loadBilder();
+          Provider.of<AudioProvider>(context, listen: false)
+              .loadAudioAufnahmen();
+          Provider.of<NotizProvider>(context, listen: false).loadNotizen();
+        });
         break;
       case AppLifecycleState.detached:
         print('App wird beendet - speichere finale Daten');
@@ -214,7 +221,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         return Scaffold(
           appBar: AppBar(
             title: Text(currentEtappe.name),
-            backgroundColor: Color(0xFF45A173),
+            backgroundColor: Color(0xFF5A7D7D),
             foregroundColor: Colors.white,
             actions: [
               Container(
@@ -265,7 +272,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     return Scaffold(
       appBar: AppBar(
         title: Text('Tracking'),
-        backgroundColor: Color(0xFF45A173),
+        backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
       ),
       body: Center(
@@ -305,7 +312,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF45A173)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5A7D7D)),
             ),
             SizedBox(height: 16),
             Text('Tracking wird initialisiert...'),
@@ -379,7 +386,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                 size: 20,
                 color: data.isPaused
                     ? (data.isPausedBySpeed ? Colors.red : Colors.orange)
-                    : Color(0xFF45A173),
+                    : Color(0xFF5A7D7D),
               ),
               SizedBox(width: 12),
               Text(
@@ -393,7 +400,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                       ? (data.isPausedBySpeed
                           ? Colors.red.shade800
                           : Colors.orange.shade800)
-                      : Color(0xFF45A173),
+                      : Color(0xFF5A7D7D),
                 ),
               ),
             ],
@@ -408,7 +415,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   ? (data.isPausedBySpeed
                       ? Colors.red.shade700
                       : Colors.orange.shade700)
-                  : Color(0xFF45A173),
+                  : Color(0xFF5A7D7D),
             ),
           ),
         ],
@@ -495,14 +502,14 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Color(0xFF45A173), size: 24),
+        Icon(icon, color: Color(0xFF5A7D7D), size: 24),
         SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF45A173),
+            color: Color(0xFF5A7D7D),
           ),
         ),
         Text(
@@ -561,7 +568,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                       decoration: BoxDecoration(
                         color: _audioService.isRecording
                             ? Colors.red
-                            : Color(0xFF45A173),
+                            : Color(0xFF5A7D7D),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -621,7 +628,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         if (audioAufnahmen.isNotEmpty) ...[
           Row(
             children: [
-              Icon(Icons.mic, size: 16, color: Color(0xFF45A173)),
+              Icon(Icons.mic, size: 16, color: Color(0xFF5A7D7D)),
               SizedBox(width: 8),
               Text(
                 '${audioAufnahmen.length} Audio-Aufnahme${audioAufnahmen.length != 1 ? 'n' : ''}',
@@ -708,13 +715,13 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: Color(0xFF45A173).withOpacity(0.1),
+                  color: Color(0xFF5A7D7D).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Color(0xFF45A173).withOpacity(0.3)),
+                  border: Border.all(color: Color(0xFF5A7D7D).withOpacity(0.3)),
                 ),
                 child: Icon(
                   Icons.audiotrack,
-                  color: Color(0xFF45A173),
+                  color: Color(0xFF5A7D7D),
                   size: 24,
                 ),
               )),
@@ -780,7 +787,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                 _buildActionMenuItem(
                   icon: Icons.camera_alt,
                   label: 'Foto',
-                  color: Color(0xFF45A173),
+                  color: Color(0xFF5A7D7D),
                   onTap: () {
                     Navigator.pop(context);
                     _takePhoto();
@@ -791,7 +798,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   label: _audioService.isRecording ? 'Stopp' : 'Audio',
                   color: _audioService.isRecording
                       ? Colors.red
-                      : Color(0xFF45A173),
+                      : Color(0xFF5A7D7D),
                   onTap: () {
                     Navigator.pop(context);
                     _recordAudio();
@@ -800,7 +807,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                 _buildActionMenuItem(
                   icon: Icons.note_add,
                   label: 'Notiz',
-                  color: Color(0xFF45A173),
+                  color: Color(0xFF5A7D7D),
                   onTap: () {
                     Navigator.pop(context);
                     _addNote();
@@ -1014,19 +1021,53 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       }
     } else {
       // Aufnahme starten
+      // Zeige Loading-Indikator
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              SizedBox(width: 12),
+              Text('Audio-Aufnahme wird vorbereitet...'),
+            ],
+          ),
+          backgroundColor: Color(0xFF5A7D7D),
+          duration: Duration(seconds: 8),
+        ),
+      );
+
       final success = await _audioService.startRecording();
+
+      // Verstecke Loading-Indikator
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Audio-Aufnahme gestartet'),
             backgroundColor: Color(0xFF8C0A28),
+            duration: Duration(seconds: 2),
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Fehler beim Starten der Aufnahme'),
+            content: Text(
+                'Fehler beim Starten der Aufnahme. Bitte versuchen Sie es erneut.'),
             backgroundColor: Color(0xFF8C0A28),
+            action: SnackBarAction(
+              label: 'Erneut versuchen',
+              textColor: Colors.white,
+              onPressed: () => _recordAudio(),
+            ),
+            duration: Duration(seconds: 5),
           ),
         );
       }
@@ -1073,7 +1114,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF45A173), width: 2),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -1089,7 +1130,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF45A173), width: 2),
+                    borderSide: BorderSide(color: Color(0xFF5A7D7D), width: 2),
                   ),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 16),
