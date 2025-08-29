@@ -16,18 +16,18 @@ class LegalMenuWidget extends StatelessWidget {
             children: [
               Icon(Icons.info_outline, size: 18, color: Color(0xFF5A7D7D)),
               SizedBox(width: 12),
-              Text('Impressum'),
+              Text('Impressum & Datenschutz'),
             ],
           ),
         ),
         PopupMenuItem<String>(
-          value: 'datenschutz',
+          value: 'nutzungsbedingungen',
           child: Row(
             children: [
-              Icon(Icons.privacy_tip_outlined,
+              Icon(Icons.description_outlined,
                   size: 18, color: Color(0xFF5A7D7D)),
               SizedBox(width: 12),
-              Text('Datenschutz'),
+              Text('Nutzungsbedingungen'),
             ],
           ),
         ),
@@ -40,10 +40,10 @@ class LegalMenuWidget extends StatelessWidget {
 
     switch (value) {
       case 'impressum':
-        url = 'https://www.der-pilger.de/impressum/';
+        url = 'https://www.pilgerverlag.de/index.php?id=151';
         break;
-      case 'datenschutz':
-        url = 'https://www.der-pilger.de/datenschutz/';
+      case 'nutzungsbedingungen':
+        url = 'https://www.pilgerverlag.de/index.php?id=148';
         break;
       default:
         return;
