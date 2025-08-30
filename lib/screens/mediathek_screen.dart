@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:open_file/open_file.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../providers/medien_provider.dart';
@@ -87,7 +86,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
             onPressed: () => _importMedia(context),
             backgroundColor: Color(0xFF5A7D7D),
             child: Icon(Icons.add, color: Colors.white),
-            tooltip: 'Medien importieren',
+            tooltip: 'Datei hinzufügen',
           ),
         );
       },
@@ -389,7 +388,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Medien hinzufügen',
+              'Datei hinzufügen',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -397,31 +396,23 @@ class _MediathekScreenState extends State<MediathekScreen> {
             ),
             SizedBox(height: 20),
             ListTile(
-              leading: Icon(Icons.photo_camera, color: Color(0xFF5A7D7D)),
-              title: Text('Kamera'),
-              subtitle: Text('Foto aufnehmen'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImageFromCamera();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
-              title: Text('Galerie'),
-              subtitle: Text('Foto aus Galerie wählen'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickImageFromGallery();
-              },
-            ),
-            ListTile(
               leading: Icon(Icons.folder_open, color: Color(0xFF5A7D7D)),
               title: Text('Datei auswählen'),
-              subtitle: Text('PDF, MP3, Bilder oder andere Dateien'),
+              subtitle: Text('PDF, MP3, Dokumente oder andere Dateien'),
               onTap: () {
                 Navigator.pop(context);
                 _pickFile();
               },
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Hinweis: Bilder können über die Etappen-Details hinzugefügt werden',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
+                fontStyle: FontStyle.italic,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -429,37 +420,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
     );
   }
 
-  void _pickImageFromCamera() async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 80,
-      );
 
-      if (image != null) {
-        await _importFile(File(image.path));
-      }
-    } catch (e) {
-      _showErrorSnackBar('Fehler beim Aufnehmen des Fotos: $e');
-    }
-  }
-
-  void _pickImageFromGallery() async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-
-      if (image != null) {
-        await _importFile(File(image.path));
-      }
-    } catch (e) {
-      _showErrorSnackBar('Fehler beim Auswählen des Fotos: $e');
-    }
-  }
 
   void _pickFile() async {
     try {
