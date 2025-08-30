@@ -528,7 +528,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       builder: (context, bilderProvider, audioProvider, notizProvider, child) {
         final bilder = bilderProvider.getBilderByEtappe(widget.etappe.id);
         final audioAufnahmen =
-            audioProvider.getAudioAufnahmenByEtappe(widget.etappe.id);
+            audioProvider.getAllgemeineAudioByEtappe(widget.etappe.id);
         final notizen = notizProvider.getNotizenByEtappe(widget.etappe.id);
 
         return Container(

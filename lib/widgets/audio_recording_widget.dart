@@ -175,7 +175,10 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
             child: Text('Abbrechen'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF8C0A28)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF8C0A28),
+              foregroundColor: Colors.white,
+            ),
             onPressed: () => Navigator.of(context).pop(true),
             child: Text('Löschen'),
           ),
