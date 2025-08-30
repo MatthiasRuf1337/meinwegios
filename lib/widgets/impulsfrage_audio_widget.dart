@@ -238,7 +238,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
         Container(
           padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.1),
+            color: Color(0xFF8C0A28).withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -248,7 +248,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: Colors.red,
+                  color: Color(0xFF8C0A28),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -258,7 +258,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Colors.red,
+                  color: Color(0xFF8C0A28),
                 ),
               ),
             ],

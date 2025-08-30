@@ -567,7 +567,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: _audioService.isRecording
-                            ? Colors.red
+                            ? Color(0xFF8C0A28)
                             : Color(0xFF5A7D7D),
                         shape: BoxShape.circle,
                       ),
@@ -797,7 +797,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   icon: _audioService.isRecording ? Icons.stop : Icons.mic,
                   label: _audioService.isRecording ? 'Stopp' : 'Audio',
                   color: _audioService.isRecording
-                      ? Colors.red
+                      ? Color(0xFF8C0A28)
                       : Color(0xFF5A7D7D),
                   onTap: () {
                     Navigator.pop(context);

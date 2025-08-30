@@ -11,6 +11,27 @@ class LegalMenuWidget extends StatelessWidget {
       onSelected: (String value) => _handleMenuSelection(context, value),
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<String>(
+          value: 'marco',
+          child: Row(
+            children: [
+              Icon(Icons.person, size: 18, color: Color(0xFF5A7D7D)),
+              SizedBox(width: 12),
+              Text('Marco'),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'buch',
+          child: Row(
+            children: [
+              Icon(Icons.book, size: 18, color: Color(0xFF5A7D7D)),
+              SizedBox(width: 12),
+              Text('Buch "Mein Weg - Meine Reise"'),
+            ],
+          ),
+        ),
+        PopupMenuDivider(),
+        PopupMenuItem<String>(
           value: 'impressum',
           child: Row(
             children: [
@@ -39,6 +60,12 @@ class LegalMenuWidget extends StatelessWidget {
     String url;
 
     switch (value) {
+      case 'marco':
+        url = 'https://www.helden-im-jetzt.de/mein-weg/meine-reise';
+        break;
+      case 'buch':
+        url = 'https://www.pilgerverlag.de/buecher/neu-mein-weg-meine-reise';
+        break;
       case 'impressum':
         url = 'https://www.pilgerverlag.de/index.php?id=151';
         break;

@@ -562,7 +562,7 @@ class DatabaseService {
         schrittAnzahl: 42000, // Realistische Schrittanzahl für 30km
         gpsPunkte: _createExampleGPSPoints(),
         notizen:
-            'Du kannst diese Beispiel-Etappe jederzeit löschen. Tipp: Nutze die App, um deine eigenen Wanderungen zu dokumentieren!',
+            'Tipp: Nutze die App weniger für Zahlen und Fakten. Konzentriere dich auf deine persönlichen Eindrücke und Erfahrungen.',
         erstellungsDatum: DateTime(2025, 8, 1, 6, 0),
         bildIds: bildId != null ? [bildId] : [],
         startWetter: beispielWetter,

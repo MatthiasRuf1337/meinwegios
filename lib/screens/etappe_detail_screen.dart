@@ -384,26 +384,13 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                                 color: Colors.grey.shade600,
                               ),
                             ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.camera_alt,
-                                      color: Color(0xFF5A7D7D)),
-                                  onPressed: _showImageSourceDialog,
-                                  tooltip: 'Foto aufnehmen',
-                                  padding: EdgeInsets.zero,
-                                  constraints: BoxConstraints(),
-                                ),
-                                SizedBox(width: 8),
-                                IconButton(
-                                  icon: Icon(Icons.photo_library,
-                                      color: Color(0xFF5A7D7D)),
-                                  onPressed: _pickImageFromGallery,
-                                  tooltip: 'Aus Galerie auswählen',
-                                  padding: EdgeInsets.zero,
-                                  constraints: BoxConstraints(),
-                                ),
-                              ],
+                            IconButton(
+                              icon: Icon(Icons.camera_alt,
+                                  color: Color(0xFF5A7D7D)),
+                              onPressed: _showImageSourceDialog,
+                              tooltip: 'Bild hinzufügen',
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
                             ),
                           ],
                         ),
@@ -973,7 +960,10 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
             child: Text('Abbrechen'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF8C0A28)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF8C0A28),
+              foregroundColor: Colors.white,
+            ),
             onPressed: () async {
               Navigator.pop(context);
               final bilderProvider =
@@ -1294,7 +1284,10 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF8C0A28)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF8C0A28),
+              foregroundColor: Colors.white,
+            ),
             child: Text('Löschen'),
           ),
         ],

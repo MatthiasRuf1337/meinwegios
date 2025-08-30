@@ -147,16 +147,8 @@ class SettingsProvider with ChangeNotifier {
   }
 
   bool get isMediathekSessionValid {
-    if (_settings.letzteMediathekAnmeldung == null) {
-      return false;
-    }
-
-    // Session ist 30 Minuten gültig
-    final sessionDuration = Duration(minutes: 30);
-    final now = DateTime.now();
-    final sessionEnd = _settings.letzteMediathekAnmeldung!.add(sessionDuration);
-
-    return now.isBefore(sessionEnd);
+    // Session ist dauerhaft gültig, sobald einmal angemeldet
+    return _settings.letzteMediathekAnmeldung != null;
   }
 
   Future<void> logoutMediathek() async {

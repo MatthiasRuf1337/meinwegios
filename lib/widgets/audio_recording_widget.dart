@@ -272,14 +272,15 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.fiber_manual_record, color: Colors.red, size: 16),
+              Icon(Icons.fiber_manual_record,
+                  color: Color(0xFF8C0A28), size: 16),
               SizedBox(width: 8),
               Text(
                 'Aufnahme läuft: ${_formatDuration(_recordingDuration)}',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.red,
+                  color: Color(0xFF8C0A28),
                 ),
               ),
             ],
