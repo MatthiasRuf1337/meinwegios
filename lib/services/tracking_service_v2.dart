@@ -14,6 +14,7 @@ class TrackingServiceV2 {
   StreamSubscription<Position>? _positionSubscription;
   StreamSubscription<StepCount>? _stepCountSubscription;
   Timer? _trackingTimer;
+  Timer? _watchdogTimer;
 
   // Tracking-Status
   bool _isTracking = false;
@@ -28,6 +29,7 @@ class TrackingServiceV2 {
   Position? _lastValidPosition;
   List<GPSPunkt> _gpsPoints = [];
   double _currentSpeed = 0.0;
+  DateTime? _lastPositionUpdate;
 
   // Schritt-Daten
   int _totalSteps = 0;
@@ -118,6 +120,9 @@ class TrackingServiceV2 {
     // Update-Timer starten
     _startUpdateTimer();
 
+    // Watchdog-Timer starten
+    _startWatchdogTimer();
+
     print('TrackingServiceV2: Tracking erfolgreich gestartet');
     _notifyUpdate();
     return true;
@@ -158,10 +163,12 @@ class TrackingServiceV2 {
     await _positionSubscription?.cancel();
     await _stepCountSubscription?.cancel();
     _trackingTimer?.cancel();
+    _watchdogTimer?.cancel();
 
     _positionSubscription = null;
     _stepCountSubscription = null;
     _trackingTimer = null;
+    _watchdogTimer = null;
 
     final finalData = currentData;
 
@@ -200,6 +207,7 @@ class TrackingServiceV2 {
     if (!_isTracking) return;
 
     _currentPosition = position;
+    _lastPositionUpdate = DateTime.now(); // Watchdog-Zeitstempel
 
     // Geschwindigkeit berechnen (m/s zu km/h)
     _currentSpeed = (position.speed * 3.6).clamp(0.0, 50.0);
@@ -654,6 +662,60 @@ class TrackingServiceV2 {
         speed: 0.0,
         speedAccuracy: 0.0,
       );
+    }
+  }
+
+  // Watchdog-Timer starten
+  void _startWatchdogTimer() {
+    _watchdogTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
+      if (!_isTracking) {
+        timer.cancel();
+        return;
+      }
+
+      _checkGPSWatchdog();
+    });
+  }
+
+  // GPS-Watchdog: Prüft ob GPS-Updates noch ankommen
+  void _checkGPSWatchdog() {
+    if (_lastPositionUpdate != null) {
+      final timeSinceLastUpdate =
+          DateTime.now().difference(_lastPositionUpdate!);
+
+      // Wenn länger als 5 Minuten keine GPS-Updates
+      if (timeSinceLastUpdate.inMinutes > 5) {
+        print(
+            'TrackingServiceV2: GPS-Watchdog - Keine Updates seit ${timeSinceLastUpdate.inMinutes} Minuten');
+        _onError?.call('GPS-Tracking unterbrochen - versuche Neustart');
+
+        // GPS-Stream neu starten
+        _restartGPSStreamInternal();
+      }
+    }
+  }
+
+  // GPS-Stream neu starten (interne Methode)
+  Future<void> _restartGPSStreamInternal() async {
+    if (!_isTracking) return;
+
+    try {
+      print('TrackingServiceV2: Starte GPS-Stream neu...');
+
+      // Alten Stream stoppen
+      await _positionSubscription?.cancel();
+      _positionSubscription = null;
+
+      // Kurze Pause
+      await Future.delayed(Duration(milliseconds: 2000));
+
+      // GPS-Stream neu starten
+      await _startGPSTracking();
+
+      print('TrackingServiceV2: GPS-Stream erfolgreich neu gestartet');
+    } catch (e) {
+      print('TrackingServiceV2: Fehler beim Neustart des GPS-Streams: $e');
+      _onError?.call('GPS-Stream konnte nicht neu gestartet werden: $e');
     }
   }
 }

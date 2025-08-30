@@ -23,6 +23,7 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
   final MapController _mapController = MapController();
   bool _isFollowingUser = true;
   LatLng? _lastCenter;
+  DateTime? _lastMapUpdate;
 
   @override
   void initState() {
@@ -33,11 +34,19 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
   void didUpdateWidget(LiveMapWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    // Batterie-Optimierung: Limitiere Map-Updates auf max. alle 3 Sekunden
+    final now = DateTime.now();
+    if (_lastMapUpdate != null &&
+        now.difference(_lastMapUpdate!).inSeconds < 3) {
+      return;
+    }
+
     // Automatisch zur aktuellen Position zentrieren wenn Follow-Modus aktiv ist
     if (_isFollowingUser &&
         widget.trackingData?.currentPosition != null &&
         widget.trackingData != oldWidget.trackingData) {
       _centerOnCurrentPosition();
+      _lastMapUpdate = now;
     }
   }
 
@@ -80,9 +89,45 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
       return [];
     }
 
-    return widget.trackingData!.gpsPoints
+    final allPoints = widget.trackingData!.gpsPoints
         .map((gpsPoint) => LatLng(gpsPoint.latitude, gpsPoint.longitude))
         .toList();
+
+    // Performance-Optimierung: Reduziere Punkte bei langen Routen
+    return _optimizeRoutePoints(allPoints);
+  }
+
+  // Optimiert GPS-Punkte für bessere Performance
+  List<LatLng> _optimizeRoutePoints(List<LatLng> points) {
+    if (points.length <= 100) {
+      return points; // Kleine Routen brauchen keine Optimierung
+    }
+
+    final optimized = <LatLng>[];
+    const double minDistance = 5.0; // Mindestabstand in Metern
+
+    optimized.add(points.first); // Startpunkt immer behalten
+
+    for (int i = 1; i < points.length - 1; i++) {
+      final lastPoint = optimized.last;
+      final currentPoint = points[i];
+
+      // Berechne Distanz zum letzten behaltenen Punkt
+      final distance =
+          const Distance().as(LengthUnit.Meter, lastPoint, currentPoint);
+
+      // Nur Punkte behalten die weit genug entfernt sind
+      if (distance >= minDistance) {
+        optimized.add(currentPoint);
+      }
+    }
+
+    if (points.isNotEmpty) {
+      optimized.add(points.last); // Endpunkt immer behalten
+    }
+
+    print('Route optimiert: ${points.length} -> ${optimized.length} Punkte');
+    return optimized;
   }
 
   LatLng? _getCurrentPosition() {
@@ -143,14 +188,23 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                 },
               ),
               children: [
-                // OpenStreetMap Tiles
+                // OpenStreetMap Tiles mit Fehlerbehandlung
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.example.meinweg',
                   maxZoom: 18,
+                  // Fallback für Offline-Nutzung
+                  fallbackUrl:
+                      'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  // Tile-Loading-Optimierung
+                  tileProvider: NetworkTileProvider(),
+                  // Fehlerbehandlung
+                  errorTileCallback: (tile, error, stackTrace) {
+                    print('Map-Tile-Fehler: $error');
+                  },
                 ),
 
-                // Route als Polyline
+                // Route als Polyline mit Glättung
                 if (_getRoutePoints().isNotEmpty)
                   PolylineLayer(
                     polylines: [
@@ -158,6 +212,11 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                         points: _getRoutePoints(),
                         strokeWidth: 4.0,
                         color: Color(0xFF5A7D7D),
+                        // Verbesserte Darstellung
+                        borderStrokeWidth: 2.0,
+                        borderColor: Colors.white.withOpacity(0.8),
+                        // Glatte Linien
+                        useStrokeWidthInMeter: false,
                       ),
                     ],
                   ),
@@ -185,23 +244,48 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                         ),
                       ),
 
-                    // Aktuelle Position Marker
+                    // Aktuelle Position Marker mit Pulseffekt
                     if (_getCurrentPosition() != null)
                       Marker(
                         point: _getCurrentPosition()!,
-                        width: 30,
-                        height: 30,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Color(0xFF5A7D7D),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            color: Colors.white,
-                            size: 16,
-                          ),
+                        width: 40,
+                        height: 40,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Pulsierender Hintergrund
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Color(0xFF5A7D7D).withOpacity(0.3),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            // Hauptmarker
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: Color(0xFF5A7D7D),
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                   ],
@@ -289,7 +373,7 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
               ),
             ),
 
-            // Route-Info oben links (GPS-Punkte entfernt für saubere Anzeige)
+            // Erweiterte Route-Info oben links
             if (_getRoutePoints().isNotEmpty)
               Positioned(
                 top: 8,
@@ -297,16 +381,34 @@ class _LiveMapWidgetState extends State<LiveMapWidget> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Color(0xFF5A7D7D),
-                    borderRadius: BorderRadius.circular(4),
+                    color: Color(0xFF5A7D7D).withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    'Live-Route',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.route,
+                        color: Colors.white,
+                        size: 12,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Live-Route (${_getRoutePoints().length} Punkte)',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

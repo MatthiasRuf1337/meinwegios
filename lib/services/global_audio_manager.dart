@@ -49,11 +49,12 @@ class GlobalAudioManager {
     }
   }
 
-  /// Audio-Session komplett zurücksetzen
-  Future<void> resetAudioSession() async {
+  /// Audio-Session komplett zurücksetzen (GPS-freundlich)
+  Future<void> resetAudioSession({bool preserveGPSTracking = true}) async {
     try {
       _isResetting = true;
-      print('Audio-Session wird zurückgesetzt...');
+      print(
+          'Audio-Session wird zurückgesetzt (GPS-freundlich: $preserveGPSTracking)...');
 
       // Alle Aktivitäten stoppen
       await stopAllAudio();
@@ -78,8 +79,14 @@ class GlobalAudioManager {
         _globalPlayer = null;
       }
 
-      // Längere Pause für iOS Audio-Session (iOS braucht mehr Zeit)
-      await Future.delayed(Duration(milliseconds: 2000));
+      // Angepasste Pause basierend auf GPS-Tracking-Status
+      if (preserveGPSTracking) {
+        // Kürzere Pause um GPS-Tracking nicht zu unterbrechen
+        await Future.delayed(Duration(milliseconds: 500));
+      } else {
+        // Längere Pause für iOS Audio-Session (iOS braucht mehr Zeit)
+        await Future.delayed(Duration(milliseconds: 2000));
+      }
 
       _isResetting = false;
       print('Audio-Session erfolgreich zurückgesetzt');

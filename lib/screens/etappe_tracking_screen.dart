@@ -12,6 +12,7 @@ import '../models/etappe.dart' as etappe_models;
 import '../models/bild.dart';
 import '../providers/bilder_provider.dart';
 import '../services/database_service.dart';
+import '../services/global_audio_manager.dart';
 import 'dart:async';
 
 class EtappeTrackingScreen extends StatefulWidget {
@@ -105,6 +106,9 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
           _inBackground = true;
           _saveCurrentSteps('APP_PAUSE'); // Schritte speichern
           _updateEtappeData(); // Finale Speicherung vor Pause
+
+          // GPS-Tracking Status prüfen und sicherstellen, dass es weiterläuft
+          _ensureBackgroundTracking();
         }
         break;
       case AppLifecycleState.resumed:
@@ -114,11 +118,19 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         if (_appPausedTime != null) {
           final pauseDuration = DateTime.now().difference(_appPausedTime!);
           print('App war pausiert für: $pauseDuration');
+
+          // Bei längerer Pause (z.B. Telefonat) GPS-Stream neu starten
+          if (pauseDuration.inMinutes > 1) {
+            _restartGPSTrackingAfterInterruption();
+          }
         }
         // Wenn nicht manuell pausiert, Basis-Schritte nach App-Resume einmalig setzen
         if (!_isPaused) {
           _getCurrentStepsForResume();
         }
+
+        // Audio-Session nach Unterbrechung zurücksetzen
+        _resetAudioSessionAfterInterruption();
         break;
       case AppLifecycleState.detached:
         print('App wird beendet - speichere finale Daten');
@@ -127,6 +139,52 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         break;
       default:
         break;
+    }
+  }
+
+  // Sicherstellen, dass Background-Tracking aktiv bleibt
+  void _ensureBackgroundTracking() {
+    if (_positionSubscription != null && !_isPaused) {
+      print('Stelle sicher, dass Background-Tracking aktiv bleibt...');
+      // Explizit Background-Tracking aktivieren
+      _positionSubscription?.resume();
+    }
+  }
+
+  // GPS-Tracking nach Unterbrechung neu starten
+  void _restartGPSTrackingAfterInterruption() async {
+    if (_positionSubscription != null && !_isPaused) {
+      print('Starte GPS-Tracking nach Unterbrechung neu...');
+
+      // Alten Stream stoppen
+      await _positionSubscription?.cancel();
+
+      // Kurze Pause für System-Recovery
+      await Future.delayed(Duration(milliseconds: 1000));
+
+      // GPS-Tracking neu starten
+      _startGPSTracking();
+    }
+  }
+
+  // Audio-Session nach Unterbrechung zurücksetzen
+  void _resetAudioSessionAfterInterruption() async {
+    try {
+      // Nur zurücksetzen wenn Audio-Manager verfügbar ist
+      final audioManager = GlobalAudioManager();
+      if (audioManager.isResetting) {
+        print('Audio-Session wird bereits zurückgesetzt, warte...');
+        await Future.delayed(Duration(milliseconds: 2000));
+      }
+
+      // Prüfe ob Audio-Session verfügbar ist
+      final isAvailable = await audioManager.isAudioSessionAvailable();
+      if (!isAvailable) {
+        print('Audio-Session nicht verfügbar, setze zurück...');
+        await audioManager.resetAudioSession(preserveGPSTracking: true);
+      }
+    } catch (e) {
+      print('Fehler beim Zurücksetzen der Audio-Session: $e');
     }
   }
 
@@ -345,63 +403,6 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildGPSInfo() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'GPS-Informationen',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16),
-          if (_currentPosition != null) ...[
-            _buildGPSRow(
-                'Breitengrad', _currentPosition!.latitude.toStringAsFixed(6)),
-            _buildGPSRow(
-                'Längengrad', _currentPosition!.longitude.toStringAsFixed(6)),
-            _buildGPSRow(
-                'Höhe', '${_currentPosition!.altitude.toStringAsFixed(1)} m'),
-            _buildGPSRow('Genauigkeit',
-                '${_currentPosition!.accuracy.toStringAsFixed(1)} m'),
-          ] else ...[
-            Text(
-              'GPS-Signal wird gesucht...',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ],
-          SizedBox(height: 8),
-          Text(
-            'GPS-Punkte: ${_gpsPoints.length}',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
