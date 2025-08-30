@@ -7,6 +7,7 @@ class AudioAufnahme {
   final String etappenId;
   final String? notiz;
   final Map<String, dynamic>? metadaten;
+  final String typ; // 'impulsfrage' oder 'allgemein'
 
   AudioAufnahme({
     required this.id,
@@ -17,6 +18,7 @@ class AudioAufnahme {
     required this.etappenId,
     this.notiz,
     this.metadaten,
+    this.typ = 'allgemein', // Standard: allgemeine Audio-Aufnahme
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class AudioAufnahme {
       'etappenId': etappenId,
       'notiz': notiz,
       'metadaten': metadaten != null ? metadaten.toString() : null,
+      'typ': typ,
     };
   }
 
@@ -44,6 +47,7 @@ class AudioAufnahme {
       metadaten: map['metadaten'] != null
           ? Map<String, dynamic>.from(map['metadaten'])
           : null,
+      typ: map['typ'] ?? 'allgemein', // Fallback für bestehende Daten
     );
   }
 
@@ -62,6 +66,7 @@ class AudioAufnahme {
     String? etappenId,
     String? notiz,
     Map<String, dynamic>? metadaten,
+    String? typ,
   }) {
     return AudioAufnahme(
       id: id ?? this.id,
@@ -72,6 +77,7 @@ class AudioAufnahme {
       etappenId: etappenId ?? this.etappenId,
       notiz: notiz ?? this.notiz,
       metadaten: metadaten ?? this.metadaten,
+      typ: typ ?? this.typ,
     );
   }
 

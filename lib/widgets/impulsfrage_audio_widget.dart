@@ -114,7 +114,8 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
   void _stopRecording() async {
     _recordingTimer?.cancel();
 
-    final audioAufnahme = await _audioService.stopRecording(widget.etappenId);
+    final audioAufnahme =
+        await _audioService.stopRecording(widget.etappenId, typ: 'impulsfrage');
     if (audioAufnahme != null) {
       final audioProvider = Provider.of<AudioProvider>(context, listen: false);
       await audioProvider.addAudioAufnahme(audioAufnahme);
@@ -185,9 +186,9 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
   Widget build(BuildContext context) {
     return Consumer<AudioProvider>(
       builder: (context, audioProvider, child) {
-        // Alle Audio-Aufnahmen für diese Etappe anzeigen
+        // Nur Impulsfrage-Audio für diese Etappe anzeigen
         final audioAufnahmen =
-            audioProvider.getAudioAufnahmenByEtappe(widget.etappenId);
+            audioProvider.getImpulsfrageAudioByEtappe(widget.etappenId);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

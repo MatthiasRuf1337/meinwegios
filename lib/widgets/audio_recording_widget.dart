@@ -207,7 +207,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     return Consumer<AudioProvider>(
       builder: (context, audioProvider, child) {
         final audioAufnahmen =
-            audioProvider.getAudioAufnahmenByEtappe(widget.etappenId);
+            audioProvider.getAllgemeineAudioByEtappe(widget.etappenId);
 
         return Card(
           child: Padding(

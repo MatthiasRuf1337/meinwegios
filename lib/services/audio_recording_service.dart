@@ -134,7 +134,8 @@ class AudioRecordingService {
   }
 
   // Aufnahme stoppen
-  Future<AudioAufnahme?> stopRecording(String etappenId) async {
+  Future<AudioAufnahme?> stopRecording(String etappenId,
+      {String typ = 'allgemein'}) async {
     try {
       if (!_audioManager.isRecording ||
           _currentRecordingPath == null ||
@@ -166,6 +167,7 @@ class AudioRecordingService {
         aufnahmeZeit: _recordingStartTime!,
         dauer: duration,
         etappenId: etappenId,
+        typ: typ,
         metadaten: {
           'encoder': 'default',
           'bitRate': 'default',

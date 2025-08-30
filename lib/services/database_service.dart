@@ -33,7 +33,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -96,7 +96,8 @@ class DatabaseService {
         dauer INTEGER NOT NULL,
         etappenId TEXT NOT NULL,
         notiz TEXT,
-        metadaten TEXT
+        metadaten TEXT,
+        typ TEXT DEFAULT 'allgemein'
       )
     ''');
 
@@ -148,6 +149,12 @@ class DatabaseService {
       // Wetter-Spalten zur Etappen-Tabelle hinzufügen
       await db.execute('ALTER TABLE etappen ADD COLUMN startWetter TEXT');
       await db.execute('ALTER TABLE etappen ADD COLUMN wetterVerlauf TEXT');
+    }
+
+    if (oldVersion < 5) {
+      // Typ-Spalte zur Audio-Aufnahmen-Tabelle hinzufügen
+      await db.execute(
+          'ALTER TABLE audio_aufnahmen ADD COLUMN typ TEXT DEFAULT \'allgemein\'');
     }
   }
 

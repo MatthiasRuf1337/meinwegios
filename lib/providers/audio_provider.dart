@@ -16,6 +16,22 @@ class AudioProvider with ChangeNotifier {
         .toList();
   }
 
+  // Nur Impulsfrage-Audio für eine Etappe
+  List<AudioAufnahme> getImpulsfrageAudioByEtappe(String etappenId) {
+    return _audioAufnahmen
+        .where((audio) =>
+            audio.etappenId == etappenId && audio.typ == 'impulsfrage')
+        .toList();
+  }
+
+  // Nur allgemeine Audio-Aufnahmen für eine Etappe
+  List<AudioAufnahme> getAllgemeineAudioByEtappe(String etappenId) {
+    return _audioAufnahmen
+        .where(
+            (audio) => audio.etappenId == etappenId && audio.typ == 'allgemein')
+        .toList();
+  }
+
   Future<void> loadAudioAufnahmen() async {
     _isLoading = true;
     notifyListeners();
