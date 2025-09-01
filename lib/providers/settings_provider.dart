@@ -162,22 +162,8 @@ class SettingsProvider with ChangeNotifier {
       return false;
     }
 
-    final now = DateTime.now();
-    final heute = DateTime(now.year, now.month, now.day);
-
-    // Wenn noch nie ein Zitat gezeigt wurde (nach Onboarding), zeige eins
-    if (_settings.letztesZitatDatum == null) {
-      return true;
-    }
-
-    final letztesZitat = DateTime(
-      _settings.letztesZitatDatum!.year,
-      _settings.letztesZitatDatum!.month,
-      _settings.letztesZitatDatum!.day,
-    );
-
-    // Zeige Zitat, wenn es ein neuer Tag ist
-    return heute.isAfter(letztesZitat);
+    // Zeige Zitat bei jedem App-Start (nach abgeschlossenem Onboarding)
+    return true;
   }
 
   Future<Zitat> getHeutigesZitat() async {
@@ -196,14 +182,9 @@ class SettingsProvider with ChangeNotifier {
         ZitatService.getNextZitatIndex(_settings.aktuellerZitatIndex);
     await setZitatIndex(nextIndex);
 
-    // Speichere nur das Datum (ohne Zeit) für konsistente Vergleiche
-    final heute = DateTime.now();
-    final heuteOhneZeit = DateTime(heute.year, heute.month, heute.day);
-    await setLetztesZitatDatum(heuteOhneZeit);
-
     print('Zitat als angezeigt markiert');
     print('Neuer Zitat-Index: $nextIndex');
-    print('Zitat-Datum gespeichert: $heuteOhneZeit');
+    // Datum wird nicht mehr gespeichert, da Zitat bei jedem App-Start gezeigt wird
   }
 
   // Debug-Funktionen

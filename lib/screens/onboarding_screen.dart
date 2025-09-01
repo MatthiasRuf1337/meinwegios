@@ -226,33 +226,39 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 20),
           // Titel
-          const Text(
-            'Die App zu deinem Buch',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF5A7D7D),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: const Text(
+              'Die App zu deinem Buch',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF5A7D7D),
+              ),
             ),
           ),
           const SizedBox(height: 16),
           // Einleitungstexte
-          Text(
-            'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise".',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade700,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise".',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade700,
+              ),
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          Text(
-            'Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.\n\nDort findest du alle Texte, Seiten für Reflexion, thematischen Impulse und Zitate.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade700,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.\n\nDort findest du alle Texte, Seiten für Reflexion, thematischen Impulse und Zitate.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade700,
+              ),
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
           // Funktionen
@@ -285,23 +291,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           const SizedBox(height: 40),
           // Titel
-          const Text(
-            'Datenschutz & Berechtigungen',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF5A7D7D),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: const Text(
+              'Datenschutz & Berechtigungen',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF5A7D7D),
+              ),
             ),
           ),
           const SizedBox(height: 24),
-          Text(
-            'Damit alle Funktionen reibungslos arbeiten, fragt die App beim Start den Zugriff auf verschiedene Bereiche ab.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade700,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Damit alle Funktionen reibungslos arbeiten, fragt die App beim Start den Zugriff auf verschiedene Bereiche ab.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade700,
+              ),
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
           Container(
@@ -341,14 +351,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          Text(
-            'Benötigte Berechtigungen:',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade800,
-              fontWeight: FontWeight.w600,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Benötigte Berechtigungen:',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade800,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           ..._permissions.map((permission) => _buildPermissionItem(permission)),
