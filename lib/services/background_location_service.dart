@@ -13,15 +13,18 @@ class BackgroundLocationService {
   // Streams und Subscriptions
   StreamSubscription<Position>? _positionSubscription;
   Timer? _backgroundTimer;
+  Timer? _watchdogTimer;
 
   // Tracking-Status
   bool _isBackgroundTracking = false;
   bool _hasBackgroundPermission = false;
+  bool _isAppInBackground = false;
 
   // GPS-Daten
   Position? _lastPosition;
   List<GPSPunkt> _backgroundGpsPoints = [];
   DateTime? _lastPositionUpdate;
+  DateTime? _lastSuccessfulUpdate;
 
   // Callbacks
   Function(List<GPSPunkt>)? _onBackgroundUpdate;
@@ -32,6 +35,21 @@ class BackgroundLocationService {
   bool get hasBackgroundPermission => _hasBackgroundPermission;
   List<GPSPunkt> get backgroundGpsPoints =>
       List.unmodifiable(_backgroundGpsPoints);
+
+  // App-Lifecycle-Status setzen
+  void setAppLifecycleState(bool isInBackground) {
+    _isAppInBackground = isInBackground;
+    print(
+        'BackgroundLocationService: App-Lifecycle-Status geändert - Background: $_isAppInBackground');
+
+    if (isInBackground && _isBackgroundTracking) {
+      // App geht in Hintergrund - verstärke GPS-Tracking
+      _enhanceBackgroundTracking();
+    } else if (!isInBackground && _isBackgroundTracking) {
+      // App kommt in Vordergrund - normalisiere GPS-Tracking
+      _normalizeBackgroundTracking();
+    }
+  }
 
   // Background-Tracking starten
   Future<bool> startBackgroundTracking({
@@ -57,6 +75,9 @@ class BackgroundLocationService {
     // Zusätzlicher Timer für regelmäßige Updates
     _startBackgroundTimer();
 
+    // Watchdog-Timer für GPS-Überwachung
+    _startWatchdogTimer();
+
     print('BackgroundLocationService: Background-Tracking gestartet');
     return true;
   }
@@ -72,9 +93,11 @@ class BackgroundLocationService {
     // Alle Subscriptions beenden
     await _positionSubscription?.cancel();
     _backgroundTimer?.cancel();
+    _watchdogTimer?.cancel();
 
     _positionSubscription = null;
     _backgroundTimer = null;
+    _watchdogTimer = null;
 
     print('BackgroundLocationService: Background-Tracking gestoppt');
   }
@@ -89,16 +112,17 @@ class BackgroundLocationService {
         locationSettings = AppleSettings(
           accuracy: LocationAccuracy.high,
           activityType: ActivityType.fitness,
-          distanceFilter: 5,
+          distanceFilter: 3, // Reduziert von 5 auf 3 für bessere Genauigkeit
           pauseLocationUpdatesAutomatically: false,
           showBackgroundLocationIndicator: true,
         );
       } else {
         locationSettings = AndroidSettings(
           accuracy: LocationAccuracy.high,
-          distanceFilter: 5,
+          distanceFilter: 3, // Reduziert von 5 auf 3 für bessere Genauigkeit
           forceLocationManager: false,
-          intervalDuration: const Duration(seconds: 10),
+          intervalDuration:
+              const Duration(seconds: 8), // Reduziert von 10 auf 8
           foregroundNotificationConfig: const ForegroundNotificationConfig(
             notificationText: "Mein Weg verfolgt Ihre Etappe im Hintergrund",
             notificationTitle: "GPS-Tracking aktiv",
@@ -161,7 +185,8 @@ class BackgroundLocationService {
 
     _backgroundGpsPoints.add(gpsPoint);
     _lastPosition = position;
-    _lastPositionUpdate = DateTime.now(); // Watchdog-Zeitstempel
+    _lastPositionUpdate = DateTime.now();
+    _lastSuccessfulUpdate = DateTime.now(); // Erfolgreicher Update
 
     // Callback aufrufen
     _onBackgroundUpdate?.call(_backgroundGpsPoints);
@@ -170,10 +195,11 @@ class BackgroundLocationService {
         'BackgroundLocationService: GPS-Punkt hinzugefügt - Total: ${_backgroundGpsPoints.length}');
   }
 
-  // Validiere GPS-Position
+  // Validiere GPS-Position (verbesserte Logik)
   bool _isValidPosition(Position position) {
     // Basis-Genauigkeitsfilter (weniger strikt für Background)
-    if (position.accuracy > 50.0) {
+    if (position.accuracy > 40.0) {
+      // Erhöht von 50 auf 40 für bessere Qualität
       print(
           'BackgroundLocationService: Position verworfen - schlechte Genauigkeit: ${position.accuracy}m');
       return false;
@@ -183,6 +209,12 @@ class BackgroundLocationService {
     if (position.latitude.abs() > 90.0 || position.longitude.abs() > 180.0) {
       print(
           'BackgroundLocationService: Position verworfen - ungültige Koordinaten');
+      return false;
+    }
+
+    // Prüfe auf Null-Werte
+    if (position.latitude == 0.0 && position.longitude == 0.0) {
+      print('BackgroundLocationService: Position verworfen - Null-Koordinaten');
       return false;
     }
 
@@ -198,7 +230,8 @@ class BackgroundLocationService {
     final timeDiffSeconds = timeDiff.inSeconds.clamp(1, 3600); // Min 1s, Max 1h
 
     // Berechne maximale realistische Geschwindigkeit (m/s)
-    final maxSpeedMps = 20.0; // 72 km/h - großzügiger für Background
+    final maxSpeedMps =
+        15.0; // Reduziert von 20 auf 15 (54 km/h) für realistischere Bewegung
     final maxDistanceForTime = maxSpeedMps * timeDiffSeconds;
 
     // Filter für unrealistische Sprünge (basierend auf Zeit)
@@ -209,7 +242,8 @@ class BackgroundLocationService {
     }
 
     // Minimale Bewegung erforderlich (weniger strikt für Background)
-    if (distance < 1.0 && timeDiffSeconds < 30) {
+    if (distance < 0.5 && timeDiffSeconds < 20) {
+      // Reduziert von 1.0 auf 0.5 und von 30 auf 20
       print(
           'BackgroundLocationService: Position verworfen - zu kleine Bewegung: ${distance}m in ${timeDiffSeconds}s');
       return false;
@@ -237,59 +271,93 @@ class BackgroundLocationService {
     });
   }
 
+  // Watchdog-Timer für GPS-Überwachung
+  void _startWatchdogTimer() {
+    _watchdogTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (!_isBackgroundTracking) {
+        timer.cancel();
+        return;
+      }
+
+      // Prüfe ob GPS-Updates in den letzten 2 Minuten kamen
+      if (_lastSuccessfulUpdate != null) {
+        final timeSinceLastUpdate =
+            DateTime.now().difference(_lastSuccessfulUpdate!);
+        if (timeSinceLastUpdate.inMinutes >= 2) {
+          print(
+              'BackgroundLocationService: Watchdog - Keine GPS-Updates seit ${timeSinceLastUpdate.inMinutes} Minuten');
+          _restartGPSTracking();
+        }
+      }
+    });
+  }
+
+  // GPS-Tracking neu starten
+  Future<void> _restartGPSTracking() async {
+    print('BackgroundLocationService: Starte GPS-Tracking neu...');
+
+    await _positionSubscription?.cancel();
+    _positionSubscription = null;
+
+    // Kurze Pause für System-Recovery
+    await Future.delayed(Duration(milliseconds: 1000));
+
+    await _startBackgroundGPSTracking();
+  }
+
   // GPS-Watchdog: Prüft ob GPS-Updates noch ankommen
   void _checkGPSWatchdog() {
     if (_lastPositionUpdate != null) {
       final timeSinceLastUpdate =
           DateTime.now().difference(_lastPositionUpdate!);
 
-      // Wenn länger als 3 Minuten keine GPS-Updates
-      if (timeSinceLastUpdate.inMinutes > 3) {
+      if (timeSinceLastUpdate.inMinutes >= 3) {
         print(
-            'BackgroundLocationService: GPS-Watchdog - Keine Updates seit ${timeSinceLastUpdate.inMinutes} Minuten');
-        _onError?.call('GPS-Tracking unterbrochen - versuche Neustart');
+            'BackgroundLocationService: Watchdog - Keine GPS-Updates seit ${timeSinceLastUpdate.inMinutes} Minuten');
 
-        // GPS-Stream neu starten
-        _restartGPSStream();
+        // Versuche GPS-Tracking neu zu starten
+        _restartGPSTracking();
       }
     }
   }
 
-  // GPS-Stream neu starten
-  Future<void> _restartGPSStream() async {
-    try {
-      print('BackgroundLocationService: Starte GPS-Stream neu...');
-
-      // Alten Stream stoppen
-      await _positionSubscription?.cancel();
-      _positionSubscription = null;
-
-      // Kurze Pause
-      await Future.delayed(Duration(milliseconds: 2000));
-
-      // GPS-Stream neu starten
-      await _startBackgroundGPSTracking();
-
-      print('BackgroundLocationService: GPS-Stream erfolgreich neu gestartet');
-    } catch (e) {
-      print(
-          'BackgroundLocationService: Fehler beim Neustart des GPS-Streams: $e');
-      _onError?.call('GPS-Stream konnte nicht neu gestartet werden: $e');
-    }
-  }
-
-  // Fallback für Position abrufen
+  // Fallback: Aktuelle Position abfragen falls Stream nicht funktioniert
   Future<void> _getCurrentPositionFallback() async {
     try {
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 10),
+        timeLimit: Duration(seconds: 10),
       );
 
-      _onBackgroundPositionUpdate(position);
+      if (_isValidPosition(position)) {
+        print('BackgroundLocationService: Fallback-Position erhalten');
+        _onBackgroundPositionUpdate(position);
+      }
     } catch (e) {
-      print('BackgroundLocationService: Fallback Position-Fehler: $e');
+      print('BackgroundLocationService: Fallback-Position fehlgeschlagen: $e');
     }
+  }
+
+  // Hintergrund-Tracking verstärken (wenn App in Hintergrund)
+  void _enhanceBackgroundTracking() {
+    print('BackgroundLocationService: Verstärke Background-Tracking...');
+
+    // Reduziere distanceFilter für bessere Genauigkeit
+    if (_positionSubscription != null) {
+      // Für iOS können wir die Einstellungen nicht dynamisch ändern
+      // Für Android könnten wir den Stream neu starten mit besseren Einstellungen
+      if (Platform.isAndroid) {
+        _restartGPSTracking();
+      }
+    }
+  }
+
+  // Hintergrund-Tracking normalisieren (wenn App in Vordergrund)
+  void _normalizeBackgroundTracking() {
+    print('BackgroundLocationService: Normalisiere Background-Tracking...');
+
+    // Keine spezielle Aktion nötig, da der Service weiterläuft
+    // aber mit normalen Einstellungen
   }
 
   // Background-Berechtigungen prüfen
@@ -349,5 +417,19 @@ class BackgroundLocationService {
   // Berechtigung-Status abrufen
   Future<LocationPermission> getPermissionStatus() async {
     return await Geolocator.checkPermission();
+  }
+
+  // Aktuelle Position abrufen
+  Future<Position?> getCurrentPosition() async {
+    try {
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 10),
+      );
+    } catch (e) {
+      print(
+          'BackgroundLocationService: Fehler beim Abrufen der aktuellen Position: $e');
+      return null;
+    }
   }
 }

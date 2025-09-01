@@ -110,6 +110,10 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
 
           // GPS-Tracking Status prüfen und sicherstellen, dass es weiterläuft
           _ensureBackgroundTracking();
+
+          // Wichtig: Der GPS-Stream läuft weiter, da er mit den richtigen
+          // Background-Einstellungen konfiguriert ist
+          print('GPS-Tracking läuft im Hintergrund weiter...');
         }
         break;
       case AppLifecycleState.resumed:
@@ -147,8 +151,18 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
   void _ensureBackgroundTracking() {
     if (_positionSubscription != null && !_isPaused) {
       print('Stelle sicher, dass Background-Tracking aktiv bleibt...');
-      // Explizit Background-Tracking aktivieren
-      _positionSubscription?.resume();
+
+      // Der GPS-Stream läuft bereits mit den richtigen Einstellungen
+      // Wir müssen nur sicherstellen, dass er nicht pausiert wird
+      if (_positionSubscription!.isPaused) {
+        print('GPS-Stream war pausiert - setze fort...');
+        _positionSubscription!.resume();
+      }
+
+      // Überwache den GPS-Status
+      _monitorGPSTrackingStatus();
+    } else {
+      print('GPS-Tracking nicht verfügbar oder pausiert');
     }
   }
 
@@ -696,25 +710,28 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       locationSettings = AppleSettings(
         accuracy: LocationAccuracy.best,
         activityType: ActivityType.fitness,
-        distanceFilter: 3,
-        pauseLocationUpdatesAutomatically: false,
-        showBackgroundLocationIndicator: true,
+        distanceFilter: 2, // Reduziert für bessere Genauigkeit im Hintergrund
+        pauseLocationUpdatesAutomatically:
+            false, // Wichtig für Hintergrund-Tracking
+        showBackgroundLocationIndicator: true, // Zeigt Hintergrund-Tracking an
       );
     } else {
       locationSettings = AndroidSettings(
         accuracy: LocationAccuracy.best,
-        distanceFilter: 3,
+        distanceFilter: 2, // Reduziert für bessere Genauigkeit im Hintergrund
         forceLocationManager: false,
-        intervalDuration: const Duration(seconds: 5),
+        intervalDuration:
+            const Duration(seconds: 3), // Reduziert für bessere Updates
         foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationText: "Mein Weg verfolgt Ihre Etappe",
+          notificationText: "Mein Weg verfolgt Ihre Etappe im Hintergrund",
           notificationTitle: "GPS-Tracking aktiv",
-          enableWakeLock: true,
+          enableWakeLock: true, // Verhindert, dass das Gerät schläft
         ),
       );
     }
 
     // Kontinuierliches GPS-Tracking mit Hintergrund-Unterstützung
+    print('Starte GPS-Stream mit Background-Unterstützung...');
     _positionSubscription = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen((Position position) {
@@ -723,11 +740,22 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       final now = DateTime.now();
       _currentPosition = position;
 
-      // Filter: schlechte Genauigkeit verwerfen (> 25 m)
+      // Filter: schlechte Genauigkeit verwerfen (> 30 m für Hintergrund-Tracking)
       final accuracy =
           (position.accuracy.isFinite ? position.accuracy : 9999).toDouble();
-      if (accuracy > 25) {
+      if (accuracy > 30) {
+        print('GPS-Punkt verworfen - schlechte Genauigkeit: ${accuracy}m');
         return;
+      }
+
+      // Zusätzliche Validierung für Hintergrund-Tracking
+      if (_inBackground) {
+        // Im Hintergrund: strengere Filter für bessere Qualität
+        if (accuracy > 20) {
+          print(
+              'GPS-Punkt im Hintergrund verworfen - Genauigkeit zu schlecht: ${accuracy}m');
+          return;
+        }
       }
 
       // Errechne inkrementelle Distanz nur von letzten akzeptierten Punkt
@@ -774,6 +802,12 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         _lastAcceptedPoint = currentPoint;
         _lastAcceptedTimestamp = now;
         // _lastAcceptedAccuracy = accuracy;
+
+        // Im Hintergrund: Zusätzliche Logging für Debugging
+        if (_inBackground) {
+          print(
+              'GPS-Punkt im Hintergrund hinzugefügt: ${increment.toStringAsFixed(2)}m, Total: ${_distance.toStringAsFixed(2)}m');
+        }
 
         // Geschwindigkeit schätzen aus letztem Intervall (km/h)
         if (_gpsPoints.length >= 2) {
@@ -1171,5 +1205,13 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Notiz-Funktion wird implementiert...')),
     );
+  }
+
+  // GPS-Tracking Status überwachen
+  void _monitorGPSTrackingStatus() {
+    if (_positionSubscription != null) {
+      print('GPS-Tracking läuft - Status überwacht');
+      // Hier können wir zusätzliche Überwachung implementieren
+    }
   }
 }
