@@ -13,6 +13,7 @@ import '../models/bild.dart';
 import '../providers/bilder_provider.dart';
 import '../services/database_service.dart';
 import '../services/global_audio_manager.dart';
+import '../services/background_permission_service.dart';
 import 'dart:async';
 
 class EtappeTrackingScreen extends StatefulWidget {
@@ -185,6 +186,54 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       }
     } catch (e) {
       print('Fehler beim Zurücksetzen der Audio-Session: $e');
+    }
+  }
+
+  // Background-Berechtigung prüfen und anfordern
+  Future<void> _checkAndRequestBackgroundPermission() async {
+    final permissionService = BackgroundPermissionService();
+
+    // Prüfe ob bereits vorhanden
+    if (await permissionService.hasBackgroundLocationPermission()) {
+      print('Background-Location-Berechtigung bereits vorhanden');
+      return;
+    }
+
+    // Frage Nutzer ob Background-Berechtigung gewünscht
+    final granted =
+        await permissionService.requestBackgroundLocationWithDialog(context);
+
+    if (granted) {
+      print('Background-Location-Berechtigung erteilt');
+      // Zeige kurze Bestätigung
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                '✅ Live-Aufzeichnung aktiviert - funktioniert jetzt auch bei Telefonaten!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } else {
+      print('Background-Location-Berechtigung nicht erteilt');
+      // Zeige Info dass nur Vordergrund-Tracking verfügbar ist
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'ℹ️ Tracking läuft nur im Vordergrund - für Live-Aufzeichnung bei Telefonaten Berechtigung in Einstellungen aktivieren'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 4),
+            action: SnackBarAction(
+              label: 'Einstellungen',
+              textColor: Colors.white,
+              onPressed: () => permissionService.showSettingsDialog(context),
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -634,8 +683,11 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     }
   }
 
-  void _startGPSTracking() {
+  void _startGPSTracking() async {
     print('Starte GPS-Tracking...');
+
+    // Background-Berechtigung prüfen und anfordern falls nötig
+    await _checkAndRequestBackgroundPermission();
 
     // Spezielle Einstellungen für Background-Tracking
     LocationSettings locationSettings;

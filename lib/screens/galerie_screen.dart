@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 import '../providers/bilder_provider.dart';
 import '../models/bild.dart';
 import 'bild_detail_screen.dart';
@@ -67,6 +70,12 @@ class _GalerieScreenState extends State<GalerieScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _addImage(context),
+        backgroundColor: Color(0xFF5A7D7D),
+        child: Icon(Icons.add_a_photo, color: Colors.white),
+        tooltip: 'Bild hinzufügen',
       ),
     );
   }
@@ -283,6 +292,139 @@ class _GalerieScreenState extends State<GalerieScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => BildDetailScreen(bild: bild),
+      ),
+    );
+  }
+
+  void _addImage(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Bild hinzufügen',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 20),
+            ListTile(
+              leading: Icon(Icons.camera_alt, color: Color(0xFF5A7D7D)),
+              title: Text('Foto aufnehmen'),
+              subtitle: Text('Mit der Kamera fotografieren'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImageFromCamera();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
+              title: Text('Aus Galerie wählen'),
+              subtitle: Text('Vorhandenes Foto auswählen'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImageFromGallery();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _pickImageFromCamera() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        await _importImage(File(image.path));
+      }
+    } catch (e) {
+      _showErrorSnackBar('Fehler beim Aufnehmen des Fotos: $e');
+    }
+  }
+
+  void _pickImageFromGallery() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        await _importImage(File(image.path));
+      }
+    } catch (e) {
+      _showErrorSnackBar('Fehler beim Auswählen des Bildes: $e');
+    }
+  }
+
+  Future<void> _importImage(File imageFile) async {
+    try {
+      if (!imageFile.existsSync()) {
+        _showErrorSnackBar('Bild-Datei existiert nicht');
+        return;
+      }
+
+      // Zielverzeichnis für Bilder erstellen
+      final appDir = await getApplicationDocumentsDirectory();
+      final bilderDir = Directory('${appDir.path}/bilder');
+      if (!bilderDir.existsSync()) {
+        await bilderDir.create(recursive: true);
+      }
+
+      // Eindeutigen Dateinamen generieren
+      final uuid = Uuid();
+      final fileExtension = imageFile.path.split('.').last.toLowerCase();
+      final newFileName = '${uuid.v4()}.$fileExtension';
+      final newFilePath = '${bilderDir.path}/$newFileName';
+
+      // Datei kopieren
+      final newFile = await imageFile.copy(newFilePath);
+
+      // Bild-Objekt erstellen
+      final bild = Bild(
+        id: uuid.v4(),
+        dateiname: newFileName,
+        dateipfad: newFile.path,
+        aufnahmeZeit: DateTime.now(),
+        etappenId: null, // Kein Etappen-Bezug bei manuell hinzugefügten Bildern
+      );
+
+      // Bild zum Provider hinzufügen
+      final bilderProvider =
+          Provider.of<BilderProvider>(context, listen: false);
+      await bilderProvider.addBild(bild);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Bild erfolgreich hinzugefügt'),
+          backgroundColor: Color(0xFF5A7D7D),
+        ),
+      );
+    } catch (e) {
+      _showErrorSnackBar('Fehler beim Importieren des Bildes: $e');
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Color(0xFF8C0A28),
       ),
     );
   }

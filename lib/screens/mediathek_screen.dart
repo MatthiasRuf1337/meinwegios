@@ -398,29 +398,17 @@ class _MediathekScreenState extends State<MediathekScreen> {
             ListTile(
               leading: Icon(Icons.folder_open, color: Color(0xFF5A7D7D)),
               title: Text('Datei auswählen'),
-              subtitle: Text('PDF, MP3, Dokumente oder andere Dateien'),
+              subtitle: Text('PDF, MP3 oder andere Dateien'),
               onTap: () {
                 Navigator.pop(context);
                 _pickFile();
               },
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Hinweis: Bilder können über die Etappen-Details hinzugefügt werden',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-                fontStyle: FontStyle.italic,
-              ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
       ),
     );
   }
-
-
 
   void _pickFile() async {
     try {
