@@ -10,6 +10,17 @@ class LegalMenuWidget extends StatelessWidget {
       icon: Icon(Icons.menu, color: Colors.white),
       onSelected: (String value) => _handleMenuSelection(context, value),
       itemBuilder: (BuildContext context) => [
+        // Schließen-Button oben
+        PopupMenuItem<String>(
+          value: 'close',
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Icon(Icons.close, size: 20, color: Colors.grey.shade600),
+            ],
+          ),
+        ),
+        PopupMenuDivider(),
         PopupMenuItem<String>(
           value: 'buch',
           child: Row(
@@ -56,6 +67,11 @@ class LegalMenuWidget extends StatelessWidget {
   }
 
   void _handleMenuSelection(BuildContext context, String value) async {
+    // Schließen-Button - nichts tun, Menu schließt sich automatisch
+    if (value == 'close') {
+      return;
+    }
+
     String url;
 
     switch (value) {
