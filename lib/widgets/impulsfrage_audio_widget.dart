@@ -307,7 +307,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Audio-Notizen zur Impulsfrage (${audioAufnahmen.length})',
+          'Audio-Notizen zur Impulsfrage',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,

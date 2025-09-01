@@ -182,7 +182,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
               ),
             ],
           ),
-          backgroundColor: Colors.orange.shade700,
+          backgroundColor: Color(0xFF8C0A28),
           duration: Duration(seconds: 4),
           behavior: SnackBarBehavior.floating,
         ),
@@ -361,14 +361,14 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       decoration: BoxDecoration(
         color: data.isPaused
             ? (data.isPausedBySpeed
-                ? Colors.red.shade50
+                ? Color(0xFF8C0A28).withOpacity(0.1)
                 : Colors.orange.shade50)
             : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: data.isPaused
               ? (data.isPausedBySpeed
-                  ? Colors.red.shade200
+                  ? Color(0xFF8C0A28).withOpacity(0.3)
                   : Colors.orange.shade200)
               : Colors.grey.shade200,
         ),
@@ -385,7 +385,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                     : Icons.play_circle,
                 size: 20,
                 color: data.isPaused
-                    ? (data.isPausedBySpeed ? Colors.red : Colors.orange)
+                    ? (data.isPausedBySpeed ? Color(0xFF8C0A28) : Colors.orange)
                     : Color(0xFF5A7D7D),
               ),
               SizedBox(width: 12),
@@ -398,7 +398,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   fontWeight: FontWeight.bold,
                   color: data.isPaused
                       ? (data.isPausedBySpeed
-                          ? Colors.red.shade800
+                          ? Color(0xFF8C0A28)
                           : Colors.orange.shade800)
                       : Color(0xFF5A7D7D),
                 ),
@@ -413,7 +413,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
               fontWeight: FontWeight.bold,
               color: data.isPaused
                   ? (data.isPausedBySpeed
-                      ? Colors.red.shade700
+                      ? Color(0xFF8C0A28)
                       : Colors.orange.shade700)
                   : Color(0xFF5A7D7D),
             ),

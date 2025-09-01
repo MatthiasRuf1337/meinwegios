@@ -988,16 +988,23 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
   }
 
   void _showEditEtappeDialog() {
-    final nameController = TextEditingController(text: widget.etappe.name);
+    // Hole die aktualisierte Etappe aus dem Provider
+    final etappenProvider =
+        Provider.of<EtappenProvider>(context, listen: false);
+    final aktuelleEtappe = etappenProvider.etappen.firstWhere(
+        (e) => e.id == widget.etappe.id,
+        orElse: () => widget.etappe);
+
+    final nameController = TextEditingController(text: aktuelleEtappe.name);
     final notizenController =
-        TextEditingController(text: widget.etappe.notizen ?? '');
+        TextEditingController(text: aktuelleEtappe.notizen ?? '');
     final distanzController = TextEditingController(
-        text: widget.etappe.gesamtDistanz.toStringAsFixed(0));
+        text: aktuelleEtappe.gesamtDistanz.toStringAsFixed(0));
     final schritteController =
-        TextEditingController(text: widget.etappe.schrittAnzahl.toString());
+        TextEditingController(text: aktuelleEtappe.schrittAnzahl.toString());
 
     // Dauer in Minuten für einfachere Bearbeitung
-    final dauerInMinuten = widget.etappe.dauer.inMinutes;
+    final dauerInMinuten = aktuelleEtappe.dauer.inMinutes;
     final dauerController =
         TextEditingController(text: dauerInMinuten.toString());
 
@@ -1178,18 +1185,18 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                     : notizenController.text.trim();
 
                 final newDistanz = double.tryParse(distanzController.text) ??
-                    widget.etappe.gesamtDistanz;
+                    aktuelleEtappe.gesamtDistanz;
                 final newSchritte = int.tryParse(schritteController.text) ??
-                    widget.etappe.schrittAnzahl;
+                    aktuelleEtappe.schrittAnzahl;
                 final newDauerMinuten = int.tryParse(dauerController.text) ??
-                    widget.etappe.dauer.inMinutes;
+                    aktuelleEtappe.dauer.inMinutes;
 
                 // Neue Endzeit basierend auf der bearbeiteten Dauer berechnen
-                final newEndzeit = widget.etappe.startzeit
+                final newEndzeit = aktuelleEtappe.startzeit
                     .add(Duration(minutes: newDauerMinuten));
 
                 // Aktualisierte Etappe erstellen
-                final updatedEtappe = widget.etappe.copyWith(
+                final updatedEtappe = aktuelleEtappe.copyWith(
                   name: newName,
                   notizen: newNotizen,
                   gesamtDistanz: newDistanz,

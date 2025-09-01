@@ -11,16 +11,6 @@ class LegalMenuWidget extends StatelessWidget {
       onSelected: (String value) => _handleMenuSelection(context, value),
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<String>(
-          value: 'marco',
-          child: Row(
-            children: [
-              Icon(Icons.person, size: 18, color: Color(0xFF5A7D7D)),
-              SizedBox(width: 12),
-              Text('Marco'),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
           value: 'buch',
           child: Row(
             children: [
@@ -30,14 +20,13 @@ class LegalMenuWidget extends StatelessWidget {
             ],
           ),
         ),
-        PopupMenuDivider(),
         PopupMenuItem<String>(
-          value: 'impressum',
+          value: 'marco',
           child: Row(
             children: [
-              Icon(Icons.info_outline, size: 18, color: Color(0xFF5A7D7D)),
+              Icon(Icons.person, size: 18, color: Color(0xFF5A7D7D)),
               SizedBox(width: 12),
-              Text('Impressum & Datenschutz'),
+              Text('Zum Autor Marco Fraleoni'),
             ],
           ),
         ),
@@ -48,7 +37,17 @@ class LegalMenuWidget extends StatelessWidget {
               Icon(Icons.description_outlined,
                   size: 18, color: Color(0xFF5A7D7D)),
               SizedBox(width: 12),
-              Text('Nutzungsbedingungen'),
+              Text('Hinweis zur Nutzung der App'),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'impressum',
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, size: 18, color: Color(0xFF5A7D7D)),
+              SizedBox(width: 12),
+              Text('Datenschutz und Impressum'),
             ],
           ),
         ),
