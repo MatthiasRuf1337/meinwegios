@@ -30,9 +30,19 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
   }
 
   void _startRecording() async {
+    // SOFORT UI-State ändern für besseres Feedback
+    setState(() {
+      _recordingDuration = Duration.zero;
+    });
+
     // Prüfe zuerst ob Aufnahme möglich ist
     final canRecord = await _audioService.canStartRecording();
     if (!canRecord) {
+      // Bei Fehler: UI zurücksetzen
+      setState(() {
+        _recordingDuration = Duration.zero;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -71,16 +81,14 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
       ),
     );
 
+    // Aufnahme im Hintergrund starten
     final success = await _audioService.startRecording();
 
     // Verstecke Loading-Indikator
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
     if (success) {
-      setState(() {
-        _recordingDuration = Duration.zero;
-      });
-
+      // Timer für Aufnahme-Dauer starten
       _recordingTimer = Timer.periodic(Duration(seconds: 1), (timer) {
         setState(() {
           _recordingDuration = _audioService.recordingDuration;
@@ -95,6 +103,11 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
         ),
       );
     } else {
+      // Bei Fehler: UI zurücksetzen
+      setState(() {
+        _recordingDuration = Duration.zero;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

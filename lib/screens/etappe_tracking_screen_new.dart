@@ -1021,6 +1021,11 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
       }
     } else {
       // Aufnahme starten
+      // SOFORT UI-State ändern für besseres Feedback
+      setState(() {
+        // Hier können Sie den UI-State sofort ändern, falls nötig
+      });
+
       // Zeige Loading-Indikator
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1043,6 +1048,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         ),
       );
 
+      // Aufnahme im Hintergrund starten
       final success = await _audioService.startRecording();
 
       // Verstecke Loading-Indikator

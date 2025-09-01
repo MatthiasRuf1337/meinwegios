@@ -48,7 +48,7 @@ class LegalMenuWidget extends StatelessWidget {
               Icon(Icons.description_outlined,
                   size: 18, color: Color(0xFF5A7D7D)),
               SizedBox(width: 12),
-              Text('Hinweis zur Nutzung der App'),
+              Text('Hinweise zur Nutzung der App'),
             ],
           ),
         ),
