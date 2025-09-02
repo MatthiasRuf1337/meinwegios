@@ -1094,7 +1094,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
 
   void _showNotizDialog({Notiz? existingNotiz}) {
     final TextEditingController titelController = TextEditingController(
-      text: existingNotiz?.titel ?? 'Live-Tracking Notiz',
+      text: existingNotiz?.titel ?? '',
     );
     final TextEditingController inhaltController = TextEditingController(
       text: existingNotiz?.inhalt ?? '',
