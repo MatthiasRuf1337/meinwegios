@@ -19,13 +19,13 @@ class ImpulsfrageAudioWidget extends StatefulWidget {
 
 class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
   final AudioRecordingService _audioService = AudioRecordingService();
-  Timer? _recordingTimer;
+  StreamSubscription<Duration>? _recordingDurationSubscription;
   Duration _recordingDuration = Duration.zero;
   String? _playingAudioId;
 
   @override
   void dispose() {
-    _recordingTimer?.cancel();
+    _recordingDurationSubscription?.cancel();
     super.dispose();
   }
 
@@ -81,27 +81,25 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
       ),
     );
 
-    // Aufnahme im Hintergrund starten
-    final success = await _audioService.startRecording();
+    // Aufnahme im Hintergrund starten (mit Typ 'impulsfrage')
+    final success = await _audioService.startRecording(type: 'impulsfrage');
 
     // Verstecke Loading-Indikator
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
     if (success) {
-      // Timer für Aufnahme-Dauer starten
-      _recordingTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-        setState(() {
-          _recordingDuration = _audioService.recordingDuration;
-        });
+      // Stream für Aufnahme-Dauer abonnieren (nur für Impulsfrage-Aufnahmen)
+      _recordingDurationSubscription = _audioService.recordingDurationStream
+          .where((_) => _audioService.isRecordingType('impulsfrage'))
+          .listen((duration) {
+        if (mounted) {
+          setState(() {
+            _recordingDuration = duration;
+          });
+        }
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Audio-Aufnahme zur Impulsfrage gestartet'),
-          backgroundColor: Color(0xFF8C0A28),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      // Erfolgsmeldung entfernt - keine SnackBar mehr
     } else {
       // Bei Fehler: UI zurücksetzen
       setState(() {
@@ -125,7 +123,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
   }
 
   void _stopRecording() async {
-    _recordingTimer?.cancel();
+    _recordingDurationSubscription?.cancel();
 
     final audioAufnahme =
         await _audioService.stopRecording(widget.etappenId, typ: 'impulsfrage');
@@ -133,12 +131,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
       final audioProvider = Provider.of<AudioProvider>(context, listen: false);
       await audioProvider.addAudioAufnahme(audioAufnahme);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Aufnahme zur Impulsfrage gespeichert!'),
-          backgroundColor: Color(0xFF8C0A28),
-        ),
-      );
+      // Erfolgsmeldung entfernt - keine SnackBar mehr
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -154,7 +147,7 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
   }
 
   void _cancelRecording() async {
-    _recordingTimer?.cancel();
+    _recordingDurationSubscription?.cancel();
     await _audioService.cancelRecording();
     setState(() {
       _recordingDuration = Duration.zero;
@@ -206,8 +199,8 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Aufnahme-Steuerung
-            if (_audioService.isRecording)
+            // Aufnahme-Steuerung (nur für Impulsfrage-Aufnahmen)
+            if (_audioService.isRecordingType('impulsfrage'))
               _buildRecordingControls()
             else
               _buildStartRecordingButton(),
@@ -224,13 +217,19 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
   }
 
   Widget _buildStartRecordingButton() {
+    // Button deaktivieren wenn eine andere Art von Aufnahme läuft
+    final isOtherRecordingActive = _audioService.isRecording &&
+        !_audioService.isRecordingType('impulsfrage');
+
     return Container(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: _startRecording,
+        onPressed: isOtherRecordingActive ? null : _startRecording,
         icon: Icon(Icons.fiber_manual_record, size: 18),
         label: Text(
-          'Audio-Notiz aufnehmen',
+          isOtherRecordingActive
+              ? 'Andere Aufnahme läuft...'
+              : 'Audio-Notiz aufnehmen',
           style: TextStyle(fontSize: 14),
         ),
         style: ElevatedButton.styleFrom(

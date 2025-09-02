@@ -560,19 +560,21 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                     ),
                   ),
                   GestureDetector(
-                    onTap: _audioService.isRecording
+                    onTap: _audioService.isRecordingType('normal')
                         ? _recordAudio
                         : _showActionMenu,
                     child: Container(
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: _audioService.isRecording
+                        color: _audioService.isRecordingType('normal')
                             ? Color(0xFF8C0A28)
                             : Color(0xFF5A7D7D),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        _audioService.isRecording ? Icons.stop : Icons.add,
+                        _audioService.isRecordingType('normal')
+                            ? Icons.stop
+                            : Icons.add,
                         color: Colors.white,
                         size: 20,
                       ),
@@ -794,9 +796,13 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   },
                 ),
                 _buildActionMenuItem(
-                  icon: _audioService.isRecording ? Icons.stop : Icons.mic,
-                  label: _audioService.isRecording ? 'Stopp' : 'Audio',
-                  color: _audioService.isRecording
+                  icon: _audioService.isRecordingType('normal')
+                      ? Icons.stop
+                      : Icons.mic,
+                  label: _audioService.isRecordingType('normal')
+                      ? 'Stopp'
+                      : 'Audio',
+                  color: _audioService.isRecordingType('normal')
                       ? Color(0xFF8C0A28)
                       : Color(0xFF5A7D7D),
                   onTap: () {
@@ -961,8 +967,10 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         await DatabaseService.instance.insertBild(bild);
 
         // Bild auch in die Galerie speichern
+        bool gallerySaved = false;
         try {
           await ImageGallerySaver.saveFile(savedFile.path);
+          gallerySaved = true;
         } catch (e) {
           print('Fehler beim Speichern in die Galerie: $e');
           // Galerie-Fehler nicht als kritisch behandeln
@@ -973,13 +981,25 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             Provider.of<BilderProvider>(context, listen: false);
         await bilderProvider.loadBilder();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Foto erfolgreich aufgenommen und in Galerie gespeichert!'),
-            backgroundColor: Color(0xFF8C0A28),
-          ),
-        );
+        // Ehrliche Feedback-Nachricht je nach Erfolg des Galerie-Speicherns
+        if (gallerySaved) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Foto erfolgreich aufgenommen und in Galerie gespeichert!'),
+              backgroundColor: Color(0xFF8C0A28),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Foto aufgenommen! ⚠️ Nur in der App gespeichert - nicht in der Handy-Galerie.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -992,7 +1012,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
   }
 
   Future<void> _recordAudio() async {
-    if (_audioService.isRecording) {
+    if (_audioService.isRecordingType('normal')) {
       // Aufnahme stoppen
       try {
         final audioAufnahme =
@@ -1048,20 +1068,14 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         ),
       );
 
-      // Aufnahme im Hintergrund starten
-      final success = await _audioService.startRecording();
+      // Aufnahme im Hintergrund starten (mit Typ 'normal')
+      final success = await _audioService.startRecording(type: 'normal');
 
       // Verstecke Loading-Indikator
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Audio-Aufnahme gestartet'),
-            backgroundColor: Color(0xFF8C0A28),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        // Erfolgsmeldung entfernt - keine SnackBar mehr
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

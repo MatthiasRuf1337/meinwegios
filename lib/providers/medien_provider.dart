@@ -73,11 +73,23 @@ class MedienProvider with ChangeNotifier {
 
   Future<void> deleteMedienDatei(String medienDateiId) async {
     try {
+      // Finde die Medien-Datei
+      final medienDatei =
+          _medienDateien.firstWhere((m) => m.id == medienDateiId);
+
+      // Verlagsdateien können nicht gelöscht werden
+      if (medienDatei.istVerlagsdatei) {
+        print(
+            'Versuch, Verlagsdatei zu löschen verhindert: ${medienDatei.dateiname}');
+        throw Exception('Verlagsdateien können nicht gelöscht werden');
+      }
+
       await DatabaseService.instance.deleteMedienDatei(medienDateiId);
       _medienDateien.removeWhere((m) => m.id == medienDateiId);
       notifyListeners();
     } catch (e) {
       print('Fehler beim Löschen der Medien-Datei: $e');
+      rethrow; // Fehler weiterwerfen, damit der UI-Code ihn behandeln kann
     }
   }
 

@@ -1171,8 +1171,10 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
         await DatabaseService.instance.insertBild(bild);
 
         // Bild auch in die Galerie speichern
+        bool gallerySaved = false;
         try {
           await ImageGallerySaver.saveFile(photo.path);
+          gallerySaved = true;
         } catch (e) {
           print('Fehler beim Speichern in die Galerie: $e');
           // Galerie-Fehler nicht als kritisch behandeln
@@ -1183,13 +1185,25 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
             Provider.of<BilderProvider>(context, listen: false);
         await bilderProvider.loadBilder();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Foto erfolgreich aufgenommen und in Galerie gespeichert!'),
-            backgroundColor: Color(0xFF8C0A28),
-          ),
-        );
+        // Ehrliche Feedback-Nachricht je nach Erfolg des Galerie-Speicherns
+        if (gallerySaved) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Foto erfolgreich aufgenommen und in Galerie gespeichert!'),
+              backgroundColor: Color(0xFF8C0A28),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Foto aufgenommen! ⚠️ Nur in der App gespeichert - nicht in der Handy-Galerie.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

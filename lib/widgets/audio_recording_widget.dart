@@ -17,7 +17,7 @@ class AudioRecordingWidget extends StatefulWidget {
 
 class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
   final AudioRecordingService _audioService = AudioRecordingService();
-  Timer? _recordingTimer;
+  StreamSubscription<Duration>? _recordingDurationSubscription;
   Duration _recordingDuration = Duration.zero;
   String? _playingAudioId;
 
@@ -32,7 +32,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
 
   @override
   void dispose() {
-    _recordingTimer?.cancel();
+    _recordingDurationSubscription?.cancel();
     super.dispose();
   }
 
@@ -64,27 +64,25 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       ),
     );
 
-    // Aufnahme im Hintergrund starten
-    final success = await _audioService.startRecording();
+    // Aufnahme im Hintergrund starten (mit Typ 'normal')
+    final success = await _audioService.startRecording(type: 'normal');
 
     // Verstecke Loading-Indikator
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
     if (success) {
-      // Timer für Aufnahme-Dauer starten
-      _recordingTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-        setState(() {
-          _recordingDuration = _audioService.recordingDuration;
-        });
+      // Stream für Aufnahme-Dauer abonnieren (nur für normale Aufnahmen)
+      _recordingDurationSubscription = _audioService.recordingDurationStream
+          .where((_) => _audioService.isRecordingType('normal'))
+          .listen((duration) {
+        if (mounted) {
+          setState(() {
+            _recordingDuration = duration;
+          });
+        }
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Audio-Aufnahme gestartet'),
-          backgroundColor: Color(0xFF8C0A28),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      // Erfolgsmeldung entfernt - keine SnackBar mehr
     } else {
       // Bei Fehler: UI zurücksetzen
       setState(() {
@@ -108,19 +106,14 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
   }
 
   void _stopRecording() async {
-    _recordingTimer?.cancel();
+    _recordingDurationSubscription?.cancel();
 
     final audioAufnahme = await _audioService.stopRecording(widget.etappenId);
     if (audioAufnahme != null) {
       final audioProvider = Provider.of<AudioProvider>(context, listen: false);
       await audioProvider.addAudioAufnahme(audioAufnahme);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Aufnahme gespeichert!'),
-          backgroundColor: Color(0xFF8C0A28),
-        ),
-      );
+      // Erfolgsmeldung entfernt - keine SnackBar mehr
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -136,7 +129,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
   }
 
   void _cancelRecording() async {
-    _recordingTimer?.cancel();
+    _recordingDurationSubscription?.cancel();
     await _audioService.cancelRecording();
     setState(() {
       _recordingDuration = Duration.zero;
@@ -198,12 +191,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       final audioProvider = Provider.of<AudioProvider>(context, listen: false);
       await audioProvider.deleteAudioAufnahme(audio.id);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Audioaufnahme gelöscht'),
-          backgroundColor: Color(0xFF8C0A28),
-        ),
-      );
+      // Erfolgsmeldung entfernt - keine SnackBar mehr
     }
   }
 
@@ -239,8 +227,14 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                     ),
                     IconButton(
                       icon: Icon(Icons.mic, color: Color(0xFF5A7D7D)),
-                      onPressed: _startRecording,
-                      tooltip: 'Aufnahme starten',
+                      onPressed: (_audioService.isRecording &&
+                              !_audioService.isRecordingType('normal'))
+                          ? null
+                          : _startRecording,
+                      tooltip: (_audioService.isRecording &&
+                              !_audioService.isRecordingType('normal'))
+                          ? 'Andere Aufnahme läuft...'
+                          : 'Aufnahme starten',
                       padding: EdgeInsets.zero,
                       constraints: BoxConstraints(),
                     ),
@@ -267,7 +261,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
   }
 
   Widget _buildRecordingControls() {
-    final isRecording = _audioService.isRecording;
+    final isRecording = _audioService.isRecordingType('normal');
 
     if (!isRecording) {
       return SizedBox.shrink(); // Zeige nichts an, wenn nicht aufgenommen wird

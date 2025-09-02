@@ -270,16 +270,18 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 ],
               ),
             ),
-            PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete, color: Color(0xFF8C0A28)),
-                  SizedBox(width: 8),
-                  Text('Löschen', style: TextStyle(color: Color(0xFF8C0A28))),
-                ],
+            // Löschen-Option nur für normale Dateien, nicht für Verlagsdateien
+            if (!medienDatei.istVerlagsdatei)
+              PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete, color: Color(0xFF8C0A28)),
+                    SizedBox(width: 8),
+                    Text('Löschen', style: TextStyle(color: Color(0xFF8C0A28))),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
         onTap: () => _openMedien(medienDatei),
@@ -351,6 +353,18 @@ class _MediathekScreenState extends State<MediathekScreen> {
   }
 
   void _deleteMedien(MedienDatei medienDatei) {
+    // Verlagsdateien können nicht gelöscht werden
+    if (medienDatei.istVerlagsdatei) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Verlagsdateien können nicht gelöscht werden'),
+          backgroundColor: Color(0xFF8C0A28),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

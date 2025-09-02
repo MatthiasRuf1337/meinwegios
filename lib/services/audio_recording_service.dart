@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,17 +18,36 @@ class AudioRecordingService {
 
   String? _currentRecordingPath;
   DateTime? _recordingStartTime;
+  String? _currentRecordingType; // 'normal' oder 'impulsfrage'
+
+  // Stream für Recording-Duration Updates
+  StreamController<Duration>? _recordingDurationController;
+  Timer? _recordingDurationTimer;
 
   bool get isRecording => _audioManager.isRecording;
   bool get isPlaying => _audioManager.isPlaying;
 
+  // Prüft ob eine bestimmte Art von Aufnahme läuft
+  bool isRecordingType(String type) =>
+      _audioManager.isRecording && _currentRecordingType == type;
+
+  // Getter für aktuellen Aufnahme-Typ
+  String? get currentRecordingType => _currentRecordingType;
+
+  // Stream für Recording-Duration Updates
+  Stream<Duration> get recordingDurationStream {
+    _recordingDurationController ??= StreamController<Duration>.broadcast();
+    return _recordingDurationController!.stream;
+  }
+
   // Aufnahme starten
-  Future<bool> startRecording() async {
-    return await _startRecordingWithRetry();
+  Future<bool> startRecording({String type = 'normal'}) async {
+    return await _startRecordingWithRetry(type: type);
   }
 
   // Aufnahme starten mit Retry-Logik
-  Future<bool> _startRecordingWithRetry({int maxRetries = 3}) async {
+  Future<bool> _startRecordingWithRetry(
+      {int maxRetries = 3, String type = 'normal'}) async {
     for (int attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         print('Starte Aufnahme-Versuch ${attempt + 1} von ${maxRetries + 1}');
@@ -88,8 +108,12 @@ class AudioRecordingService {
         );
 
         _currentRecordingPath = filePath;
+        _currentRecordingType = type;
         _audioManager.setRecordingStatus(true);
         _recordingStartTime = DateTime.now();
+
+        // Recording-Duration-Timer starten
+        _startRecordingDurationTimer();
 
         print('Audio-Aufnahme erfolgreich gestartet (Versuch ${attempt + 1})');
         return true;
@@ -178,6 +202,8 @@ class AudioRecordingService {
       // Reset
       _currentRecordingPath = null;
       _recordingStartTime = null;
+      _currentRecordingType = null;
+      _stopRecordingDurationTimer();
 
       return audioAufnahme;
     } catch (e) {
@@ -185,6 +211,8 @@ class AudioRecordingService {
       _audioManager.setRecordingStatus(false);
       _currentRecordingPath = null;
       _recordingStartTime = null;
+      _currentRecordingType = null;
+      _stopRecordingDurationTimer();
       return null;
     }
   }
@@ -209,6 +237,8 @@ class AudioRecordingService {
       }
 
       _recordingStartTime = null;
+      _currentRecordingType = null;
+      _stopRecordingDurationTimer();
     } catch (e) {
       print('Fehler beim Abbrechen der Aufnahme: $e');
     }
@@ -287,6 +317,27 @@ class AudioRecordingService {
     return Duration.zero;
   }
 
+  // Recording-Duration-Timer starten
+  void _startRecordingDurationTimer() {
+    _recordingDurationTimer?.cancel();
+    _recordingDurationController ??= StreamController<Duration>.broadcast();
+
+    _recordingDurationTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_audioManager.isRecording && _recordingStartTime != null) {
+        final duration = DateTime.now().difference(_recordingStartTime!);
+        _recordingDurationController!.add(duration);
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  // Recording-Duration-Timer stoppen
+  void _stopRecordingDurationTimer() {
+    _recordingDurationTimer?.cancel();
+    _recordingDurationTimer = null;
+  }
+
   // Audio-Service komplett zurücksetzen
   Future<void> resetAudioService() async {
     try {
@@ -295,6 +346,8 @@ class AudioRecordingService {
       // Cleanup lokaler Variablen
       _currentRecordingPath = null;
       _recordingStartTime = null;
+      _currentRecordingType = null;
+      _stopRecordingDurationTimer();
 
       // Audio-Session komplett zurücksetzen
       await _audioManager.resetAudioSession();
@@ -303,6 +356,13 @@ class AudioRecordingService {
     } catch (e) {
       print('Fehler beim Zurücksetzen des Audio-Services: $e');
     }
+  }
+
+  // Service komplett freigeben
+  void dispose() {
+    _stopRecordingDurationTimer();
+    _recordingDurationController?.close();
+    _recordingDurationController = null;
   }
 
   // Prüft ob Audio-Aufnahme möglich ist (ohne tatsächlich aufzunehmen)
@@ -337,7 +397,7 @@ class AudioRecordingService {
   }
 
   // Ressourcen freigeben
-  Future<void> dispose() async {
+  Future<void> disposeResources() async {
     try {
       if (_audioManager.isRecording) {
         await cancelRecording();
