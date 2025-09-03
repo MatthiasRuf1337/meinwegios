@@ -242,7 +242,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise".\nUm sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form.\nDort findest du alle Texte, Seiten für Reflexion, thematischen Impulse und Zitate.',
+              'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise". Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form. Dort findest du alle Texte, Seiten für Reflexion, thematischen Impulse und Zitate.',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey.shade700,

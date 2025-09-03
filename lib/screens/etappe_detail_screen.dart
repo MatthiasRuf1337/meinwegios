@@ -18,7 +18,7 @@ import '../services/permission_service.dart';
 import 'bild_detail_screen.dart';
 
 import '../widgets/audio_recording_widget.dart';
-import '../widgets/static_route_map_widget.dart';
+// import '../widgets/static_route_map_widget.dart';
 import '../widgets/wetter_widget.dart';
 import '../widgets/impulsfrage_widget.dart';
 import '../widgets/impulsfrage_audio_widget.dart';
@@ -352,10 +352,10 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                             ),
                           ),
                           SizedBox(height: 16),
-                          StaticRouteMapWidget(
-                            etappe: etappe,
-                            height: 300,
-                          ),
+                          // StaticRouteMapWidget(
+                          //   etappe: etappe,
+                          //   height: 300,
+                          // ),
                         ],
                       ),
                     ),

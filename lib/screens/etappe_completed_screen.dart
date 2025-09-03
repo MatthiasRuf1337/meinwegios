@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math';
 import '../models/etappe.dart';
-import '../widgets/static_route_map_widget.dart';
+// import '../widgets/static_route_map_widget.dart';
 import '../widgets/impulsfrage_widget.dart';
 import '../widgets/impulsfrage_audio_widget.dart';
 import '../services/impulsfragen_service.dart';
@@ -199,10 +199,10 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                               ],
                             ),
                             SizedBox(height: 16),
-                            StaticRouteMapWidget(
-                              etappe: widget.etappe,
-                              height: 250,
-                            ),
+                            // StaticRouteMapWidget(
+                            //   etappe: widget.etappe,
+                            //   height: 250,
+                            // ),
                           ],
                         ),
                       ),

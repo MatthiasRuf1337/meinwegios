@@ -19,7 +19,7 @@ import '../services/audio_recording_service.dart';
 import '../services/wetter_service.dart';
 import '../models/wetter_daten.dart';
 
-import '../widgets/live_map_widget.dart';
+// import '../widgets/live_map_widget.dart';
 import '../widgets/impulsfrage_widget.dart';
 import '../widgets/impulsfrage_audio_widget.dart';
 import '../services/impulsfragen_service.dart';
@@ -490,10 +490,10 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             ),
           ),
           SizedBox(height: 8),
-          LiveMapWidget(
-            trackingData: data,
-            height: 250,
-          ),
+          // LiveMapWidget(
+          //   trackingData: data,
+          //   height: 250,
+          // ),
         ],
       ),
     );
