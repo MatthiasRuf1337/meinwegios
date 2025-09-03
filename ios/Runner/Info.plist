@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>de</string>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Mein Weg</string>
 	<key>CFBundleExecutable</key>
@@ -12,6 +14,11 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>de</string>
+		<string>en</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>meinweg</string>
 	<key>CFBundlePackageType</key>
@@ -24,6 +31,28 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Die App benötigt Zugriff auf die Kamera, um Bilder während Ihrer Etappen aufzunehmen.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Die App benötigt dauerhaften Zugriff auf den Standort, um Ihre Etappen auch im Hintergrund zu verfolgen und aufzuzeichnen.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Die App benötigt dauerhaften Zugriff auf den Standort, um Ihre Etappen auch im Hintergrund zu verfolgen und aufzuzeichnen.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Die App benötigt Zugriff auf den Standort, um Ihre Etappen mit GPS zu verfolgen.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Die App benötigt Zugriff auf das Mikrofon für Audio-Aufnahmen.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Die App benötigt Zugriff auf Aktivitätserkennung, um Ihre Schritte zu zählen.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Die App möchte Ihre aufgenommenen Bilder in der Foto-Galerie speichern.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Die App benötigt Zugriff auf Fotos, um Bilder aus Ihrer Galerie zu importieren.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -43,41 +72,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-
-	<!-- Lokalisierung -->
-	<key>CFBundleLocalizations</key>
-	<array>
-		<string>de</string>
-		<string>en</string>
-	</array>
-
-	<!-- Berechtigungen -->
-	<key>NSCameraUsageDescription</key>
-	<string>Die App benötigt Zugriff auf die Kamera, um Bilder während Ihrer Etappen aufzunehmen.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Die App benötigt Zugriff auf den Standort, um Ihre Etappen mit GPS zu verfolgen.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Die App benötigt dauerhaften Zugriff auf den Standort, um Ihre Etappen auch im Hintergrund zu verfolgen und aufzuzeichnen.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Die App benötigt dauerhaften Zugriff auf den Standort, um Ihre Etappen auch im Hintergrund zu verfolgen und aufzuzeichnen.</string>
-	<key>NSMotionUsageDescription</key>
-	<string>Die App benötigt Zugriff auf Aktivitätserkennung, um Ihre Schritte zu zählen.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Die App benötigt Zugriff auf Fotos, um Bilder aus Ihrer Galerie zu importieren.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Die App möchte Ihre aufgenommenen Bilder in der Foto-Galerie speichern.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Die App benötigt Zugriff auf das Mikrofon für Audio-Aufnahmen.</string>
-	
-	<!-- Hintergrund-Modi -->
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-		<string>audio</string>
-	</array>
 </dict>
-</plist> 
+</plist>
