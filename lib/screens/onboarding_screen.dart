@@ -228,12 +228,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Titel
           Align(
             alignment: Alignment.centerLeft,
-            child: const Text(
+            child: Text(
               'Die App zu deinem Buch',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF5A7D7D),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Color(0xFF5A7D7D),
               ),
             ),
           ),
@@ -245,7 +247,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               'Diese App ist kein Ersatz für das Buch „Mein Weg – Meine Reise". Um sie vollständig zu nutzen, brauchst du das Pilgertagebuch in gedruckter Form. Dort findest du alle Texte, Seiten für Reflexion, thematischen Impulse und Zitate.',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey.shade700,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade300
+                    : Colors.grey.shade700,
               ),
             ),
           ),
@@ -258,7 +262,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade200
+                    : Colors.grey.shade800,
               ),
             ),
           ),
@@ -282,12 +288,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Titel
           Align(
             alignment: Alignment.centerLeft,
-            child: const Text(
+            child: Text(
               'Datenschutz & Berechtigungen',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF5A7D7D),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Color(0xFF5A7D7D),
               ),
             ),
           ),
@@ -298,7 +306,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               'Damit alle Funktionen reibungslos arbeiten, fragt die App beim Start den Zugriff auf verschiedene Bereiche ab.',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey.shade700,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade300
+                    : Colors.grey.shade700,
               ),
             ),
           ),
@@ -471,7 +481,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             permission,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade700,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey.shade300
+                  : Colors.grey.shade700,
             ),
           ),
         ],
@@ -492,7 +504,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               text,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey.shade700,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade300
+                    : Colors.grey.shade700,
               ),
             ),
           ),

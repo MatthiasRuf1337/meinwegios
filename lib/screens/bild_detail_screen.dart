@@ -24,10 +24,6 @@ class BildDetailScreen extends StatelessWidget {
             onPressed: () => _confirmDelete(context),
             tooltip: 'Bild löschen',
           ),
-          IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () => _shareBild(context),
-          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -174,13 +170,6 @@ class BildDetailScreen extends StatelessWidget {
     );
   }
 
-  void _shareBild(BuildContext context) {
-    // Implementierung für das Teilen des Bildes
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Teilen-Funktion wird implementiert...')),
-    );
-  }
-
   void _confirmDelete(BuildContext context) {
     showDialog(
       context: context,
@@ -193,7 +182,10 @@ class BildDetailScreen extends StatelessWidget {
             child: Text('Abbrechen'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF8C0A28)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF8C0A28),
+              foregroundColor: Colors.white,
+            ),
             onPressed: () async {
               Navigator.pop(context);
               // delete via provider
@@ -206,12 +198,6 @@ class BildDetailScreen extends StatelessWidget {
               // pop back after deletion
               // ignore: use_build_context_synchronously
               Navigator.pop(context);
-              // ignore: use_build_context_synchronously
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content: Text('Bild gelöscht'),
-                    backgroundColor: Color(0xFF8C0A28)),
-              );
             },
             child: Text('Löschen'),
           ),

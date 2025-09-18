@@ -320,47 +320,47 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                     etappe.wetterVerlauf.isNotEmpty)
                   SizedBox(height: 16),
 
-                // Route-Karte (nur wenn GPS-Daten vorhanden)
-                if (etappe.gpsPunkte.isNotEmpty)
-                  Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Gelaufene Route',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                              SizedBox(
-                                  width:
-                                      24), // Platzhalter für konsistenten Abstand
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Deine aufgezeichnete Strecke auf der Karte',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          // StaticRouteMapWidget(
-                          //   etappe: etappe,
-                          //   height: 300,
-                          // ),
-                        ],
-                      ),
-                    ),
-                  ),
-                if (etappe.gpsPunkte.isNotEmpty) SizedBox(height: 16),
+                // Route-Karte (nur wenn GPS-Daten vorhanden) - AUSGEBLENDET
+                // if (etappe.gpsPunkte.isNotEmpty)
+                //   Card(
+                //     child: Padding(
+                //       padding: EdgeInsets.all(16),
+                //       child: Column(
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         children: [
+                //           Row(
+                //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //             children: [
+                //               Text(
+                //                 'Gelaufene Route',
+                //                 style: TextStyle(
+                //                   fontSize: 14,
+                //                   fontWeight: FontWeight.bold,
+                //                   color: Colors.grey.shade600,
+                //                 ),
+                //               ),
+                //               SizedBox(
+                //                   width:
+                //                       24), // Platzhalter für konsistenten Abstand
+                //             ],
+                //           ),
+                //           SizedBox(height: 8),
+                //           Text(
+                //             'Deine aufgezeichnete Strecke auf der Karte',
+                //             style: TextStyle(
+                //               color: Colors.grey[600],
+                //             ),
+                //           ),
+                //           SizedBox(height: 16),
+                //           // StaticRouteMapWidget(
+                //           //   etappe: etappe,
+                //           //   height: 300,
+                //           // ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // if (etappe.gpsPunkte.isNotEmpty) SizedBox(height: 16),
 
                 // Impulsfragen-Sektion
                 _buildImpulsfrageSection(),
@@ -924,25 +924,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
           Provider.of<BilderProvider>(context, listen: false);
       await bilderProvider.loadBilder();
 
-      // Ehrliche Feedback-Nachricht je nach Erfolg des Galerie-Speicherns
-      if (gallerySaved) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Bild erfolgreich hinzugefügt und in Galerie gespeichert!'),
-            backgroundColor: Color(0xFF8C0A28),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Bild hinzugefügt! ⚠️ Nur in der App gespeichert - nicht in der Handy-Galerie.'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 5),
-          ),
-        );
-      }
+      // Bild erfolgreich hinzugefügt - keine Benachrichtigung mehr
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

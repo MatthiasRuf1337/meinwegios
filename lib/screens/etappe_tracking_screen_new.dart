@@ -479,17 +479,6 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             ],
           ),
           SizedBox(height: 16),
-
-          // Live-Karte
-          Text(
-            'Live-Karte',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          SizedBox(height: 8),
           // LiveMapWidget(
           //   trackingData: data,
           //   height: 250,
@@ -981,25 +970,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
             Provider.of<BilderProvider>(context, listen: false);
         await bilderProvider.loadBilder();
 
-        // Ehrliche Feedback-Nachricht je nach Erfolg des Galerie-Speicherns
-        if (gallerySaved) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Foto erfolgreich aufgenommen und in Galerie gespeichert!'),
-              backgroundColor: Color(0xFF8C0A28),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Foto aufgenommen! ⚠️ Nur in der App gespeichert - nicht in der Handy-Galerie.'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 5),
-            ),
-          );
-        }
+        // Foto erfolgreich aufgenommen - keine Benachrichtigung mehr
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1024,12 +995,7 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
               Provider.of<AudioProvider>(context, listen: false);
           await audioProvider.addAudioAufnahme(audioAufnahme);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Audio-Aufnahme gespeichert!'),
-              backgroundColor: Color(0xFF8C0A28),
-            ),
-          );
+          // Audio-Aufnahme gespeichert - keine Benachrichtigung mehr
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(

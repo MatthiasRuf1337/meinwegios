@@ -157,57 +157,57 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     ],
                   ),
 
-                  // Route-Karte (nur wenn GPS-Daten vorhanden)
-                  if (widget.etappe.gpsPunkte.isNotEmpty) ...[
-                    SizedBox(height: 24),
-                    Card(
-                      margin: EdgeInsets.symmetric(vertical: 8),
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.map,
-                                    size: 20, color: Colors.grey.shade600),
-                                SizedBox(width: 16),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Deine Route',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      'Deine aufgezeichnete Strecke',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 16),
-                            // StaticRouteMapWidget(
-                            //   etappe: widget.etappe,
-                            //   height: 250,
-                            // ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                  // Route-Karte (nur wenn GPS-Daten vorhanden) - AUSGEBLENDET
+                  // if (widget.etappe.gpsPunkte.isNotEmpty) ...[
+                  //   SizedBox(height: 24),
+                  //   Card(
+                  //     margin: EdgeInsets.symmetric(vertical: 8),
+                  //     elevation: 4,
+                  //     shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(12)),
+                  //     child: Padding(
+                  //       padding: EdgeInsets.all(16),
+                  //       child: Column(
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           Row(
+                  //             children: [
+                  //               Icon(Icons.map,
+                  //                   size: 20, color: Colors.grey.shade600),
+                  //               SizedBox(width: 16),
+                  //               Column(
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 children: [
+                  //                   Text(
+                  //                     'Deine Route',
+                  //                     style: TextStyle(
+                  //                       fontSize: 14,
+                  //                       fontWeight: FontWeight.bold,
+                  //                       color: Colors.grey.shade600,
+                  //                     ),
+                  //                   ),
+                  //                   SizedBox(height: 4),
+                  //                   Text(
+                  //                     'Deine aufgezeichnete Strecke',
+                  //                     style: TextStyle(
+                  //                       fontSize: 14,
+                  //                       color: Colors.grey.shade600,
+                  //                     ),
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //             ],
+                  //           ),
+                  //           SizedBox(height: 16),
+                  //           // StaticRouteMapWidget(
+                  //           //   etappe: widget.etappe,
+                  //           //   height: 250,
+                  //           // ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ],
 
                   SizedBox(height: 32),
 

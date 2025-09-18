@@ -84,14 +84,31 @@ class _GalerieScreenState extends State<GalerieScreen> {
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: TextField(
+        style: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.black
+              : Colors.black,
+        ),
         decoration: InputDecoration(
           hintText: 'Bilder durchsuchen...',
-          prefixIcon: Icon(Icons.search),
+          hintStyle: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey.shade600
+                : Colors.grey.shade500,
+          ),
+          prefixIcon: Icon(
+            Icons.search,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey.shade600
+                : Colors.grey.shade500,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           filled: true,
-          fillColor: Colors.grey.shade100,
+          fillColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey.shade200
+              : Colors.grey.shade100,
         ),
         onChanged: (value) {
           setState(() {
@@ -408,13 +425,6 @@ class _GalerieScreenState extends State<GalerieScreen> {
       final bilderProvider =
           Provider.of<BilderProvider>(context, listen: false);
       await bilderProvider.addBild(bild);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Bild erfolgreich hinzugefügt'),
-          backgroundColor: Color(0xFF5A7D7D),
-        ),
-      );
     } catch (e) {
       _showErrorSnackBar('Fehler beim Importieren des Bildes: $e');
     }
