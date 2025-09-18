@@ -42,33 +42,12 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
       _recordingDuration = Duration.zero;
     });
 
-    // Zeige Loading-Indikator
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-            SizedBox(width: 12),
-            Text('Aufnahme wird vorbereitet...'),
-          ],
-        ),
-        backgroundColor: Color(0xFF5A7D7D),
-        duration: Duration(seconds: 5),
-      ),
-    );
+    // Loading-Indikator entfernt
 
     // Aufnahme im Hintergrund starten (mit Typ 'normal')
     final success = await _audioService.startRecording(type: 'normal');
 
-    // Verstecke Loading-Indikator
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    // Loading-Indikator entfernt
 
     if (success) {
       // Stream für Aufnahme-Dauer abonnieren (nur für normale Aufnahmen)
