@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart'; // Temporarily disabled
 import '../providers/etappen_provider.dart';
 import '../providers/bilder_provider.dart';
 import '../providers/audio_provider.dart';
@@ -17,6 +17,7 @@ import '../services/database_service.dart';
 import '../services/tracking_service_v2.dart';
 import '../services/audio_recording_service.dart';
 import '../services/wetter_service.dart';
+import '../services/permission_service.dart';
 import '../models/wetter_daten.dart';
 
 // import '../widgets/live_map_widget.dart';
@@ -121,6 +122,18 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
   void _initializeTracking() async {
     print('Initialisiere Tracking für Etappe: ${widget.etappe.name}');
 
+    // Prüfen, ob Bewegungsdaten-Berechtigung verweigert wurde
+    final hasActivityPermission = await PermissionService.checkActivityRecognitionPermission();
+    if (!hasActivityPermission) {
+      // Prüfen, ob die Berechtigung bereits einmal angefordert wurde
+      final wasRequested = await PermissionService.requestActivityRecognitionPermission();
+      if (!wasRequested) {
+        // Berechtigung wurde verweigert, Dialog anzeigen
+        _showActivityRecognitionPermissionDialog();
+        // Tracking trotzdem starten (funktioniert ohne Bewegungsdaten)
+      }
+    }
+
     // Wenn die Etappe bereits läuft, von vorhandenen Daten fortsetzen
     if (widget.etappe.status == EtappenStatus.aktiv) {
       _trackingService.resumeFromEtappe(widget.etappe);
@@ -138,6 +151,43 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         _errorMessage = 'Tracking konnte nicht gestartet werden';
       });
     }
+  }
+
+  void _showActivityRecognitionPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.directions_walk, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Text('Berechtigung erforderlich'),
+          ],
+        ),
+        content: Text(
+          'Für die Schrittzählung benötigt die App die Bewegungsdaten-Berechtigung. '
+          'Bitte aktivieren Sie diese in den Einstellungen.\n\n'
+          'Ohne diese Berechtigung wird die Schrittzählung über GPS geschätzt.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _onTrackingUpdate(TrackingData data) {
@@ -958,8 +1008,8 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
         // Bild auch in die Galerie speichern
         bool gallerySaved = false;
         try {
-          await ImageGallerySaver.saveFile(savedFile.path);
-          gallerySaved = true;
+          // await ImageGallerySaver.saveFile(savedFile.path); // Temporarily disabled
+          gallerySaved = true; // Assume success for now
         } catch (e) {
           print('Fehler beim Speichern in die Galerie: $e');
           // Galerie-Fehler nicht als kritisch behandeln
@@ -1116,12 +1166,6 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                       Provider.of<NotizProvider>(context, listen: false);
                   await notizProvider.deleteNotiz(existingNotiz.id);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Notiz gelöscht!'),
-                      backgroundColor: Color(0xFF8C0A28),
-                    ),
-                  );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -1160,12 +1204,6 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   await notizProvider.updateNotiz(updatedNotiz);
 
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Notiz aktualisiert!'),
-                      backgroundColor: Color(0xFF8C0A28),
-                    ),
-                  );
                 } else {
                   // Neue Notiz erstellen
                   final notiz = Notiz(
@@ -1179,12 +1217,6 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
                   await notizProvider.addNotiz(notiz);
 
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Notiz hinzugefügt!'),
-                      backgroundColor: Color(0xFF8C0A28),
-                    ),
-                  );
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(

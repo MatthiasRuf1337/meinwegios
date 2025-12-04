@@ -46,6 +46,11 @@
             android:exported="false"
             android:foregroundServiceType="location" />
             
+        <!-- Support for 16 KB page size devices (Android 15+) -->
+        <meta-data
+            android:name="android.app.PROPERTY_NATIVE_LIBRARY_PAGE_SIZE"
+            android:value="16384" />
+            
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

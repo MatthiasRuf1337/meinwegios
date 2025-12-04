@@ -7,6 +7,7 @@ import '../providers/bilder_provider.dart';
 import '../models/bild.dart';
 import 'bild_detail_screen.dart';
 import '../widgets/legal_menu_widget.dart';
+import '../services/permission_service.dart';
 import 'dart:io';
 
 class GalerieScreen extends StatefulWidget {
@@ -367,6 +368,17 @@ class _GalerieScreenState extends State<GalerieScreen> {
         await _importImage(File(image.path));
       }
     } catch (e) {
+      // Prüfen, ob es ein Berechtigungsfehler war
+      if (e.toString().contains('permission') ||
+          e.toString().contains('denied')) {
+        // Prüfen, ob die Kamera-Berechtigung tatsächlich verweigert wurde
+        final hasPermission = await PermissionService.checkCameraPermission();
+        if (!hasPermission) {
+          _showCameraPermissionDialog();
+          return;
+        }
+      }
+
       _showErrorSnackBar('Fehler beim Aufnehmen des Fotos: $e');
     }
   }
@@ -385,8 +397,92 @@ class _GalerieScreenState extends State<GalerieScreen> {
         await _importImage(File(image.path));
       }
     } catch (e) {
+      // Prüfen, ob es ein Berechtigungsfehler war
+      if (e.toString().contains('permission') ||
+          e.toString().contains('denied')) {
+        // Prüfen, ob die Foto-Berechtigung tatsächlich verweigert wurde
+        final hasPermission = await PermissionService.checkPhotosPermission();
+        if (!hasPermission) {
+          _showPhotoPermissionDialog();
+          return;
+        }
+      }
+
       _showErrorSnackBar('Fehler beim Auswählen des Bildes: $e');
     }
+  }
+
+  void _showPhotoPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Text('Berechtigung erforderlich'),
+          ],
+        ),
+        content: Text(
+          'Für den Zugriff auf Ihre Fotos benötigt die App die Foto-Berechtigung. '
+          'Bitte aktivieren Sie diese in den Einstellungen.\n\n'
+          'Achtung: Bei Nicht-Aktivierung werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCameraPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.camera_alt, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Text('Berechtigung erforderlich'),
+          ],
+        ),
+        content: Text(
+          'Für das Aufnehmen von Fotos benötigt die App die Kamera-Berechtigung. '
+          'Bitte aktivieren Sie diese in den Einstellungen.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _importImage(File imageFile) async {

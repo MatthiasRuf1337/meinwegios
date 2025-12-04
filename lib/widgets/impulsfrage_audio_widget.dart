@@ -4,6 +4,7 @@ import 'dart:async';
 import '../models/audio_aufnahme.dart';
 import '../providers/audio_provider.dart';
 import '../services/audio_recording_service.dart';
+import '../services/permission_service.dart';
 
 class ImpulsfrageAudioWidget extends StatefulWidget {
   final String etappenId;
@@ -42,6 +43,13 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
       setState(() {
         _recordingDuration = Duration.zero;
       });
+
+      // Prüfen, ob die Mikrofon-Berechtigung verweigert wurde
+      final hasPermission = await PermissionService.checkMicrophonePermission();
+      if (!hasPermission) {
+        _showMicrophonePermissionDialog();
+        return;
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -85,6 +93,13 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
         _recordingDuration = Duration.zero;
       });
 
+      // Prüfen, ob die Mikrofon-Berechtigung verweigert wurde
+      final hasPermission = await PermissionService.checkMicrophonePermission();
+      if (!hasPermission) {
+        _showMicrophonePermissionDialog();
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -109,6 +124,9 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
     if (audioAufnahme != null) {
       final audioProvider = Provider.of<AudioProvider>(context, listen: false);
       await audioProvider.addAudioAufnahme(audioAufnahme);
+      
+      // Sicherstellen, dass die Liste aktualisiert wird
+      await audioProvider.loadAudioAufnahmen();
 
       // Erfolgsmeldung entfernt - keine SnackBar mehr
     } else {
@@ -423,13 +441,42 @@ class _ImpulsfrageAudioWidgetState extends State<ImpulsfrageAudioWidget> {
     if (confirmed == true) {
       final audioProvider = Provider.of<AudioProvider>(context, listen: false);
       await audioProvider.deleteAudioAufnahme(audio.id);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Audio-Notiz gelöscht'),
-          backgroundColor: Color(0xFF8C0A28),
-        ),
-      );
     }
+  }
+
+  void _showMicrophonePermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.mic, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Text('Berechtigung erforderlich'),
+          ],
+        ),
+        content: Text(
+          'Für Audio-Aufnahmen benötigt die App die Mikrofon-Berechtigung. '
+          'Bitte aktivieren Sie diese in den Einstellungen.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
   }
 }

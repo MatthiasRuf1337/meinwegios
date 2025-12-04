@@ -57,7 +57,12 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
           children: [
             // Hauptinhalt
             SingleChildScrollView(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: 100, // Extra Platz am Ende für besseres Scrollen auf Android
+              ),
               child: Column(
                 children: [
                   SizedBox(height: 40),
@@ -270,6 +275,9 @@ class _EtappeCompletedScreenState extends State<EtappeCompletedScreen> {
                     },
                     child: Text('Zur Übersicht'),
                   ),
+                  
+                  // Zusätzliches Padding am Ende für besseres Scrollen auf Android
+                  SizedBox(height: 100),
                 ],
               ),
             ),

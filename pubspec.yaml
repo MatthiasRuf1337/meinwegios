@@ -1,7 +1,7 @@
 name: meinweg
 description: Etappen-Tracking App für Wanderungen und Touren
 publish_to: 'none'
-version: 1.2.0+1
+version: 1.2.1+24
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -27,7 +27,7 @@ dependencies:
   image_picker: ^1.0.4
   camera: ^0.10.5+5
   file_picker: ^8.0.0+1
-  image_gallery_saver: ^2.0.3
+  # image_gallery_saver: ^2.0.3  # Temporarily disabled for Android compatibility
   uuid: ^4.0.0
 
   # PDF und Audio
@@ -63,6 +63,9 @@ dependencies:
 
   # URL Launcher für externe Links
   url_launcher: ^6.2.2
+
+  # Teilen-Funktionalität
+  share_plus: ^7.2.1
 
 dev_dependencies:
   flutter_test:

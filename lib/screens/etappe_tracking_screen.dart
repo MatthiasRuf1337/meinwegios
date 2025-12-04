@@ -14,6 +14,7 @@ import '../providers/bilder_provider.dart';
 import '../services/database_service.dart';
 import '../services/global_audio_manager.dart';
 import '../services/background_permission_service.dart';
+import '../services/permission_service.dart';
 import 'dart:async';
 
 class EtappeTrackingScreen extends StatefulWidget {
@@ -836,15 +837,15 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
     print('Starte Schrittzählung...');
 
     // Berechtigung prüfen
-    bool granted = await Permission.activityRecognition.isGranted;
+    bool granted = await PermissionService.checkActivityRecognitionPermission();
     if (!granted) {
-      granted = await Permission.activityRecognition.request() ==
-          PermissionStatus.granted;
-    }
-
-    if (!granted) {
-      print('Aktivitätserkennung-Berechtigung verweigert');
-      return;
+      granted = await PermissionService.requestActivityRecognitionPermission();
+      if (!granted) {
+        print('Aktivitätserkennung-Berechtigung verweigert');
+        // Dialog anzeigen
+        _showActivityRecognitionPermissionDialog();
+        return;
+      }
     }
 
     // SOFORT den Stream starten, bevor wir die initialen Schritte holen
@@ -1227,5 +1228,42 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
       print('GPS-Tracking läuft - Status überwacht');
       // Hier können wir zusätzliche Überwachung implementieren
     }
+  }
+
+  void _showActivityRecognitionPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.directions_walk, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Text('Berechtigung erforderlich'),
+          ],
+        ),
+        content: Text(
+          'Für die Schrittzählung benötigt die App die Bewegungsdaten-Berechtigung. '
+          'Bitte aktivieren Sie diese in den Einstellungen.\n\n'
+          'Ohne diese Berechtigung wird die Schrittzählung über GPS geschätzt.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
   }
 }

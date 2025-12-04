@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 import '../providers/medien_provider.dart';
 import '../providers/settings_provider.dart';
@@ -360,13 +361,32 @@ class _MediathekScreenState extends State<MediathekScreen> {
     }
   }
 
-  void _shareMedien(MedienDatei medienDatei) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Teilen-Funktion wird implementiert...'),
-        backgroundColor: Color(0xFF8C0A28),
-      ),
-    );
+  void _shareMedien(MedienDatei medienDatei) async {
+    try {
+      final file = File(medienDatei.dateipfad);
+      if (!file.existsSync()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Datei nicht gefunden'),
+            backgroundColor: Color(0xFF8C0A28),
+          ),
+        );
+        return;
+      }
+
+      final xFile = XFile(file.path);
+      await Share.shareXFiles(
+        [xFile],
+        text: medienDatei.dateiname,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Fehler beim Teilen: $e'),
+          backgroundColor: Color(0xFF8C0A28),
+        ),
+      );
+    }
   }
 
   void _deleteMedien(MedienDatei medienDatei) {
@@ -488,15 +508,7 @@ class _MediathekScreenState extends State<MediathekScreen> {
           Provider.of<MedienProvider>(context, listen: false);
       final success = await medienProvider.importFile(file);
 
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Datei erfolgreich importiert: ${file.path.split('/').last}'),
-            backgroundColor: Color(0xFF8C0A28),
-          ),
-        );
-      } else {
+      if (!success) {
         _showErrorSnackBar('Fehler beim Importieren der Datei');
       }
     } catch (e) {

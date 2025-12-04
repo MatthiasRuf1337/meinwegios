@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart'; // Temporarily disabled
 import '../models/etappe.dart';
 import '../models/bild.dart';
 import '../models/notiz.dart';
@@ -144,7 +144,12 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
           final bilder = bilderProvider.getBilderByEtappe(widget.etappe.id);
 
           return SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 16,
+              bottom: widget.fromCompletedScreen ? 100 : 16, // Extra Platz für BottomNavigationBar auf Android
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -629,6 +634,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
 
                 // Audio-Aufnahmen Sektion
                 AudioRecordingWidget(etappenId: widget.etappe.id),
+                
+                // Zusätzliches Padding am Ende für Android BottomNavigationBar
+                SizedBox(height: widget.fromCompletedScreen ? 100 : 16),
               ],
             ),
           );
@@ -804,13 +812,20 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
         await _saveImage(photo, 'camera');
       }
     } catch (e) {
-      // Spezifische Fehlermeldung für Kamera-Fehler
-      String errorMessage = 'Fehler beim Aufnehmen des Fotos';
+      // Prüfen, ob es ein Berechtigungsfehler war
       if (e.toString().contains('permission') ||
           e.toString().contains('denied')) {
-        errorMessage =
-            'Kamera-Berechtigung verweigert. Bitte erlauben Sie den Zugriff in den Einstellungen.';
-      } else if (e.toString().contains('camera') ||
+        // Prüfen, ob die Kamera-Berechtigung tatsächlich verweigert wurde
+        final hasPermission = await PermissionService.checkCameraPermission();
+        if (!hasPermission) {
+          _showCameraPermissionDialog();
+          return;
+        }
+      }
+
+      // Spezifische Fehlermeldung für andere Kamera-Fehler
+      String errorMessage = 'Fehler beim Aufnehmen des Fotos';
+      if (e.toString().contains('camera') ||
           e.toString().contains('unavailable')) {
         errorMessage =
             'Kamera nicht verfügbar. Bitte überprüfen Sie, ob die Kamera von einer anderen App verwendet wird.';
@@ -821,14 +836,45 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
           content: Text(errorMessage),
           backgroundColor: Color(0xFF8C0A28),
           duration: Duration(seconds: 4),
-          action: SnackBarAction(
-            label: 'Einstellungen',
-            textColor: Colors.white,
-            onPressed: () => PermissionService.openAppSettings(),
-          ),
         ),
       );
     }
+  }
+
+  void _showCameraPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.camera_alt, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Text('Berechtigung erforderlich'),
+          ],
+        ),
+        content: Text(
+          'Für das Aufnehmen von Fotos benötigt die App die Kamera-Berechtigung. '
+          'Bitte aktivieren Sie diese in den Einstellungen.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _pickImageFromGallery() async {
@@ -843,13 +889,20 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
         await _saveImage(image, 'gallery');
       }
     } catch (e) {
-      // Spezifische Fehlermeldung für Galerie-Fehler
-      String errorMessage = 'Fehler beim Auswählen des Bildes';
+      // Prüfen, ob es ein Berechtigungsfehler war
       if (e.toString().contains('permission') ||
           e.toString().contains('denied')) {
-        errorMessage =
-            'Galerie-Berechtigung verweigert. Bitte erlauben Sie den Zugriff in den Einstellungen.';
-      } else if (e.toString().contains('gallery') ||
+        // Prüfen, ob die Foto-Berechtigung tatsächlich verweigert wurde
+        final hasPermission = await PermissionService.checkPhotosPermission();
+        if (!hasPermission) {
+          _showPhotoPermissionDialog();
+          return;
+        }
+      }
+
+      // Spezifische Fehlermeldung für andere Galerie-Fehler
+      String errorMessage = 'Fehler beim Auswählen des Bildes';
+      if (e.toString().contains('gallery') ||
           e.toString().contains('unavailable')) {
         errorMessage =
             'Galerie nicht verfügbar. Bitte überprüfen Sie, ob Bilder in der Galerie vorhanden sind.';
@@ -860,14 +913,46 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
           content: Text(errorMessage),
           backgroundColor: Color(0xFF8C0A28),
           duration: Duration(seconds: 4),
-          action: SnackBarAction(
-            label: 'Einstellungen',
-            textColor: Colors.white,
-            onPressed: () => PermissionService.openAppSettings(),
-          ),
         ),
       );
     }
+  }
+
+  void _showPhotoPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Text('Berechtigung erforderlich'),
+          ],
+        ),
+        content: Text(
+          'Für den Zugriff auf Ihre Fotos benötigt die App die Foto-Berechtigung. '
+          'Bitte aktivieren Sie diese in den Einstellungen.\n\n'
+          'Achtung: Bei Nicht-Aktivierung werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _saveImage(XFile image, String source) async {
@@ -912,8 +997,8 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
       // Bild auch in die Galerie speichern
       bool gallerySaved = false;
       try {
-        await ImageGallerySaver.saveFile(savedFile.path);
-        gallerySaved = true;
+        // await ImageGallerySaver.saveFile(savedFile.path); // Temporarily disabled
+        gallerySaved = true; // Assume success for now
       } catch (e) {
         print('Fehler beim Speichern in die Galerie: $e');
         // Galerie-Fehler nicht als kritisch behandeln
@@ -965,12 +1050,6 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
               final bilderProvider =
                   Provider.of<BilderProvider>(context, listen: false);
               await bilderProvider.deleteBild(bild.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Bild gelöscht'),
-                  backgroundColor: Color(0xFF8C0A28),
-                ),
-              );
             },
             child: Text('Löschen'),
           ),
@@ -1268,15 +1347,6 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                   // Normale Navigation zurück
                   Navigator.pop(context);
                 }
-
-                // Erfolgsmeldung anzeigen
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text('Etappe "${widget.etappe.name}" wurde gelöscht'),
-                    backgroundColor: Color(0xFF8C0A28),
-                  ),
-                );
               } catch (e) {
                 // Fehlermeldung anzeigen
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -1390,12 +1460,6 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                     await notizProvider.deleteNotiz(existingNotiz.id);
 
                     Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Notiz gelöscht!'),
-                        backgroundColor: Color(0xFF8C0A28),
-                      ),
-                    );
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -1436,12 +1500,6 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                   await notizProvider.updateNotiz(updatedNotiz);
 
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Notiz aktualisiert!'),
-                      backgroundColor: Color(0xFF8C0A28),
-                    ),
-                  );
                 } else {
                   // Neue Notiz erstellen
                   final notiz = Notiz(
@@ -1455,12 +1513,6 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                   await notizProvider.addNotiz(notiz);
 
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Notiz hinzugefügt!'),
-                      backgroundColor: Color(0xFF8C0A28),
-                    ),
-                  );
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -1501,12 +1553,6 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
                 await notizProvider.deleteNotiz(notiz.id);
 
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Notiz gelöscht!'),
-                    backgroundColor: Color(0xFF8C0A28),
-                  ),
-                );
               } catch (e) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(

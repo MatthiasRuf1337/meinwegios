@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class AudioAufnahme {
   final String id;
   final String dateiname;
@@ -30,7 +32,7 @@ class AudioAufnahme {
       'dauer': dauer.inMilliseconds,
       'etappenId': etappenId,
       'notiz': notiz,
-      'metadaten': metadaten != null ? metadaten.toString() : null,
+      'metadaten': metadaten != null ? json.encode(metadaten) : null,
       'typ': typ,
     };
   }
@@ -44,9 +46,19 @@ class AudioAufnahme {
       dauer: Duration(milliseconds: map['dauer']),
       etappenId: map['etappenId'],
       notiz: map['notiz'],
-      metadaten: map['metadaten'] != null
-          ? Map<String, dynamic>.from(map['metadaten'])
-          : null,
+      metadaten: (() {
+        if (map['metadaten'] == null) return null;
+        try {
+          if (map['metadaten'] is String) {
+            return Map<String, dynamic>.from(json.decode(map['metadaten']));
+          } else if (map['metadaten'] is Map) {
+            return Map<String, dynamic>.from(map['metadaten']);
+          }
+        } catch (e) {
+          print('Fehler beim Parsen der Metadaten: $e');
+        }
+        return null;
+      })(),
       typ: map['typ'] ?? 'allgemein', // Fallback für bestehende Daten
     );
   }
