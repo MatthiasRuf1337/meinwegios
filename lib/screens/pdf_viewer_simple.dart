@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
-import 'package:share_plus/share_plus.dart';
 import '../models/medien_datei.dart';
 import 'dart:io';
 
@@ -25,12 +24,6 @@ class _PDFViewerSimpleState extends State<PDFViewerSimple> {
         title: Text(widget.medienDatei.dateiname),
         backgroundColor: Color(0xFF5A7D7D),
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () => _sharePDF(context),
-          ),
-        ],
       ),
       body: _buildContent(),
     );
@@ -268,31 +261,4 @@ class _PDFViewerSimpleState extends State<PDFViewerSimple> {
     }
   }
 
-  void _sharePDF(BuildContext context) async {
-    try {
-      final file = File(widget.medienDatei.dateipfad);
-      if (!file.existsSync()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('PDF-Datei nicht gefunden'),
-            backgroundColor: Color(0xFF8C0A28),
-          ),
-        );
-        return;
-      }
-
-      final xFile = XFile(file.path);
-      await Share.shareXFiles(
-        [xFile],
-        text: widget.medienDatei.dateiname,
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Fehler beim Teilen: $e'),
-          backgroundColor: Color(0xFF8C0A28),
-        ),
-      );
-    }
-  }
 }

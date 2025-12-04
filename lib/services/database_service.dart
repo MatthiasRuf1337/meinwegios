@@ -322,18 +322,6 @@ class DatabaseService {
   // Vorab geladene Medien (PDFs und MP3s) importieren
   Future<void> importPreloadedMedia() async {
     try {
-      // Datenbank zurücksetzen für Medien-Import
-      final db = await database;
-      await db.delete('medien_dateien');
-      print('Datenbank für Medien-Import zurückgesetzt');
-
-      // Prüfen ob bereits Medien in der Datenbank sind
-      final existingMedia = await getMedienDateien();
-      if (existingMedia.isNotEmpty) {
-        print('Medien bereits in der Datenbank vorhanden, überspringe Import');
-        return;
-      }
-
       // Assets-Verzeichnis durchsuchen
       final manifestContent = await rootBundle.loadString('AssetManifest.json');
       final Map<String, dynamic> manifestMap = json.decode(manifestContent);
@@ -377,22 +365,29 @@ class DatabaseService {
       final id =
           'preloaded_${fileName.replaceAll(extension, '').replaceAll(' ', '_')}';
 
-      // Temporären Pfad für die Datei erstellen
-      final tempDir = await getTemporaryDirectory();
-      final tempPath = '${tempDir.path}/$fileName';
+      // Prüfen ob bereits vorhanden
+      final existingMedia = await getMedienDateien();
+      if (existingMedia.any((media) => media.id == id)) {
+        print('Vorab geladenes Medium bereits vorhanden: $fileName');
+        return;
+      }
 
-      // Datei in temporäres Verzeichnis schreiben
-      final file = File(tempPath);
+      // App-Verzeichnis für Dateien verwenden (nicht temporäres Verzeichnis)
+      final appDir = await getAppDirectory();
+      final targetPath = '${appDir.path}/$fileName';
+
+      // Datei in App-Verzeichnis schreiben
+      final file = File(targetPath);
       await file.writeAsBytes(bytes);
 
       // Prüfen ob Datei erfolgreich geschrieben wurde
       if (!file.existsSync()) {
-        print('Fehler: Datei konnte nicht geschrieben werden: $tempPath');
+        print('Fehler: Datei konnte nicht geschrieben werden: $targetPath');
         return;
       }
 
       print(
-          '${typ == MedienTyp.pdf ? 'PDF' : 'MP3'} erfolgreich kopiert nach: $tempPath');
+          '${typ == MedienTyp.pdf ? 'PDF' : 'MP3'} erfolgreich kopiert nach: $targetPath');
       print('Dateigröße: ${file.lengthSync()} bytes');
 
       // MedienDatei-Objekt erstellen
@@ -400,7 +395,7 @@ class DatabaseService {
         id: id,
         typ: typ,
         dateiname: fileName,
-        dateipfad: tempPath,
+        dateipfad: targetPath,
         groesse: bytes.length,
         importDatum: DateTime.now(),
         metadaten: {

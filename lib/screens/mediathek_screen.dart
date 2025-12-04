@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 import '../providers/medien_provider.dart';
 import '../providers/settings_provider.dart';
@@ -278,16 +277,6 @@ class _MediathekScreenState extends State<MediathekScreen> {
                 ],
               ),
             ),
-            PopupMenuItem(
-              value: 'share',
-              child: Row(
-                children: [
-                  Icon(Icons.share),
-                  SizedBox(width: 8),
-                  Text('Teilen'),
-                ],
-              ),
-            ),
             // Löschen-Option nur für normale Dateien, nicht für Verlagsdateien
             if (!medienDatei.istVerlagsdatei)
               PopupMenuItem(
@@ -352,42 +341,12 @@ class _MediathekScreenState extends State<MediathekScreen> {
       case 'open':
         _openMedien(medienDatei);
         break;
-      case 'share':
-        _shareMedien(medienDatei);
-        break;
       case 'delete':
         _deleteMedien(medienDatei);
         break;
     }
   }
 
-  void _shareMedien(MedienDatei medienDatei) async {
-    try {
-      final file = File(medienDatei.dateipfad);
-      if (!file.existsSync()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Datei nicht gefunden'),
-            backgroundColor: Color(0xFF8C0A28),
-          ),
-        );
-        return;
-      }
-
-      final xFile = XFile(file.path);
-      await Share.shareXFiles(
-        [xFile],
-        text: medienDatei.dateiname,
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Fehler beim Teilen: $e'),
-          backgroundColor: Color(0xFF8C0A28),
-        ),
-      );
-    }
-  }
 
   void _deleteMedien(MedienDatei medienDatei) {
     // Verlagsdateien können nicht gelöscht werden

@@ -64,9 +64,6 @@ dependencies:
   # URL Launcher für externe Links
   url_launcher: ^6.2.2
 
-  # Teilen-Funktionalität
-  share_plus: ^7.2.1
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
