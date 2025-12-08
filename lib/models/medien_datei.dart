@@ -46,6 +46,7 @@ class MedienDatei {
       'Thumbnail_Die_Magie_des_Pilgerns.jpg',
       'Thumbnail_Mache_dich_auf_den_Weg.jpg',
       'Thumbnail_Packliste.jpg',
+      'Thumbnail_Packliste_Wandern.jpg',
     ];
 
     if (knownThumbnails.contains(thumbnailName)) {
@@ -162,7 +163,7 @@ class MedienDatei {
     if (name.contains('atem ruhe freundlichkeit')) return 2;
     if (name.contains('die magie des pilgerns')) return 3;
     if (name.contains('mache dich auf den weg')) return 4;
-    if (name.contains('packliste')) return 5;
+    if (name.contains('packliste')) return 5; // Packliste Wandern
 
     return 6; // Andere Buchdateien
   }
@@ -180,8 +181,8 @@ class MedienDatei {
         baseName = 'Die Magie des Pilgerns';
       } else if (nameLower == 'mache dich auf den weg') {
         baseName = 'Mache dich auf den Weg';
-      } else if (nameLower == 'packliste') {
-        baseName = 'Packliste';
+      } else if (nameLower == 'packliste wandern') {
+        baseName = 'Packliste Wandern';
       } else {
         baseName = name;
       }

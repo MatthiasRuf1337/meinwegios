@@ -79,6 +79,7 @@ flutter:
     - assets/images/Thumbnail_Die_Magie_des_Pilgerns.jpg
     - assets/images/Thumbnail_Mache_dich_auf_den_Weg.jpg
     - assets/images/Thumbnail_Packliste.jpg
+    - assets/images/Thumbnail_Packliste_Wandern.jpg
     - assets/images/Marco_Bach_2025.jpg
     - assets/audio/
     - assets/audio/3 Minuten Atemraum.mp3
@@ -86,7 +87,7 @@ flutter:
     - assets/pdf/
     - assets/pdf/Die Magie des Pilgerns.pdf
     - assets/pdf/Mache dich auf den Weg.pdf
-    - assets/pdf/Packliste.pdf
+    - assets/pdf/Packliste Wandern.pdf
     - icon.png
     - Zitate.csv
     - Impulsfragen.csv

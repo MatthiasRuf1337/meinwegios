@@ -30,7 +30,11 @@ class ThumbnailService {
 
     // Spezielle Behandlung für Packliste (Hardcoded-Fix für TestFlight)
     if (medienDatei.dateiname.toLowerCase().contains('packliste')) {
-      assetPath = 'assets/images/Thumbnail_Packliste.jpg';
+      if (medienDatei.dateiname.toLowerCase().contains('wandern')) {
+        assetPath = 'assets/images/Thumbnail_Packliste_Wandern.jpg';
+      } else {
+        assetPath = 'assets/images/Thumbnail_Packliste.jpg';
+      }
     }
 
     return Container(
@@ -84,7 +88,11 @@ class ThumbnailService {
 
     // Spezielle Behandlung für Packliste (Hardcoded-Fix für TestFlight)
     if (medienDatei.dateiname.toLowerCase().contains('packliste')) {
-      assetPath = 'assets/images/Thumbnail_Packliste.jpg';
+      if (medienDatei.dateiname.toLowerCase().contains('wandern')) {
+        assetPath = 'assets/images/Thumbnail_Packliste_Wandern.jpg';
+      } else {
+        assetPath = 'assets/images/Thumbnail_Packliste.jpg';
+      }
     }
 
     return Container(
