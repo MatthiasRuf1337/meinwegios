@@ -7,6 +7,7 @@ import '../providers/medien_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/medien_datei.dart';
 import '../services/thumbnail_service.dart';
+import '../services/database_service.dart';
 import 'mediathek_login_screen.dart';
 import 'audio_player_screen.dart';
 import '../widgets/legal_menu_widget.dart';
@@ -501,6 +502,15 @@ class _MediathekScreenState extends State<MediathekScreen> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.refresh),
+              title: Text('Standard-Dateien neu importieren'),
+              subtitle: Text('PDFs und MP3s aus Assets'),
+              onTap: () {
+                Navigator.pop(context);
+                _reimportPreloadedMedia(context);
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.logout),
               title: Text('Abmelden'),
               onTap: () {
@@ -664,5 +674,83 @@ class _MediathekScreenState extends State<MediathekScreen> {
         backgroundColor: Color(0xFF8C0A28),
       ),
     );
+  }
+
+  Future<void> _reimportPreloadedMedia(BuildContext context) async {
+    // Zeige Bestätigungsdialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Standard-Dateien neu importieren'),
+        content: Text(
+          'Möchten Sie die Standard-PDFs und MP3s aus den Assets neu importieren? '
+          'Bereits vorhandene Dateien werden dabei überschrieben.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Neu importieren'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    // Zeige Ladeindikator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Importiere Standard-Dateien...'),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      // Importiere vorab geladene Medien neu
+      await DatabaseService.instance.reimportPreloadedMedia();
+
+      // Lade Medien neu
+      final medienProvider =
+          Provider.of<MedienProvider>(context, listen: false);
+      await medienProvider.loadMedienDateien();
+
+      // Schließe Ladeindikator
+      Navigator.pop(context);
+
+      // Zeige Erfolgsmeldung
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Standard-Dateien erfolgreich neu importiert'),
+          backgroundColor: Color(0xFF5A7D7D),
+        ),
+      );
+    } catch (e) {
+      // Schließe Ladeindikator
+      Navigator.pop(context);
+
+      // Zeige Fehlermeldung
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Fehler beim Neuimportieren: $e'),
+          backgroundColor: Color(0xFF8C0A28),
+        ),
+      );
+    }
   }
 }
