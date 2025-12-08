@@ -409,7 +409,18 @@ class DatabaseService {
       for (String assetPath in standardPDFs) {
         // Prüfe case-insensitive
         final normalizedPath = assetPath.toLowerCase();
-        if (!importedAssets.contains(normalizedPath)) {
+
+        // Spezial-Behandlung für Packliste: Immer versuchen zu importieren
+        // (Fix für Release-Build-Problem in TestFlight)
+        if (assetPath.toLowerCase().contains('packliste')) {
+          print(
+              '  Packliste: Force-Import aufgrund bekannter Release-Build-Probleme');
+          try {
+            await _importAsset(assetPath, MedienTyp.pdf);
+          } catch (e) {
+            print('Fehler beim Importieren von Packliste: $e');
+          }
+        } else if (!importedAssets.contains(normalizedPath)) {
           print('  PDF fehlt im Manifest, importiere direkt: $assetPath');
           try {
             await _importAsset(assetPath, MedienTyp.pdf);
@@ -558,6 +569,16 @@ class DatabaseService {
         existingMediaItem = null;
       }
       print('Bereits vorhandene Medien: ${existingMedia.length}');
+
+      // Debug: Zeige alle vorhandenen IDs für PDFs
+      if (typ == MedienTyp.pdf) {
+        final existingPDFs =
+            existingMedia.where((m) => m.typ == MedienTyp.pdf).toList();
+        print('Vorhandene PDF-IDs in DB:');
+        for (var pdf in existingPDFs) {
+          print('  - ID: ${pdf.id}, Dateiname: ${pdf.dateiname}');
+        }
+      }
 
       // Wenn bereits vorhanden, prüfe ob Datei noch existiert
       if (existingMediaItem != null) {
