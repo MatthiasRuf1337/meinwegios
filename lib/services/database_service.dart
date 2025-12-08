@@ -348,6 +348,9 @@ class DatabaseService {
         'assets/audio/Atem Ruhe Freundlichkeit.mp3',
       ];
 
+      // Setze für alle Standard-Dateien, die importiert wurden
+      final Set<String> importedAssets = {};
+
       // Versuche zuerst über AssetManifest
       try {
         final manifestContent =
@@ -367,50 +370,70 @@ class DatabaseService {
           print('  - $key');
         }
 
-        // PDFs importieren
+        // PDFs importieren - prüfe auch case-insensitive
         final pdfAssets = manifestMap.keys
             .where((String key) =>
-                key.startsWith('assets/pdf/') && key.endsWith('.pdf'))
+                key.toLowerCase().startsWith('assets/pdf/') &&
+                key.toLowerCase().endsWith('.pdf'))
             .toList();
 
         print('Gefundene PDF-Assets im Manifest: ${pdfAssets.length}');
         for (String assetPath in pdfAssets) {
           print('  - $assetPath');
           await _importAsset(assetPath, MedienTyp.pdf);
+          // Normalisiere den Pfad für Vergleich (case-insensitive)
+          importedAssets.add(assetPath.toLowerCase());
         }
 
-        // MP3s importieren
+        // MP3s importieren - prüfe auch case-insensitive
         final mp3Assets = manifestMap.keys
             .where((String key) =>
-                key.startsWith('assets/audio/') && key.endsWith('.mp3'))
+                key.toLowerCase().startsWith('assets/audio/') &&
+                key.toLowerCase().endsWith('.mp3'))
             .toList();
 
         print('Gefundene MP3-Assets im Manifest: ${mp3Assets.length}');
         for (String assetPath in mp3Assets) {
           print('  - $assetPath');
           await _importAsset(assetPath, MedienTyp.mp3);
+          // Normalisiere den Pfad für Vergleich (case-insensitive)
+          importedAssets.add(assetPath.toLowerCase());
         }
       } catch (e) {
         print('Fehler beim Laden über AssetManifest: $e');
         print('Versuche direkten Import der Standard-Dateien...');
       }
 
-      // Fallback: Direkter Import der Standard-Dateien
-      print('Importiere Standard-PDFs direkt:');
+      // Fallback: Direkter Import der Standard-Dateien, die nicht über Manifest importiert wurden
+      print('Importiere fehlende Standard-PDFs direkt:');
       for (String assetPath in standardPDFs) {
-        try {
-          await _importAsset(assetPath, MedienTyp.pdf);
-        } catch (e) {
-          print('Fehler beim Importieren von $assetPath: $e');
+        // Prüfe case-insensitive
+        final normalizedPath = assetPath.toLowerCase();
+        if (!importedAssets.contains(normalizedPath)) {
+          print('  PDF fehlt im Manifest, importiere direkt: $assetPath');
+          try {
+            await _importAsset(assetPath, MedienTyp.pdf);
+          } catch (e) {
+            print('Fehler beim Importieren von $assetPath: $e');
+          }
+        } else {
+          print('  Bereits importiert über Manifest: $assetPath');
         }
       }
 
-      print('Importiere Standard-MP3s direkt:');
+      print('Importiere fehlende Standard-MP3s direkt:');
       for (String assetPath in standardMP3s) {
-        try {
-          await _importAsset(assetPath, MedienTyp.mp3);
-        } catch (e) {
-          print('Fehler beim Importieren von $assetPath: $e');
+        // Prüfe case-insensitive
+        final normalizedPath = assetPath.toLowerCase();
+        if (!importedAssets.contains(normalizedPath)) {
+          print('  MP3 fehlt im Manifest, importiere direkt: $assetPath');
+          try {
+            await _importAsset(assetPath, MedienTyp.mp3);
+          } catch (e) {
+            print('Fehler beim Importieren von $assetPath: $e');
+          }
+        } else {
+          print('  Bereits importiert über Manifest: $assetPath');
         }
       }
 
