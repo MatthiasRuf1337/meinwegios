@@ -260,12 +260,12 @@ class DatabaseService {
       (m) => m.id == medienDateiId,
       orElse: () => throw Exception('Medien-Datei nicht gefunden'),
     );
-    
+
     // Standard-Dateien (preloaded) können nicht gelöscht werden
     if (medienDatei.metadaten['isPreloaded'] == true) {
       throw Exception('Standard-Dateien können nicht gelöscht werden');
     }
-    
+
     final db = await database;
     await db.delete(
       'medien_dateien',
@@ -335,29 +335,32 @@ class DatabaseService {
   Future<void> importPreloadedMedia() async {
     try {
       print('=== Starte Import der vorab geladenen Medien ===');
-      
+
       // Liste der Standard-Dateien (explizit definiert)
       final standardPDFs = [
         'assets/pdf/Die Magie des Pilgerns.pdf',
         'assets/pdf/Mache dich auf den Weg.pdf',
         'assets/pdf/Packliste.pdf',
       ];
-      
+
       final standardMP3s = [
         'assets/audio/3 Minuten Atemraum.mp3',
         'assets/audio/Atem Ruhe Freundlichkeit.mp3',
       ];
-      
+
       // Versuche zuerst über AssetManifest
       try {
-        final manifestContent = await rootBundle.loadString('AssetManifest.json');
+        final manifestContent =
+            await rootBundle.loadString('AssetManifest.json');
         final Map<String, dynamic> manifestMap = json.decode(manifestContent);
-        print('AssetManifest geladen, ${manifestMap.keys.length} Assets gefunden');
-        
+        print(
+            'AssetManifest geladen, ${manifestMap.keys.length} Assets gefunden');
+
         // Debug: Alle Assets ausgeben, die mit assets/pdf/ oder assets/audio/ beginnen
         final allPdfAudioAssets = manifestMap.keys
             .where((String key) =>
-                key.startsWith('assets/pdf/') || key.startsWith('assets/audio/'))
+                key.startsWith('assets/pdf/') ||
+                key.startsWith('assets/audio/'))
             .toList();
         print('Alle PDF/Audio-Assets im Manifest:');
         for (String key in allPdfAudioAssets) {
@@ -391,7 +394,7 @@ class DatabaseService {
         print('Fehler beim Laden über AssetManifest: $e');
         print('Versuche direkten Import der Standard-Dateien...');
       }
-      
+
       // Fallback: Direkter Import der Standard-Dateien
       print('Importiere Standard-PDFs direkt:');
       for (String assetPath in standardPDFs) {
@@ -401,7 +404,7 @@ class DatabaseService {
           print('Fehler beim Importieren von $assetPath: $e');
         }
       }
-      
+
       print('Importiere Standard-MP3s direkt:');
       for (String assetPath in standardMP3s) {
         try {
@@ -422,35 +425,72 @@ class DatabaseService {
   Future<void> reimportPreloadedMedia() async {
     try {
       print('=== Starte Neuimport der vorab geladenen Medien ===');
-      
-      // Assets-Verzeichnis durchsuchen
-      final manifestContent = await rootBundle.loadString('AssetManifest.json');
-      final Map<String, dynamic> manifestMap = json.decode(manifestContent);
 
-      print('AssetManifest geladen, ${manifestMap.keys.length} Assets gefunden');
+      // Liste der Standard-Dateien (explizit definiert)
+      final standardPDFs = [
+        'assets/pdf/Die Magie des Pilgerns.pdf',
+        'assets/pdf/Mache dich auf den Weg.pdf',
+        'assets/pdf/Packliste.pdf',
+      ];
 
-      // PDFs importieren
-      final pdfAssets = manifestMap.keys
-          .where((String key) =>
-              key.startsWith('assets/pdf/') && key.endsWith('.pdf'))
-          .toList();
+      final standardMP3s = [
+        'assets/audio/3 Minuten Atemraum.mp3',
+        'assets/audio/Atem Ruhe Freundlichkeit.mp3',
+      ];
 
-      print('Gefundene PDF-Assets: ${pdfAssets.length}');
-      for (String assetPath in pdfAssets) {
-        print('  - $assetPath');
-        await _importAsset(assetPath, MedienTyp.pdf, forceReimport: true);
+      // Versuche zuerst über AssetManifest
+      try {
+        final manifestContent =
+            await rootBundle.loadString('AssetManifest.json');
+        final Map<String, dynamic> manifestMap = json.decode(manifestContent);
+        print(
+            'AssetManifest geladen, ${manifestMap.keys.length} Assets gefunden');
+
+        // PDFs importieren
+        final pdfAssets = manifestMap.keys
+            .where((String key) =>
+                key.startsWith('assets/pdf/') && key.endsWith('.pdf'))
+            .toList();
+
+        print('Gefundene PDF-Assets im Manifest: ${pdfAssets.length}');
+        for (String assetPath in pdfAssets) {
+          print('  - $assetPath');
+          await _importAsset(assetPath, MedienTyp.pdf, forceReimport: true);
+        }
+
+        // MP3s importieren
+        final mp3Assets = manifestMap.keys
+            .where((String key) =>
+                key.startsWith('assets/audio/') && key.endsWith('.mp3'))
+            .toList();
+
+        print('Gefundene MP3-Assets im Manifest: ${mp3Assets.length}');
+        for (String assetPath in mp3Assets) {
+          print('  - $assetPath');
+          await _importAsset(assetPath, MedienTyp.mp3, forceReimport: true);
+        }
+      } catch (e) {
+        print('Fehler beim Laden über AssetManifest: $e');
+        print('Versuche direkten Import der Standard-Dateien...');
       }
 
-      // MP3s importieren
-      final mp3Assets = manifestMap.keys
-          .where((String key) =>
-              key.startsWith('assets/audio/') && key.endsWith('.mp3'))
-          .toList();
+      // Fallback: Direkter Import der Standard-Dateien
+      print('Importiere Standard-PDFs direkt (forceReimport):');
+      for (String assetPath in standardPDFs) {
+        try {
+          await _importAsset(assetPath, MedienTyp.pdf, forceReimport: true);
+        } catch (e) {
+          print('Fehler beim Importieren von $assetPath: $e');
+        }
+      }
 
-      print('Gefundene MP3-Assets: ${mp3Assets.length}');
-      for (String assetPath in mp3Assets) {
-        print('  - $assetPath');
-        await _importAsset(assetPath, MedienTyp.mp3, forceReimport: true);
+      print('Importiere Standard-MP3s direkt (forceReimport):');
+      for (String assetPath in standardMP3s) {
+        try {
+          await _importAsset(assetPath, MedienTyp.mp3, forceReimport: true);
+        } catch (e) {
+          print('Fehler beim Importieren von $assetPath: $e');
+        }
       }
 
       print('=== Neuimport der vorab geladenen Medien abgeschlossen ===');
@@ -462,10 +502,12 @@ class DatabaseService {
   }
 
   // Einzelne Asset-Datei importieren
-  Future<void> _importAsset(String assetPath, MedienTyp typ, {bool forceReimport = false}) async {
+  Future<void> _importAsset(String assetPath, MedienTyp typ,
+      {bool forceReimport = false}) async {
     try {
-      print('Importiere Asset: $assetPath (Typ: ${typ == MedienTyp.pdf ? 'PDF' : 'MP3'})');
-      
+      print(
+          'Importiere Asset: $assetPath (Typ: ${typ == MedienTyp.pdf ? 'PDF' : 'MP3'})');
+
       // Datei aus Assets laden
       final ByteData data = await rootBundle.load(assetPath);
       final List<int> bytes = data.buffer.asUint8List();
@@ -474,7 +516,7 @@ class DatabaseService {
       // Dateiname aus Pfad extrahieren
       final fileName = assetPath.split('/').last;
       final extension = typ == MedienTyp.pdf ? '.pdf' : '.mp3';
-      
+
       // ID generieren: Extension entfernen und Leerzeichen durch Unterstriche ersetzen
       String baseName = fileName;
       if (baseName.toLowerCase().endsWith(extension.toLowerCase())) {
@@ -493,7 +535,7 @@ class DatabaseService {
         existingMediaItem = null;
       }
       print('Bereits vorhandene Medien: ${existingMedia.length}');
-      
+
       // Wenn bereits vorhanden, prüfe ob Datei noch existiert
       if (existingMediaItem != null) {
         final file = File(existingMediaItem.dateipfad);
@@ -505,12 +547,14 @@ class DatabaseService {
             print('Standard-Datei aktualisiert: $fileName');
           } else {
             // Normal: Datei existiert, überspringe Import
-            print('Vorab geladenes Medium bereits vorhanden (ID: $id): $fileName');
+            print(
+                'Vorab geladenes Medium bereits vorhanden (ID: $id): $fileName');
           }
           return;
         } else {
           // Datei fehlt, lösche DB-Eintrag und importiere neu
-          print('Standard-Datei existiert in DB, aber Datei fehlt. Importiere neu: $fileName');
+          print(
+              'Standard-Datei existiert in DB, aber Datei fehlt. Importiere neu: $fileName');
           final db = await database;
           await db.delete(
             'medien_dateien',
@@ -538,7 +582,8 @@ class DatabaseService {
       }
 
       final fileSize = file.lengthSync();
-      print('${typ == MedienTyp.pdf ? 'PDF' : 'MP3'} erfolgreich kopiert nach: $targetPath');
+      print(
+          '${typ == MedienTyp.pdf ? 'PDF' : 'MP3'} erfolgreich kopiert nach: $targetPath');
       print('Dateigröße: $fileSize bytes');
 
       // MedienDatei-Objekt erstellen
@@ -557,7 +602,8 @@ class DatabaseService {
 
       // In Datenbank speichern
       await insertMedienDatei(medienDatei);
-      print('✓ Vorab geladenes ${typ == MedienTyp.pdf ? 'PDF' : 'MP3'} erfolgreich importiert: $fileName (ID: $id)');
+      print(
+          '✓ Vorab geladenes ${typ == MedienTyp.pdf ? 'PDF' : 'MP3'} erfolgreich importiert: $fileName (ID: $id)');
     } catch (e, stackTrace) {
       print('FEHLER beim Importieren von $assetPath: $e');
       print('Stack Trace: $stackTrace');
