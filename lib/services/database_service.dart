@@ -340,7 +340,7 @@ class DatabaseService {
       final standardPDFs = [
         'assets/pdf/Die Magie des Pilgerns.pdf',
         'assets/pdf/Mache dich auf den Weg.pdf',
-        'assets/pdf/Packliste Wandern.pdf',
+        'assets/pdf/Deine Packliste.pdf',
       ];
 
       final standardMP3s = [
@@ -464,7 +464,7 @@ class DatabaseService {
       final standardPDFs = [
         'assets/pdf/Die Magie des Pilgerns.pdf',
         'assets/pdf/Mache dich auf den Weg.pdf',
-        'assets/pdf/Packliste Wandern.pdf',
+        'assets/pdf/Deine Packliste.pdf',
       ];
 
       final standardMP3s = [

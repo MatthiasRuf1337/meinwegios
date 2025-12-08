@@ -46,7 +46,7 @@ class MedienDatei {
       'Thumbnail_Die_Magie_des_Pilgerns.jpg',
       'Thumbnail_Mache_dich_auf_den_Weg.jpg',
       'Thumbnail_Packliste.jpg',
-      'Thumbnail_Packliste_Wandern.jpg',
+      'Thumbnail_Deine_Packliste.jpg',
     ];
 
     if (knownThumbnails.contains(thumbnailName)) {
@@ -181,8 +181,8 @@ class MedienDatei {
         baseName = 'Die Magie des Pilgerns';
       } else if (nameLower == 'mache dich auf den weg') {
         baseName = 'Mache dich auf den Weg';
-      } else if (nameLower == 'packliste wandern') {
-        baseName = 'Packliste Wandern';
+      } else if (nameLower == 'deine packliste') {
+        baseName = 'Deine Packliste';
       } else {
         baseName = name;
       }
