@@ -123,10 +123,12 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
     print('Initialisiere Tracking für Etappe: ${widget.etappe.name}');
 
     // Prüfen, ob Bewegungsdaten-Berechtigung verweigert wurde
-    final hasActivityPermission = await PermissionService.checkActivityRecognitionPermission();
+    final hasActivityPermission =
+        await PermissionService.checkActivityRecognitionPermission();
     if (!hasActivityPermission) {
       // Prüfen, ob die Berechtigung bereits einmal angefordert wurde
-      final wasRequested = await PermissionService.requestActivityRecognitionPermission();
+      final wasRequested =
+          await PermissionService.requestActivityRecognitionPermission();
       if (!wasRequested) {
         // Berechtigung wurde verweigert, Dialog anzeigen
         _showActivityRecognitionPermissionDialog();
@@ -1005,31 +1007,132 @@ class _EtappeTrackingScreenNewState extends State<EtappeTrackingScreenNew>
 
         await DatabaseService.instance.insertBild(bild);
 
-        // Bild auch in die Galerie speichern
-        bool gallerySaved = false;
-        try {
-          // await ImageGallerySaver.saveFile(savedFile.path); // Temporarily disabled
-          gallerySaved = true; // Assume success for now
-        } catch (e) {
-          print('Fehler beim Speichern in die Galerie: $e');
-          // Galerie-Fehler nicht als kritisch behandeln
-        }
-
         // Provider aktualisieren
         final bilderProvider =
             Provider.of<BilderProvider>(context, listen: false);
         await bilderProvider.loadBilder();
 
-        // Foto erfolgreich aufgenommen - keine Benachrichtigung mehr
+        // Prüfen, ob Foto-Galerie-Berechtigung vorhanden ist
+        final hasPhotosPermission =
+            await PermissionService.checkPhotosPermission();
+        if (!hasPhotosPermission) {
+          // Dialog mit Warnmeldung anzeigen
+          _showPhotoPermissionWarningDialog();
+        }
       }
     } catch (e) {
+      // Prüfen, ob es ein Berechtigungsfehler war
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('permission') ||
+          errorString.contains('denied') ||
+          errorString.contains('camera_access_denied') ||
+          errorString.contains('access_denied')) {
+        // Prüfen, ob die Kamera-Berechtigung tatsächlich verweigert wurde
+        final hasPermission = await PermissionService.checkCameraPermission();
+        if (!hasPermission) {
+          _showCameraPermissionDialog();
+          return;
+        }
+      }
+
+      // Spezifische Fehlermeldung für andere Kamera-Fehler
+      String errorMessage = 'Fehler beim Aufnehmen des Fotos';
+      if (e.toString().contains('camera') ||
+          e.toString().contains('unavailable')) {
+        errorMessage =
+            'Kamera nicht verfügbar. Bitte überprüfen Sie, ob die Kamera von einer anderen App verwendet wird.';
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Fehler beim Aufnehmen des Fotos: $e'),
+          content: Text(errorMessage),
           backgroundColor: Color(0xFF8C0A28),
+          duration: Duration(seconds: 4),
         ),
       );
     }
+  }
+
+  void _showCameraPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.camera_alt, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Berechtigung erforderlich',
+                softWrap: true,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Für das Aufnehmen von Fotos benötigt die App die Kamera-Berechtigung. '
+          'Bitte aktivieren Sie diese in den Einstellungen.\n\n'
+          'Achtung: Bei Nicht-Aktivierung werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPhotoPermissionWarningDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Berechtigung erforderlich',
+                softWrap: true,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Achtung: Bei Nicht-Aktivierung werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _recordAudio() async {

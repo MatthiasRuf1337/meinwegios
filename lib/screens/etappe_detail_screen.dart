@@ -148,7 +148,9 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
               left: 16,
               right: 16,
               top: 16,
-              bottom: widget.fromCompletedScreen ? 100 : 16, // Extra Platz für BottomNavigationBar auf Android
+              bottom: widget.fromCompletedScreen
+                  ? 100
+                  : 16, // Extra Platz für BottomNavigationBar auf Android
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -634,7 +636,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
 
                 // Audio-Aufnahmen Sektion
                 AudioRecordingWidget(etappenId: widget.etappe.id),
-                
+
                 // Zusätzliches Padding am Ende für Android BottomNavigationBar
                 SizedBox(height: widget.fromCompletedScreen ? 100 : 16),
               ],
@@ -813,8 +815,11 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
       }
     } catch (e) {
       // Prüfen, ob es ein Berechtigungsfehler war
-      if (e.toString().contains('permission') ||
-          e.toString().contains('denied')) {
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('permission') ||
+          errorString.contains('denied') ||
+          errorString.contains('camera_access_denied') ||
+          errorString.contains('access_denied')) {
         // Prüfen, ob die Kamera-Berechtigung tatsächlich verweigert wurde
         final hasPermission = await PermissionService.checkCameraPermission();
         if (!hasPermission) {
@@ -849,12 +854,18 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
           children: [
             Icon(Icons.camera_alt, color: Color(0xFF5A7D7D)),
             SizedBox(width: 8),
-            Text('Berechtigung erforderlich'),
+            Expanded(
+              child: Text(
+                'Berechtigung erforderlich',
+                softWrap: true,
+              ),
+            ),
           ],
         ),
         content: Text(
           'Für das Aufnehmen von Fotos benötigt die App die Kamera-Berechtigung. '
-          'Bitte aktivieren Sie diese in den Einstellungen.',
+          'Bitte aktivieren Sie diese in den Einstellungen.\n\n'
+          'Achtung: Bei Nicht-Aktivierung werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
         ),
         actions: [
           TextButton(
@@ -926,7 +937,12 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
           children: [
             Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
             SizedBox(width: 8),
-            Text('Berechtigung erforderlich'),
+            Expanded(
+              child: Text(
+                'Berechtigung erforderlich',
+                softWrap: true,
+              ),
+            ),
           ],
         ),
         content: Text(
@@ -938,6 +954,46 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text('Abbrechen'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              PermissionService.openAppSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF5A7D7D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Einstellungen öffnen'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPhotoPermissionWarningDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.photo_library, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Berechtigung erforderlich',
+                softWrap: true,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Achtung: Bei Nicht-Aktivierung werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -994,22 +1050,20 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
 
       await DatabaseService.instance.insertBild(bild);
 
-      // Bild auch in die Galerie speichern
-      bool gallerySaved = false;
-      try {
-        // await ImageGallerySaver.saveFile(savedFile.path); // Temporarily disabled
-        gallerySaved = true; // Assume success for now
-      } catch (e) {
-        print('Fehler beim Speichern in die Galerie: $e');
-        // Galerie-Fehler nicht als kritisch behandeln
-      }
-
       // Provider aktualisieren
       final bilderProvider =
           Provider.of<BilderProvider>(context, listen: false);
       await bilderProvider.loadBilder();
 
-      // Bild erfolgreich hinzugefügt - keine Benachrichtigung mehr
+      // Prüfen, ob Foto-Galerie-Berechtigung vorhanden ist (nur bei Kamera-Aufnahmen)
+      if (source == 'camera') {
+        final hasPhotosPermission =
+            await PermissionService.checkPhotosPermission();
+        if (!hasPhotosPermission) {
+          // Dialog mit Warnmeldung anzeigen
+          _showPhotoPermissionWarningDialog();
+        }
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
