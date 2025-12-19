@@ -154,7 +154,19 @@ class BackgroundPermissionService {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Berechtigung erforderlich'),
+        title: Row(
+          children: [
+            Icon(Icons.location_on, color: Color(0xFF5A7D7D)),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Berechtigung erforderlich',
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          ],
+        ),
         content: Text(
           'Bitte aktivieren Sie in den Einstellungen die Standort-Berechtigung "Immer" für die Live-Aufzeichnung.',
         ),

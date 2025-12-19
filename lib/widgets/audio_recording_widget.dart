@@ -199,7 +199,13 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
           children: [
             Icon(Icons.mic, color: Color(0xFF5A7D7D)),
             SizedBox(width: 8),
-            Text('Berechtigung erforderlich'),
+            Expanded(
+              child: Text(
+                'Berechtigung erforderlich',
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+            ),
           ],
         ),
         content: Text(

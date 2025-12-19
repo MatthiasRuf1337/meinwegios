@@ -858,6 +858,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
               child: Text(
                 'Berechtigung erforderlich',
                 softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ],
@@ -865,7 +866,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
         content: Text(
           'Für das Aufnehmen von Fotos benötigt die App die Kamera-Berechtigung. '
           'Bitte aktivieren Sie diese in den Einstellungen.\n\n'
-          'Achtung: Bei Nicht-Aktivierung werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
+          'Achtung: Bei Nicht-Aktivierung der Funktion „Fotos“ oder „Galerie“ werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
         ),
         actions: [
           TextButton(
@@ -941,6 +942,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
               child: Text(
                 'Berechtigung erforderlich',
                 softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ],
@@ -948,7 +950,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
         content: Text(
           'Für den Zugriff auf Ihre Fotos benötigt die App die Foto-Berechtigung. '
           'Bitte aktivieren Sie diese in den Einstellungen.\n\n'
-          'Achtung: Bei Nicht-Aktivierung werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
+          'Achtung: Bei Nicht-Aktivierung der Funktion „Fotos“ oder „Galerie“ werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
         ),
         actions: [
           TextButton(
@@ -983,12 +985,13 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
               child: Text(
                 'Berechtigung erforderlich',
                 softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ],
         ),
         content: Text(
-          'Achtung: Bei Nicht-Aktivierung werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
+          'Achtung: Bei Nicht-Aktivierung der Funktion „Fotos“ oder „Galerie“ werden Fotos ausschließlich in der App gespeichert und beim Löschen der App ebenfalls gelöscht.',
         ),
         actions: [
           TextButton(
