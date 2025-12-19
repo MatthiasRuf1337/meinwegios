@@ -1059,6 +1059,7 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
       await bilderProvider.loadBilder();
 
       // Bild auch in die Galerie speichern - nur bei Kamera-Aufnahmen und nur auf iOS
+      // iOS: Fotos werden automatisch in der Foto-Galerie gespeichert, wenn Berechtigung vorhanden ist
       if (source == 'camera' && Platform.isIOS) {
         final hasPhotosPermission =
             await PermissionService.checkPhotosPermission();
