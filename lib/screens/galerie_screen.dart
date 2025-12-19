@@ -8,6 +8,7 @@ import '../models/bild.dart';
 import 'bild_detail_screen.dart';
 import '../widgets/legal_menu_widget.dart';
 import '../services/permission_service.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'dart:io';
 
 class GalerieScreen extends StatefulWidget {
@@ -367,12 +368,21 @@ class _GalerieScreenState extends State<GalerieScreen> {
       if (image != null) {
         await _importImage(File(image.path));
 
-        // Prüfen, ob Foto-Galerie-Berechtigung vorhanden ist
-        final hasPhotosPermission =
-            await PermissionService.checkPhotosPermission();
-        if (!hasPhotosPermission) {
-          // Dialog mit Warnmeldung anzeigen
-          _showPhotoPermissionWarningDialog();
+        // Bild auch in die Galerie speichern - nur auf iOS
+        if (Platform.isIOS) {
+          final hasPhotosPermission =
+              await PermissionService.checkPhotosPermission();
+          if (hasPhotosPermission) {
+            try {
+              await ImageGallerySaver.saveFile(image.path);
+            } catch (e) {
+              print('Fehler beim Speichern in die Galerie: $e');
+              // Galerie-Fehler nicht als kritisch behandeln
+            }
+          } else {
+            // Dialog mit Warnmeldung anzeigen
+            _showPhotoPermissionWarningDialog();
+          }
         }
       }
     } catch (e) {

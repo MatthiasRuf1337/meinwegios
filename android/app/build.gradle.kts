@@ -18,7 +18,9 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.marcobachpilgern.meinweg"
     compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    // NDK r28+ is REQUIRED for 16KB page size support (Google Play requirement)
+    // Install via: Android Studio → SDK Manager → SDK Tools → NDK (Side by side) → 28.0.12674087
+    ndkVersion = "28.0.12674087"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -37,6 +39,8 @@ android {
         versionName = flutter.versionName
         ndk {
             debugSymbolLevel = "FULL"
+            // Support for 16 KB page size
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86_64"))
         }
     }
     
@@ -44,9 +48,24 @@ android {
     packaging {
         jniLibs {
             useLegacyPackaging = false
+            // Ensure native libraries are aligned for 16 KB pages
+            keepDebugSymbols += "**/*.so"
         }
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    
+    // Ensure native libraries are properly aligned for 16 KB pages
+    bundle {
+        language {
+            enableSplit = false
+        }
+        density {
+            enableSplit = false
+        }
+        abi {
+            enableSplit = true
         }
     }
 

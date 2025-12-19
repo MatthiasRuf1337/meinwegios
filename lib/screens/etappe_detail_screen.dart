@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-// import 'package:image_gallery_saver/image_gallery_saver.dart'; // Temporarily disabled
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import '../models/etappe.dart';
 import '../models/bild.dart';
 import '../models/notiz.dart';
@@ -1058,11 +1058,18 @@ class _EtappeDetailScreenState extends State<EtappeDetailScreen>
           Provider.of<BilderProvider>(context, listen: false);
       await bilderProvider.loadBilder();
 
-      // Prüfen, ob Foto-Galerie-Berechtigung vorhanden ist (nur bei Kamera-Aufnahmen)
-      if (source == 'camera') {
+      // Bild auch in die Galerie speichern - nur bei Kamera-Aufnahmen und nur auf iOS
+      if (source == 'camera' && Platform.isIOS) {
         final hasPhotosPermission =
             await PermissionService.checkPhotosPermission();
-        if (!hasPhotosPermission) {
+        if (hasPhotosPermission) {
+          try {
+            await ImageGallerySaver.saveFile(savedFile.path);
+          } catch (e) {
+            print('Fehler beim Speichern in die Galerie: $e');
+            // Galerie-Fehler nicht als kritisch behandeln
+          }
+        } else {
           // Dialog mit Warnmeldung anzeigen
           _showPhotoPermissionWarningDialog();
         }

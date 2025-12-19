@@ -1,7 +1,7 @@
 name: meinweg
 description: Etappen-Tracking App für Wanderungen und Touren
 publish_to: 'none'
-version: 1.2.1+24
+version: 1.2.2+27
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -27,7 +27,7 @@ dependencies:
   image_picker: ^1.0.4
   camera: ^0.10.5+5
   file_picker: ^8.0.0+1
-  # image_gallery_saver: ^2.0.3  # Temporarily disabled for Android compatibility
+  image_gallery_saver: ^2.0.3  # Used for iOS gallery saving only
   uuid: ^4.0.0
 
   # PDF und Audio

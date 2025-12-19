@@ -93,14 +93,24 @@ class LegalMenuWidget extends StatelessWidget {
 
     try {
       final Uri uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(
+      // Versuche die URL direkt zu öffnen
+      // Bei Android 11+ kann canLaunchUrl() fälschlicherweise false zurückgeben
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      
+      if (!launched) {
+        // Fallback: Versuche es mit inAppWebView falls externalApplication fehlschlägt
+        final launchedInApp = await launchUrl(
           uri,
-          mode: LaunchMode.externalApplication,
+          mode: LaunchMode.platformDefault,
         );
-      } else {
-        _showErrorDialog(context, 'Link konnte nicht geöffnet werden',
-            'Die Webseite $url konnte nicht geöffnet werden.');
+        
+        if (!launchedInApp) {
+          _showErrorDialog(context, 'Link konnte nicht geöffnet werden',
+              'Die Webseite $url konnte nicht geöffnet werden. Bitte überprüfen Sie Ihre Internetverbindung.');
+        }
       }
     } catch (e) {
       _showErrorDialog(context, 'Fehler',
