@@ -57,7 +57,7 @@ Die App benötigt folgende Berechtigungen:
 - **Framework**: Flutter
 - **Datenbank**: SQLite (sqflite)
 - **GPS**: geolocator
-- **PDF-Viewer**: flutter_pdfview
+- **PDF-Viewer**: syncfusion_flutter_pdfviewer
 - **Audio**: just_audio
 - **State Management**: Provider
 
