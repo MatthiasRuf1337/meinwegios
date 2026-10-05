@@ -34,7 +34,8 @@ android {
     defaultConfig {
         applicationId = "com.marcobachpilgern.meinweg"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        // Google Play verlangt ab 31.08.2026 targetSdk 36 (Android 16)
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         ndk {
@@ -48,8 +49,6 @@ android {
     packaging {
         jniLibs {
             useLegacyPackaging = false
-            // Ensure native libraries are aligned for 16 KB pages
-            keepDebugSymbols += "**/*.so"
         }
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"

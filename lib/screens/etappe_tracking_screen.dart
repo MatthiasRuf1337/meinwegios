@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:gal/gal.dart';
 import '../providers/etappen_provider.dart';
 import '../models/etappe.dart';
 import '../models/etappe.dart' as etappe_models;
@@ -1177,7 +1177,7 @@ class _EtappeTrackingScreenState extends State<EtappeTrackingScreen>
             await PermissionService.checkPhotosPermission();
         if (hasPhotosPermission) {
           try {
-            await ImageGallerySaver.saveFile(photo.path);
+            await Gal.putImage(photo.path);
             gallerySaved = true;
           } catch (e) {
             print('Fehler beim Speichern in die Galerie: $e');

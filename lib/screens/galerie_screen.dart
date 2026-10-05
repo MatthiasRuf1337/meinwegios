@@ -8,7 +8,7 @@ import '../models/bild.dart';
 import 'bild_detail_screen.dart';
 import '../widgets/legal_menu_widget.dart';
 import '../services/permission_service.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:gal/gal.dart';
 import 'dart:io';
 
 class GalerieScreen extends StatefulWidget {
@@ -374,7 +374,7 @@ class _GalerieScreenState extends State<GalerieScreen> {
               await PermissionService.checkPhotosPermission();
           if (hasPhotosPermission) {
             try {
-              await ImageGallerySaver.saveFile(image.path);
+              await Gal.putImage(image.path);
             } catch (e) {
               print('Fehler beim Speichern in die Galerie: $e');
               // Galerie-Fehler nicht als kritisch behandeln
